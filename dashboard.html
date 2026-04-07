@@ -425,7 +425,13 @@ function buildIframeHTML(code){
 ${safe}
 try{const r=ReactDOM.createRoot(document.getElementById('root'));r.render(React.createElement(Widget));}
 catch(e){document.getElementById('root').innerHTML='<div style="padding:10px;color:#dc2626;font-size:12px;background:#fef2f2;border-radius:6px"><strong>Fout:</strong> '+e.message+'</div>';}
-<\/script></body></html>`;
+<\/script>
+<script>
+function reportHeight(){const h=document.documentElement.scrollHeight;window.parent.postMessage({type:'iframeResize',height:h},'*');}
+setTimeout(reportHeight,200);setTimeout(reportHeight,800);
+new ResizeObserver(reportHeight).observe(document.body);
+<\/script>
+</body></html>`;
 }
 
 function saveWidgets(){
@@ -476,7 +482,7 @@ function widgetCardHTML(w){
     </div>
   </div>
   <iframe id="${iframeId}" srcdoc="${srcdoc}" sandbox="allow-scripts"
-    style="width:100%;height:${h}px;border:none;display:block"></iframe>
+    style="width:100%;height:${h}px;border:none;display:block;transition:height .2s ease"></iframe>
 </div>`;
 }
 
@@ -1863,7 +1869,7 @@ function render(){
   document.getElementById('tb-title').textContent=meta.title;
   document.getElementById('tb-sub').textContent=meta.sub;
   // Hide scenario bar on compare and my-dashboard views
-  document.querySelector('.scenario-bar').style.display=(mod==='compare'||mod==='my-dashboard')?'none':'';
+  document.querySelector('.scenario-bar').style.display=(mod==='compare')?'none':'';
   if(mod==='finance')renderFinance();
   else if(mod==='revenue')renderRevenue();
   else if(mod==='marketing')renderMarketing();
@@ -1879,6 +1885,7 @@ function render(){
 // NAV
 // ═══════════════════════════════════════════════════════
 const MODULES = [
+  {key:'my-dashboard',  label:'My Dashboard',       icon:'dashboard'},
   {key:'finance',       label:'Finance',           icon:null},
   {key:'revenue',       label:'Revenue',            icon:null},
   {key:'marketing',     label:'Marketing',          icon:null},
@@ -1886,7 +1893,6 @@ const MODULES = [
   {key:'logistics',     label:'Logistics',          icon:null},
   {key:'projects',      label:'Projects',           icon:null},
   {key:'compare',       label:'Compare Scenarios',  icon:'compare'},
-  {key:'my-dashboard',  label:'My Dashboard',       icon:'dashboard'},
 ];
 const NAV_ICONS = {
   briefcase:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;opacity:.8;margin-right:8px"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>`,
@@ -2065,6 +2071,15 @@ async function loadAndRender(){
     overlay.appendChild(errEl);
   }
 }
+
+// Auto-resize iframes based on their content height
+window.addEventListener('message', function(e){
+  if(!e.data || e.data.type !== 'iframeResize') return;
+  const iframes = document.querySelectorAll('iframe[id^="wif-"]');
+  iframes.forEach(function(f){
+    try{ if(f.contentWindow === e.source){ f.style.height = e.data.height + 'px'; } }catch(_){}
+  });
+});
 
 // Init
 document.body.classList.add('chat-open');
