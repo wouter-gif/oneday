@@ -424,7 +424,7 @@ function buildIframeHTML(code){
 <script type="text/babel" data-presets="react">
 ${safe}
 try{const r=ReactDOM.createRoot(document.getElementById('root'));r.render(React.createElement(Widget));}
-catch(e){document.getElementById('root').innerHTML='<div style="padding:10px;color:#dc2626;font-size:12px;background:#fef2f2;border-radius:6px"><strong>Fout:</strong> '+e.message+'</div>';}
+catch(e){document.getElementById('root').innerHTML='<div style="padding:10px;color:#dc2626;font-size:12px;background:#fef2f2;border-radius:6px"><strong>Error:</strong> '+e.message+'</div>';}
 <\/script>
 <script>
 function reportHeight(){const h=document.documentElement.scrollHeight;window.parent.postMessage({type:'iframeResize',height:h},'*');}
@@ -478,7 +478,7 @@ function widgetCardHTML(w){
   <div class="widget-title-bar">
     <span>${w.title||'Widget'}</span>
     <div class="widget-actions">
-      <button class="widget-del-btn" onclick="deleteWidget('${w.id}')" title="Verwijder widget">✕</button>
+      <button class="widget-del-btn" onclick="deleteWidget('${w.id}')" title="Remove widget">✕</button>
     </div>
   </div>
   <iframe id="${iframeId}" srcdoc="${srcdoc}" sandbox="allow-scripts"
@@ -492,13 +492,13 @@ function renderWidgets(){
   if(widgets.length === 0){
     el.innerHTML = `<div class="widget-empty">
       <div class="widget-empty-icon">✦</div>
-      <div class="widget-empty-title">Jouw dashboard is leeg</div>
-      <div class="widget-empty-body">Typ in de chat hiernaast wat je wilt zien — een omzetgrafiek, KPI-kaart, teamverdeling — en One Day AI bouwt het voor je.</div>
+      <div class="widget-empty-title">Your dashboard is empty</div>
+      <div class="widget-empty-body">Type in the chat what you'd like to see — a revenue chart, KPI card, team breakdown — and One Day AI will build it for you.</div>
       <div class="widget-hints-row">
-        <span class="widget-hint-chip" onclick="setWidgetHint(this)">Maak een omzetgrafiek</span>
-        <span class="widget-hint-chip" onclick="setWidgetHint(this)">Voeg een KPI-overzicht toe</span>
-        <span class="widget-hint-chip" onclick="setWidgetHint(this)">Laat de teamverdeling zien</span>
-        <span class="widget-hint-chip" onclick="setWidgetHint(this)">Seizoensverloop omzet</span>
+        <span class="widget-hint-chip" onclick="setWidgetHint(this)">Create a revenue chart</span>
+        <span class="widget-hint-chip" onclick="setWidgetHint(this)">Add a KPI overview</span>
+        <span class="widget-hint-chip" onclick="setWidgetHint(this)">Show team breakdown</span>
+        <span class="widget-hint-chip" onclick="setWidgetHint(this)">Seasonal revenue trend</span>
       </div>
     </div>`;
   } else {
@@ -1391,12 +1391,12 @@ function renderChat(){
       <div class="chat-welcome">
         <div class="chat-welcome-av">✦</div>
         <div class="chat-welcome-title">Dashboard builder</div>
-        <div class="chat-welcome-body">Vertel me welke widget je wilt — een grafiek, KPI-kaart of tabel. Ik genereer hem direct voor jou.</div>
+        <div class="chat-welcome-body">Tell me which widget you want — a chart, KPI card, or table. I'll generate it for you right away.</div>
         <div class="chat-hints">
-          <div class="chat-hint">Maak een staafgrafiek van de maandelijkse omzet</div>
-          <div class="chat-hint">Voeg een KPI-kaart toe met MRR, omzet en marge</div>
-          <div class="chat-hint">Toon de teamverdeling als cirkeldiagram</div>
-          <div class="chat-hint">Wat is onze beste maand in de base case?</div>
+          <div class="chat-hint">Create a bar chart of monthly revenue</div>
+          <div class="chat-hint">Add a KPI card with MRR, revenue and margin</div>
+          <div class="chat-hint">Show team breakdown as a pie chart</div>
+          <div class="chat-hint">What is our best month in the base case?</div>
         </div>
       </div>`;
   } else {
@@ -1844,7 +1844,7 @@ const MODULE_META={
   logistics:    {title:'Logistics',          sub:'Inventory, shipments & supplier performance · FY 2026'},
   projects:     {title:'Projects',           sub:'Operational initiatives & budget tracking · FY 2026'},
   compare:      {title:'Compare Scenarios',  sub:'All five scenarios · Key outcomes side by side · FY 2026'},
-  'my-dashboard':{title:'My Dashboard',     sub:'Jouw persoonlijke widgets · gebouwd via AI'},
+  'my-dashboard':{title:'My Dashboard',     sub:'Your personal widgets · built by AI'},
 };
 
 // ═══════════════════════════════════════════════════════
@@ -1856,8 +1856,8 @@ const MODULE_META={
 function renderMyDashboard(){
   document.getElementById('content').innerHTML = `
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-  <div class="wdb-section-title" style="margin:0">Jouw widgets</div>
-  ${widgets.length > 0 ? `<button onclick="if(confirm('Alle widgets verwijderen?')){widgets=[];saveWidgets();renderWidgets();}" style="font-size:11px;color:var(--txt3);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:4px;transition:all .15s" onmouseover="this.style.color='#dc2626'" onmouseout="this.style.color='var(--txt3)'">Alles wissen</button>` : ''}
+  <div class="wdb-section-title" style="margin:0">Your widgets</div>
+  ${widgets.length > 0 ? `<button onclick="if(confirm('Remove all widgets?')){widgets=[];saveWidgets();renderWidgets();}" style="font-size:11px;color:var(--txt3);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:4px;transition:all .15s" onmouseover="this.style.color='#dc2626'" onmouseout="this.style.color='var(--txt3)'">Clear all</button>` : ''}
 </div>
 <div id="widget-canvas"></div>`;
   renderWidgets();
