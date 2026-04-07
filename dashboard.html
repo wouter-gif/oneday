@@ -412,7 +412,7 @@ function scanCode(code){
 }
 
 function buildIframeHTML(code){
-  // Escape </script> to prevent HTML injection
+  // Escape closing script tags to prevent HTML injection
   const safe = code.replace(/<\/script>/gi, '<\\/script>');
   return `<!DOCTYPE html><html lang="nl"><head><meta charset="UTF-8">
 <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:transparent;overflow:hidden}#root{width:100%;min-height:100%;padding:14px}</style>
