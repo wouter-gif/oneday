@@ -1,0 +1,2074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Polar Bear Icecream — Business Intelligence Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --teal:#4fc3a1;--blue:#2563eb;--dark:#1a2535;--darker:#111827;
+  --sw:220px;--th:60px;--sh:50px;--cw:310px;
+  --txt:#1f2937;--txt2:#6b7280;--txt3:#9ca3af;
+  --bg:#f1f5f9;--white:#fff;--bdr:#e5e7eb;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--txt);display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:var(--sw);background:var(--dark);display:flex;flex-direction:column;flex-shrink:0;position:fixed;left:0;top:0;bottom:0;z-index:100}
+.sb-logo{padding:18px 16px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sb-brand{display:flex;align-items:center;gap:10px}
+.sb-brand svg{flex-shrink:0}
+.sb-title{font-size:14px;font-weight:700;color:#fff;line-height:1.2}
+.sb-sub{font-size:10px;color:var(--teal);letter-spacing:.8px;text-transform:uppercase;margin-top:2px}
+.sb-nav{padding:16px 0;flex:1}
+.nav-group-label{font-size:10px;font-weight:600;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:1.5px;padding:0 16px 8px}
+.nav-item{display:flex;align-items:center;padding:10px 16px;cursor:pointer;color:rgba(255,255,255,.55);font-size:13.5px;font-weight:500;transition:all .15s;border-left:3px solid transparent;letter-spacing:.01em}
+.nav-item:hover{background:rgba(255,255,255,.05);color:#fff}
+.nav-item.active{background:rgba(79,195,161,.12);color:var(--teal);border-left-color:var(--teal)}
+.nav-item-primary{color:rgba(255,255,255,.9);font-size:14px;font-weight:600;padding:11px 16px}
+.nav-item-primary:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav-item-primary.active{background:rgba(37,99,235,.2);color:#93c5fd;border-left-color:#3b82f6}
+.nav-divider{height:1px;background:rgba(255,255,255,.08);margin:10px 16px}.sb-footer{padding:14px 16px;border-top:1px solid rgba(255,255,255,.08);font-size:11px;color:rgba(255,255,255,.3)}
+.nav-star{margin-left:auto;flex-shrink:0;opacity:0;font-size:13px;color:rgba(255,255,255,.35);transition:opacity .15s,color .15s;padding:2px 5px;line-height:1;border-radius:3px}
+.nav-item:hover .nav-star{opacity:1}
+.nav-star.starred{opacity:1;color:#f59e0b}
+.nav-star:hover{color:#fbbf24!important;background:rgba(251,191,36,.12)}
+.sb-footer strong{color:rgba(255,255,255,.5)}
+
+/* MAIN */
+.main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden;transition:margin-right .3s ease}
+body.chat-open .main{margin-right:var(--cw)}
+.topbar{background:var(--white);border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:var(--th);flex-shrink:0}
+.tb-title{font-size:17px;font-weight:700;color:var(--txt)}
+.tb-sub{font-size:11px;color:var(--txt2);margin-top:1px}
+.tb-badge{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
+
+.scenario-bar{background:var(--white);border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 24px;gap:6px;height:var(--sh);flex-shrink:0}
+.sc-label{font-size:11px;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin-right:6px}
+.sc-btn{padding:5px 13px;border-radius:20px;border:1.5px solid var(--bdr);background:transparent;font-size:12px;font-weight:500;color:var(--txt2);cursor:pointer;transition:all .15s;white-space:nowrap}
+.sc-btn:hover{border-color:var(--blue);color:var(--blue)}
+.sc-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
+
+.content{flex:1;overflow-y:auto;padding:20px 24px}
+
+/* CARDS */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.kpi-card{background:var(--white);border-radius:12px;padding:18px 20px;border:1px solid var(--bdr)}
+.kpi-lbl{font-size:11px;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.kpi-val{font-size:26px;font-weight:700;color:var(--txt);line-height:1}
+.kpi-chg{margin-top:5px;font-size:12px;font-weight:500}
+.pos{color:#16a34a}.neg{color:#dc2626}.neu{color:var(--txt2)}
+.kpi-accent{width:3px;height:36px;border-radius:2px;position:absolute;left:0;top:50%;transform:translateY(-50%)}
+.kpi-card{position:relative;overflow:hidden}
+
+/* CHART CONTAINERS */
+.cg2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.cg1{display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:16px}
+.cg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+.cc{background:var(--white);border-radius:12px;padding:18px 20px;border:1px solid var(--bdr);min-width:0}
+.cc-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.cc-title{font-size:14px;font-weight:600;color:var(--txt)}
+.cc-sub{font-size:11px;color:var(--txt2);margin-top:2px}
+.badge-actual{background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:600;display:inline-block}
+.badge-fcst{background:#eff6ff;color:#2563eb;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:600;display:inline-block}
+
+/* SCENARIO CALLOUT */
+.sc-callout{border-radius:10px;padding:11px 16px;margin-bottom:18px;font-size:13px;display:flex;align-items:center;gap:10px;border:1px solid}
+.sc-callout.hidden{display:none}
+.sc-callout-icon{font-size:18px;flex-shrink:0}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--bdr)}
+.dt{width:100%;border-collapse:collapse;font-size:12px}
+.dt th{background:#f8fafc;padding:8px 10px;text-align:right;font-size:11px;font-weight:600;color:var(--txt2);border-bottom:2px solid var(--bdr);white-space:nowrap}
+.dt th:first-child{text-align:left;position:sticky;left:0;background:#f8fafc;z-index:2}
+.dt td{padding:6px 10px;text-align:right;border-bottom:1px solid #f1f5f9;font-variant-numeric:tabular-nums;white-space:nowrap}
+.dt td:first-child{text-align:left;position:sticky;left:0;background:var(--white);z-index:1;font-weight:500}
+.dt tr.sec-hdr td{background:#f8fafc;font-weight:700;font-size:11px;color:var(--txt)}
+.dt tr.sec-hdr td:first-child{background:#f8fafc}
+.dt tr.total-row td{font-weight:700;border-top:2px solid var(--bdr);background:#fafafa}
+.dt tr.total-row td:first-child{background:#fafafa}
+.ac{color:var(--txt)}
+.fc{color:var(--blue)}
+.red{color:#dc2626}
+.grn{color:#16a34a}
+
+/* LEGEND */
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:4px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--txt2)}
+.ld{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.ld-line{width:16px;height:3px;border-radius:2px}
+
+/* STATUS */
+.st{display:inline-block;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:600}
+.st-done{background:#dcfce7;color:#166534}
+.st-prog{background:#dbeafe;color:#1d4ed8}
+.st-plan{background:#f3f4f6;color:#6b7280}
+.st-risk{background:#fef2f2;color:#dc2626}
+
+/* PROGRESS */
+.pb-wrap{background:#f3f4f6;border-radius:4px;height:7px;overflow:hidden}
+.pb{height:100%;border-radius:4px}
+
+/* GANTT */
+.gantt-wrap{padding:8px 0}
+.gantt-row{display:grid;grid-template-columns:180px 1fr;gap:10px;align-items:center;margin-bottom:10px}
+.gantt-lbl{font-size:12px;font-weight:500;color:var(--txt)}
+.gantt-track{background:#f3f4f6;border-radius:4px;height:22px;position:relative;overflow:hidden}
+.gantt-bar{position:absolute;height:100%;border-radius:4px;display:flex;align-items:center;padding:0 8px;font-size:10px;color:#fff;font-weight:600;overflow:hidden;white-space:nowrap}
+
+/* FUNNEL */
+.funnel{display:flex;flex-direction:column;gap:6px;padding:8px 0}
+.funnel-row{display:flex;align-items:center;gap:10px}
+.funnel-bar-wrap{flex:1;background:#f3f4f6;border-radius:4px;height:28px;overflow:hidden}
+.funnel-bar{height:100%;border-radius:4px;display:flex;align-items:center;padding:0 10px;font-size:12px;font-weight:600;color:#fff;transition:width .4s}
+.funnel-lbl{font-size:12px;font-weight:500;color:var(--txt);width:110px;text-align:right}
+.funnel-val{font-size:12px;font-weight:600;color:var(--txt);width:50px}
+
+/* MISC */
+.section-title{font-size:13px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin:20px 0 10px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px}
+.tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:500;background:#f3f4f6;color:#6b7280;margin:2px}
+.tag-blue{background:#eff6ff;color:#2563eb}
+.tag-teal{background:#f0fdf9;color:#0d9488}
+.tag-green{background:#f0fdf4;color:#16a34a}
+.integration-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:4px 0}
+.int-card{border:1px solid var(--bdr);border-radius:8px;padding:12px;text-align:center}
+.int-name{font-size:13px;font-weight:600;color:var(--txt);margin-bottom:4px}
+.int-sub{font-size:11px;color:var(--txt2)}
+canvas{max-height:280px}
+
+/* LOADING OVERLAY */
+.loading-overlay{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:14px}
+.loading-overlay.hidden{display:none}
+.loading-spinner{width:36px;height:36px;border:3px solid var(--bdr);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite}
+.loading-msg{font-size:13px;color:var(--txt2);font-weight:500}
+.loading-error{font-size:13px;color:#dc2626;font-weight:500;max-width:360px;text-align:center;line-height:1.5}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── COMPARE PAGE ── */
+.advisor-card{background:var(--dark);border-radius:14px;padding:20px 22px;margin-bottom:20px;color:#fff}
+.advisor-card-hdr{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.advisor-av-lg{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--teal));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0}
+.advisor-title{font-size:14px;font-weight:700;color:#fff}
+.advisor-sub{font-size:11px;color:var(--teal);margin-top:1px}
+.advisor-recs{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.advisor-rec{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:11px 13px}
+.rec-goal{font-size:10px;font-weight:600;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.rec-winner{font-size:13px;font-weight:700;margin-bottom:2px}
+.rec-why{font-size:11px;color:rgba(255,255,255,.5);line-height:1.4}
+.advisor-summary{font-size:12.5px;color:rgba(255,255,255,.65);line-height:1.6;border-top:1px solid rgba(255,255,255,.1);padding-top:14px}
+.advisor-summary strong{color:rgba(255,255,255,.9)}
+
+.cmp-wrap{background:var(--white);border-radius:12px;border:1px solid var(--bdr);overflow:hidden}
+.cmp-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.cmp-tbl th{padding:11px 14px;font-size:11px;font-weight:700;text-align:right;border-bottom:2px solid var(--bdr);white-space:nowrap;background:#f8fafc}
+.cmp-tbl th:first-child{text-align:left;position:sticky;left:0;z-index:3;background:#f8fafc}
+.cmp-tbl th.scen-hdr{color:#fff;text-align:center;font-size:12px;font-weight:700;padding:13px 14px}
+.cmp-tbl td{padding:10px 14px;text-align:right;border-bottom:1px solid #f1f5f9;font-variant-numeric:tabular-nums;vertical-align:middle}
+.cmp-tbl td:first-child{text-align:left;position:sticky;left:0;background:var(--white);z-index:1;font-weight:600;font-size:12px;color:var(--txt)}
+.cmp-tbl tr:last-child td{border-bottom:none}
+.cmp-tbl tr:hover td{background:#fafafa}
+.cmp-tbl tr:hover td:first-child{background:#fafafa}
+.cmp-best{background:#f0fdf4 !important;color:#15803d;font-weight:700}
+.cmp-worst{background:#fff7f7 !important;color:#dc2626}
+.cmp-neutral{color:var(--txt)}
+.cmp-val-main{font-size:13px;font-weight:600}
+.cmp-delta{display:block;font-size:10.5px;font-weight:500;margin-top:2px}
+.cmp-delta.pos{color:#16a34a}.cmp-delta.neg{color:#dc2626}.cmp-delta.neu{color:var(--txt3)}
+.cmp-metric-lbl{font-size:12px;font-weight:600;color:var(--txt)}
+.cmp-metric-sub{font-size:10.5px;color:var(--txt2);font-weight:400;margin-top:1px}
+.cmp-sect-hdr td{background:#f8fafc !important;font-size:10px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.8px;padding:7px 14px !important;border-top:1px solid var(--bdr)}
+
+/* ── CHAT PANEL ── */
+.chat-panel{position:fixed;right:0;top:0;bottom:0;width:var(--cw);background:var(--white);border-left:1px solid var(--bdr);display:flex;flex-direction:column;z-index:200;transition:transform .3s ease}
+.chat-panel.hidden{transform:translateX(100%)}
+.chat-hdr{background:var(--dark);padding:13px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.chat-hdr-info{display:flex;align-items:center;gap:9px}
+.chat-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--teal));display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:700;flex-shrink:0}
+.chat-hdr-name{font-size:13px;font-weight:700;color:#fff}
+.chat-hdr-status{font-size:10px;color:var(--teal);margin-top:1px}
+.chat-min-btn{background:none;border:none;color:rgba(255,255,255,.45);cursor:pointer;padding:5px 6px;border-radius:5px;font-size:17px;line-height:1;transition:all .15s}
+.chat-min-btn:hover{color:#fff;background:rgba(255,255,255,.1)}
+.chat-ctx{background:#f8fafc;border-bottom:1px solid var(--bdr);padding:7px 14px;font-size:11px;color:var(--txt2);flex-shrink:0;display:flex;gap:5px;align-items:center}
+.chat-ctx-tag{background:#eff6ff;color:var(--blue);padding:2px 8px;border-radius:8px;font-weight:600;font-size:10px}
+.chat-ctx-tag.scen{background:#f0fdf9;color:#0d9488}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.cmsg{display:flex;gap:7px;max-width:92%}
+.cmsg.user{align-self:flex-end;flex-direction:row-reverse}
+.cmsg-av{width:25px;height:25px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;margin-top:1px}
+.cmsg.ai .cmsg-av{background:linear-gradient(135deg,var(--blue),var(--teal));color:#fff;font-weight:700}
+.cmsg.user .cmsg-av{background:#f1f5f9;font-size:13px}
+.cmsg-text{padding:9px 12px;border-radius:12px;font-size:12.5px;line-height:1.55;word-break:break-word}
+.cmsg.ai .cmsg-text{background:#f8fafc;color:var(--txt);border-radius:2px 12px 12px 12px;border:1px solid #f1f5f9}
+.cmsg.user .cmsg-text{background:var(--blue);color:#fff;border-radius:12px 2px 12px 12px}
+.cmsg.typing .cmsg-text{color:var(--txt3);font-style:italic}
+/* chat tabs */
+.chat-tab-bar{display:flex;border-bottom:1px solid var(--bdr);flex-shrink:0;background:var(--white)}
+.chat-tab{flex:1;padding:10px 0;font-size:12px;font-weight:600;font-family:inherit;border:none;border-bottom:2px solid transparent;cursor:pointer;background:none;color:var(--txt2);margin-bottom:-1px;transition:all .15s}
+.chat-tab:hover{color:var(--txt)}
+.chat-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.chat-tab-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#16a34a;margin-left:5px;vertical-align:middle}
+.chat-pane{display:flex;flex-direction:column;flex:1;overflow:hidden}
+.chat-pane.hidden{display:none}
+/* welcome */
+.chat-welcome{padding:24px 16px 16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px}
+.chat-welcome-av{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--teal));display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;font-weight:700;margin-bottom:2px}
+.chat-welcome-title{font-size:15px;font-weight:700;color:var(--txt)}
+.chat-welcome-body{font-size:12px;color:var(--txt2);line-height:1.65;max-width:230px}
+.chat-hints{display:flex;flex-direction:column;gap:6px;width:100%;margin-top:6px}
+.chat-hint{background:#f8fafc;border:1px solid var(--bdr);border-radius:10px;padding:8px 12px;font-size:11.5px;color:var(--txt2);cursor:pointer;text-align:left;transition:all .15s;line-height:1.4}
+.chat-hint:hover{background:#eff6ff;border-color:#93c5fd;color:var(--blue)}
+/* settings pane */
+.chat-settings{padding:20px 16px;display:flex;flex-direction:column;gap:14px;overflow-y:auto}
+.chat-settings-title{font-size:14px;font-weight:700;color:var(--txt)}
+.chat-settings-desc{font-size:12.5px;color:var(--txt2);line-height:1.6}
+.chat-key-row{display:flex;flex-direction:column;gap:8px}
+.chat-key-inp{width:100%;border:1px solid var(--bdr);border-radius:10px;padding:10px 14px;font-size:12px;outline:none;color:var(--txt);font-family:monospace;background:#f8fafc;transition:all .15s;box-sizing:border-box}
+.chat-key-inp:focus{border-color:var(--blue);background:#fff}
+.chat-key-inp:disabled{opacity:.6;cursor:default}
+.chat-key-btn{padding:10px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit;background:var(--blue);color:#fff;transition:background .15s}
+.chat-key-btn:hover{background:#1d4ed8}
+.chat-key-btn.connected{background:#16a34a}
+.chat-key-status{font-size:11.5px;color:var(--txt2);font-style:italic;line-height:1.5}
+.chat-settings-note{font-size:11px;color:var(--txt3);line-height:1.55;padding:10px 12px;background:#f8fafc;border-radius:8px;border:1px solid var(--bdr)}
+/* input row */
+.chat-input-row{border-top:1px solid var(--bdr);padding:12px 14px;display:flex;flex-direction:column;gap:8px;flex-shrink:0;background:var(--white)}
+.chat-inp{width:100%;border:1px solid var(--bdr);border-radius:12px;padding:10px 14px;font-size:13px;outline:none;color:var(--txt);font-family:inherit;background:#f8fafc;transition:all .15s;resize:none;min-height:64px;max-height:180px;line-height:1.5;overflow-y:auto;box-sizing:border-box}
+.chat-inp:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.chat-inp:disabled{opacity:.45;cursor:not-allowed}
+.chat-input-actions{display:flex;justify-content:flex-end}
+.chat-send-btn{padding:7px 16px;border-radius:20px;background:var(--blue);border:none;cursor:pointer;display:flex;align-items:center;gap:6px;color:#fff;font-size:12px;font-weight:600;font-family:inherit;transition:background .15s}
+.chat-send-btn:hover{background:#1d4ed8}
+.chat-send-btn:disabled{opacity:.45;cursor:not-allowed}
+/* BUBBLE */
+.float-bubble{position:fixed;bottom:20px;right:20px;width:52px;height:52px;border-radius:50%;background:var(--blue);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(37,99,235,.45);z-index:200;transition:transform .15s,box-shadow .15s}
+.float-bubble:hover{transform:scale(1.08);box-shadow:0 6px 22px rgba(37,99,235,.55)}
+.float-bubble.hidden{display:none}
+
+/* ── WIDGET DASHBOARD ── */
+.widget-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;padding:4px 0}
+.widget-card{background:var(--white);border-radius:12px;border:1px solid var(--bdr);overflow:hidden;position:relative;transition:box-shadow .15s}
+.widget-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.07)}
+.widget-card[data-size="wide"]{grid-column:1/-1}
+.widget-card[data-size="large"]{grid-column:span 2}
+.widget-card:hover .widget-actions{opacity:1}
+.widget-title-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 8px;border-bottom:1px solid var(--bdr);font-size:13px;font-weight:600;color:var(--txt)}
+.widget-actions{display:flex;gap:2px;opacity:0;transition:opacity .15s}
+.widget-del-btn{background:none;border:none;cursor:pointer;padding:3px 7px;border-radius:5px;font-size:11px;color:var(--txt3);line-height:1;transition:all .15s}
+.widget-del-btn:hover{background:#fef2f2;color:#dc2626}
+.widget-iframe{width:100%;border:none;display:block;min-height:160px}
+.widget-empty{text-align:center;padding:56px 24px 64px;color:var(--txt2)}
+.widget-empty-icon{font-size:38px;margin-bottom:14px}
+.widget-empty-title{font-size:16px;font-weight:700;color:var(--txt);margin-bottom:8px}
+.widget-empty-body{font-size:13px;line-height:1.65;max-width:320px;margin:0 auto}
+.widget-hints-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px}
+.widget-hint-chip{background:var(--white);border:1.5px solid var(--bdr);border-radius:20px;padding:7px 15px;font-size:12px;font-weight:500;color:var(--txt2);cursor:pointer;transition:all .15s}
+.widget-hint-chip:hover{border-color:var(--blue);color:var(--blue);background:#eff6ff}
+.widget-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;border-radius:20px;font-size:11px;font-weight:600;animation:wbFade .4s ease}
+.widget-badge.ok{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
+.widget-badge.err{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
+@keyframes wbFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.wdb-section-title{font-size:11px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.8px;margin:0 0 10px}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-brand">
+      <svg width="34" height="34" viewBox="0 0 34 34">
+        <polygon points="2,34 10,2 22,2 14,34" fill="#2563eb"/>
+        <polygon points="12,2 26,2 18,34 4,34" fill="#4fc3a1" opacity=".85"/>
+      </svg>
+      <div>
+        <div class="sb-title">Polar Bear Icecream</div>
+        <div class="sb-sub">Powered by One Day</div>
+      </div>
+    </div>
+  </div>
+  <nav class="sb-nav" id="sb-nav"></nav>
+  <div class="sb-footer">
+    <strong>Polar Bear Icecream BV</strong><br>
+    Powered by One Day · FY 2026
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="tb-title" id="tb-title">Finance</div>
+      <div class="tb-sub" id="tb-sub">Financial overview · FY 2026</div>
+    </div>
+    <div class="tb-badge" id="tb-badge">● Live forecast</div>
+  </div>
+  <div class="scenario-bar">
+    <span class="sc-label">Scenario</span>
+    <button class="sc-btn active" data-scenario="base">Base</button>
+    <button class="sc-btn" data-scenario="new-product">New Product</button>
+    <button class="sc-btn" data-scenario="bank-loan">Bank Loan</button>
+    <button class="sc-btn" data-scenario="push-receivables">Push Receivables</button>
+    <button class="sc-btn" data-scenario="hire-sales">Hire More Sales</button>
+  </div>
+  <div class="content" id="content"></div>
+</div>
+
+<!-- CHAT PANEL -->
+<div class="chat-panel" id="chat-panel">
+  <div class="chat-hdr">
+    <div class="chat-hdr-info">
+      <div class="chat-av">✦</div>
+      <div>
+        <div class="chat-hdr-name">One Day AI</div>
+        <div class="chat-hdr-status">● Analysing your data</div>
+      </div>
+    </div>
+    <button class="chat-min-btn" id="chat-min-btn" title="Minimise chat">✕</button>
+  </div>
+  <!-- Tab bar -->
+  <div class="chat-tab-bar">
+    <button class="chat-tab active" id="chat-tab-chat">Chat</button>
+    <button class="chat-tab" id="chat-tab-connect">Connect<span class="chat-tab-dot" id="chat-conn-dot" style="display:none"></span></button>
+  </div>
+  <!-- Chat pane -->
+  <div class="chat-pane" id="chat-pane-chat">
+    <div class="chat-ctx">
+      <span>Context:</span>
+      <span class="chat-ctx-tag" id="chat-ctx-mod">Finance</span>
+      <span class="chat-ctx-tag scen" id="chat-ctx-scen">Base</span>
+    </div>
+    <div class="chat-msgs" id="chat-msgs"></div>
+    <div class="chat-input-row" id="chat-input-row">
+      <textarea class="chat-inp" id="chat-inp" placeholder="Ask One Day AI…" autocomplete="off" rows="3"></textarea>
+      <div class="chat-input-actions">
+        <button class="chat-send-btn" id="chat-send-btn">
+          Send
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Connect pane -->
+  <div class="chat-pane hidden" id="chat-pane-connect">
+    <div class="chat-settings">
+      <div class="chat-settings-title">Connect to Claude</div>
+      <div class="chat-settings-desc">Enter your Anthropic API key to enable live AI analysis of your Polar Bear Icecream data.</div>
+      <div class="chat-key-row" id="chat-key-row">
+        <input class="chat-key-inp" id="chat-key-inp" type="password" placeholder="sk-ant-api03-…" autocomplete="off" />
+        <button class="chat-key-btn" id="chat-key-btn">Connect</button>
+      </div>
+      <div class="chat-key-status" id="chat-key-status"></div>
+      <div class="chat-settings-note">Your key is stored locally in your browser and only sent directly to the Anthropic API — never to any other server.</div>
+    </div>
+  </div>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-msg" id="loading-msg">Loading dashboard data…</div>
+</div>
+
+<!-- CHAT BUBBLE (minimised state) -->
+<button class="float-bubble hidden" id="float-bubble" title="Open One Day AI">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+</button>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let mod = 'finance', scen = 'base';
+let starredMods = JSON.parse(localStorage.getItem('oneday_starred') || '["finance"]');
+const chartReg = {};
+let claudeApiKey = localStorage.getItem('oneday_api_key') || '';
+let chatHistory = [];  // [{role:'user'|'assistant', content:'...'}]
+
+// ── Widget state ────────────────────────────────────────
+let widgets = JSON.parse(localStorage.getItem('oneday_widgets') || '[]');
+
+// Forbidden patterns for sandboxed widget code
+const WIDGET_FORBIDDEN = [
+  { re: /fetch\s*\(/,       name: 'fetch()' },
+  { re: /XMLHttpRequest/,   name: 'XMLHttpRequest' },
+  { re: /WebSocket/,        name: 'WebSocket' },
+  { re: /eval\s*\(/,        name: 'eval()' },
+  { re: /document\.cookie/, name: 'document.cookie' },
+  { re: /import\s*\(/,      name: 'dynamic import()' },
+  { re: /require\s*\(/,     name: 'require()' },
+  { re: /window\.parent/,   name: 'window.parent' },
+  { re: /window\.top/,      name: 'window.top' },
+  { re: /localStorage/,     name: 'localStorage' },
+  { re: /sessionStorage/,   name: 'sessionStorage' },
+];
+
+function scanCode(code){
+  const violations = WIDGET_FORBIDDEN.filter(p => p.re.test(code)).map(p => p.name);
+  return { safe: violations.length === 0, violations };
+}
+
+function buildIframeHTML(code){
+  // Escape </script> to prevent HTML injection
+  const safe = code.replace(/<\/script>/gi, '<\\/script>');
+  return `<!DOCTYPE html><html lang="nl"><head><meta charset="UTF-8">
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:transparent;overflow:hidden}#root{width:100%;min-height:100%;padding:14px}</style>
+</head><body><div id="root"></div>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"><\/script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"><\/script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"><\/script>
+<script>window.React=React;window.ReactDOM=ReactDOM;<\/script>
+<script type="text/babel" data-presets="react">
+${safe}
+try{const r=ReactDOM.createRoot(document.getElementById('root'));r.render(React.createElement(Widget));}
+catch(e){document.getElementById('root').innerHTML='<div style="padding:10px;color:#dc2626;font-size:12px;background:#fef2f2;border-radius:6px"><strong>Fout:</strong> '+e.message+'</div>';}
+<\/script></body></html>`;
+}
+
+function saveWidgets(){
+  localStorage.setItem('oneday_widgets', JSON.stringify(widgets));
+  // Also persist to Supabase via the /api/widgets endpoint
+  if(claudeApiKey){
+    fetch('/api/widgets', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ widgets })
+    }).catch(()=>{/* silent – localStorage is the source of truth */});
+  }
+}
+
+function applyWidgetAction(def){
+  const { action='add', id } = def;
+  if(action === 'remove'){
+    widgets = widgets.filter(w => w.id !== id);
+  } else if(action === 'update'){
+    const idx = widgets.findIndex(w => w.id === id);
+    if(idx >= 0) widgets[idx] = { ...widgets[idx], ...def };
+    else widgets.push({ ...def, createdAt: Date.now() });
+  } else { // add
+    const idx = widgets.findIndex(w => w.id === id);
+    if(idx >= 0) widgets[idx] = { ...widgets[idx], ...def };
+    else widgets.push({ ...def, createdAt: Date.now() });
+  }
+  saveWidgets();
+}
+
+function deleteWidget(id){
+  widgets = widgets.filter(w => w.id !== id);
+  saveWidgets();
+  renderWidgets();
+}
+
+// Render a single widget card (returns HTML string)
+function widgetCardHTML(w){
+  const iframeId = 'wif-'+w.id;
+  const html = buildIframeHTML(w.code || '');
+  const srcdoc = html.replace(/"/g, '&quot;');
+  const h = w.height || (w.size === 'tall' ? 340 : 220);
+  return `<div class="widget-card" data-size="${w.size||'medium'}" data-id="${w.id}">
+  <div class="widget-title-bar">
+    <span>${w.title||'Widget'}</span>
+    <div class="widget-actions">
+      <button class="widget-del-btn" onclick="deleteWidget('${w.id}')" title="Verwijder widget">✕</button>
+    </div>
+  </div>
+  <iframe id="${iframeId}" srcdoc="${srcdoc}" sandbox="allow-scripts"
+    style="width:100%;height:${h}px;border:none;display:block"></iframe>
+</div>`;
+}
+
+function renderWidgets(){
+  const el = document.getElementById('widget-canvas');
+  if(!el) return;
+  if(widgets.length === 0){
+    el.innerHTML = `<div class="widget-empty">
+      <div class="widget-empty-icon">✦</div>
+      <div class="widget-empty-title">Jouw dashboard is leeg</div>
+      <div class="widget-empty-body">Typ in de chat hiernaast wat je wilt zien — een omzetgrafiek, KPI-kaart, teamverdeling — en One Day AI bouwt het voor je.</div>
+      <div class="widget-hints-row">
+        <span class="widget-hint-chip" onclick="setWidgetHint(this)">Maak een omzetgrafiek</span>
+        <span class="widget-hint-chip" onclick="setWidgetHint(this)">Voeg een KPI-overzicht toe</span>
+        <span class="widget-hint-chip" onclick="setWidgetHint(this)">Laat de teamverdeling zien</span>
+        <span class="widget-hint-chip" onclick="setWidgetHint(this)">Seizoensverloop omzet</span>
+      </div>
+    </div>`;
+  } else {
+    el.innerHTML = `<div class="widget-grid">${widgets.map(widgetCardHTML).join('')}</div>`;
+  }
+}
+
+function setWidgetHint(el){
+  const inp = document.getElementById('chat-inp');
+  if(!inp || inp.disabled) return;
+  inp.value = el.textContent;
+  inp.style.height = 'auto';
+  inp.style.height = Math.min(inp.scrollHeight, 180)+'px';
+  inp.focus();
+}
+
+// ═══════════════════════════════════════════════════════
+// DATA  (populated at runtime from /api/data → Supabase)
+// ═══════════════════════════════════════════════════════
+const MONTHS  = ['Jan 26','Feb 26','Mar 26','Apr 26','May 26','Jun 26','Jul 26','Aug 26','Sep 26','Oct 26','Nov 26','Dec 26'];
+const LIQMON  = ['Mar 26','Apr 26','May 26','Jun 26','Jul 26','Aug 26','Sep 26','Oct 26','Nov 26','Dec 26','Jan 27','Feb 27'];
+const ISACT   = [1,1,0,0,0,0,0,0,0,0,0,0];
+
+// These are populated by loadAndRender() below
+let B, SC, REV_BASE, HR_BASE, MKT_BASE, LOG_BASE, PRJ_BASE;
+
+// Data is loaded at startup by loadAndRender() — see bottom of file
+
+// ═══════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════
+const e=(n,abs=false)=>{
+  if(n===null||n===undefined)return'–';
+  const v=abs?Math.abs(n):n;
+  const s=Math.abs(v)>=1e6?'€'+(v/1e6).toFixed(2)+'M':Math.abs(v)>=1e3?'€'+Math.round(v/1000).toLocaleString('nl-NL')+'K':'€'+Math.round(v).toLocaleString('nl-NL');
+  return n<0&&!abs?s.replace('€','-€'):s;
+};
+const ef=(n)=>{
+  if(!n&&n!==0)return'–';
+  const pref=n>0?'+':'';
+  return pref+e(n);
+};
+const ep=(v)=>(v>0?`<span class="pos">▲ ${e(v,true)}</span>`:`<span class="neg">▼ ${e(Math.abs(v),true)}</span>`);
+const pct=(n)=>(n>=0?'+':'')+n.toFixed(1)+'%';
+const num=(n)=>n.toLocaleString('nl-NL');
+const clr=(n)=>n<0?'red':'';
+const colorCell=(n,isTax=false)=>{
+  if(n===0)return'';
+  if(isTax)return n<0?'red':'grn';
+  return n<0?'red':'grn';
+};
+
+function getScenData(){
+  const s=SC[scen];
+  const rev=B.rev.map((v,i)=>v+s.rAdj[i]);
+  const cost=B.cost.map((v,i)=>v+s.cAdj[i]);
+  const opRes=rev.map((v,i)=>v-cost[i]);
+  const rbt=opRes.map((v,i)=>v+B.finInc[i]);
+  const rat=rbt.map((v,i)=>v-B.corpTax[i]);
+  const lb=B.liqBal.map((v,i)=>v+(s.lbAdj[i]||0));
+  return {rev,cost,opRes,rbt,rat,lb};
+}
+
+function mkChart(id,cfg){
+  if(chartReg[id])chartReg[id].destroy();
+  const el=document.getElementById(id);
+  if(!el)return null;
+  chartReg[id]=new Chart(el,cfg);
+  return chartReg[id];
+}
+function destroyAll(){Object.values(chartReg).forEach(c=>c&&c.destroy());Object.keys(chartReg).forEach(k=>delete chartReg[k]);}
+
+// ═══════════════════════════════════════════════════════
+// SCENARIO CALLOUT
+// ═══════════════════════════════════════════════════════
+function calloutHTML(){
+  const s=SC[scen];
+  if(!s.desc)return'';
+  const colors={
+    'new-product':'background:#f0fdf4;border-color:#86efac;color:#15803d',
+    'bank-loan':'background:#faf5ff;border-color:#d8b4fe;color:#7e22ce',
+    'push-receivables':'background:#fffbeb;border-color:#fcd34d;color:#92400e',
+    'hire-sales':'background:#fef2f2;border-color:#fca5a5;color:#991b1b',
+  };
+  return `<div class="sc-callout" style="${colors[scen]||''}"><span class="sc-callout-icon">${s.dot}</span><div><strong>${s.lbl} scenario:</strong> ${s.desc}</div></div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// MODULE: FINANCE
+// ═══════════════════════════════════════════════════════
+function renderFinance(){
+  const d=getScenData();
+  const totalRev=d.rev.reduce((a,b)=>a+b,0);
+  const totalCost=d.cost.reduce((a,b)=>a+b,0);
+  const opRes=totalRev-totalCost;
+  const cashDec=B.ca[11]+(SC[scen].lbAdj[11]||0)*1000;
+  const burnAvg=d.cost.slice(2).reduce((a,b)=>a+b,0)/10;
+
+  const kpiChange=scen==='base'?'':` <span class="fc" style="font-size:11px">(${scen==='hire-sales'?'▲ costs':'▲ revenue'})</span>`;
+
+  document.getElementById('content').innerHTML=`
+${calloutHTML()}
+<div class="kpi-grid">
+  <div class="kpi-card"><div class="kpi-lbl">Total Revenue 2026</div><div class="kpi-val">${e(totalRev)}</div><div class="kpi-chg ${opRes>0?'pos':'neu'}">${opRes>0?'↑':'↓'} Operating result ${e(opRes)}</div></div>
+  <div class="kpi-card"><div class="kpi-lbl">Operating Result</div><div class="kpi-val ${opRes<0?'neg':'pos'}">${e(opRes)}</div><div class="kpi-chg neu">Full year incl. prognosis</div></div>
+  <div class="kpi-card"><div class="kpi-lbl">Cash Position Dec</div><div class="kpi-val">${e((B.liqBal[11]+(SC[scen].lbAdj[11]||0))*1000)}</div><div class="kpi-chg neu">Current account balance</div></div>
+  <div class="kpi-card"><div class="kpi-lbl">Avg Monthly Costs</div><div class="kpi-val">${e(burnAvg)}</div><div class="kpi-chg neu">Mar – Dec prognosis avg</div></div>
+</div>
+<div class="cg1">
+  <div class="cc">
+    <div class="cc-hdr">
+      <div><div class="cc-title">Profit &amp; Loss per period</div><div class="cc-sub">Revenue vs Total Costs · Jan–Dec 2026</div></div>
+      <div style="display:flex;gap:6px"><span class="badge-actual">Actual</span><span class="badge-fcst">Prognosis</span></div>
+    </div>
+    <canvas id="ch-pl" height="120"></canvas>
+    <div class="legend" style="margin-top:10px">
+      <div class="legend-item"><div class="ld" style="background:#4fc3a1"></div>Revenue</div>
+      <div class="legend-item"><div class="ld" style="background:#94a3b8"></div>Total Costs</div>
+      <div class="legend-item"><div class="ld-line" style="background:#f59e0b"></div>Operating Result</div>
+    </div>
+  </div>
+</div>
+<div class="cg1">
+  <div class="cc">
+    <div class="cc-hdr">
+      <div><div class="cc-title">Liquidity planning</div><div class="cc-sub">Cash income, expenses &amp; current account balance · Mar 26–Feb 27</div></div>
+    </div>
+    <canvas id="ch-liq" height="100"></canvas>
+    <div class="legend" style="margin-top:10px">
+      <div class="legend-item"><div class="ld" style="background:#93c5fd"></div>Income</div>
+      <div class="legend-item"><div class="ld" style="background:#6b7280"></div>Expenses</div>
+      <div class="legend-item"><div class="ld-line" style="background:#1e293b"></div>Current account closing balance</div>
+    </div>
+  </div>
+</div>
+<div class="cc" style="margin-bottom:16px">
+  <div class="cc-hdr"><div><div class="cc-title">Profit &amp; Loss per period</div></div><div style="display:flex;gap:6px"><span class="badge-actual">Jan–Feb Actual</span><span class="badge-fcst">Mar–Dec Prognosis</span></div></div>
+  <div class="tbl-wrap">${buildPLTable(d)}</div>
+</div>
+<div class="cc" style="margin-bottom:16px">
+  <div class="cc-hdr"><div><div class="cc-title">Balance sheet per period</div></div><div style="display:flex;gap:6px"><span class="badge-actual">Jan–Feb Actual</span><span class="badge-fcst">Mar–Dec Prognosis</span></div></div>
+  <div class="tbl-wrap">${buildBSTable()}</div>
+</div>`;
+
+  // P&L Chart
+  const d2=getScenData();
+  mkChart('ch-pl',{
+    type:'bar',
+    data:{
+      labels:MONTHS,
+      datasets:[
+        {label:'Revenue',data:d2.rev,backgroundColor:MONTHS.map((_,i)=>ISACT[i]?'#4fc3a1':'rgba(79,195,161,0.5)'),yAxisID:'y',order:2},
+        {label:'Total Costs',data:d2.cost,backgroundColor:MONTHS.map((_,i)=>ISACT[i]?'#94a3b8':'rgba(148,163,184,0.5)'),yAxisID:'y',order:2},
+        {label:'Operating Result',data:d2.opRes,type:'line',borderColor:'#f59e0b',backgroundColor:'transparent',borderWidth:2.5,pointRadius:3,pointBackgroundColor:'#f59e0b',yAxisID:'y',tension:.35,order:1},
+      ]
+    },
+    options:{responsive:true,interaction:{mode:'index'},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+e(ctx.parsed.y)}}},scales:{y:{ticks:{callback:v=>e(v)},grid:{color:'#f1f5f9'}}}}
+  });
+
+  // Liquidity chart
+  const lb=d2.lb;
+  mkChart('ch-liq',{
+    type:'bar',
+    data:{
+      labels:LIQMON,
+      datasets:[
+        {label:'Income',data:B.liqIn,backgroundColor:'rgba(147,197,253,0.75)',yAxisID:'y',order:2},
+        {label:'Expenses',data:B.liqEx,backgroundColor:'rgba(107,114,128,0.65)',yAxisID:'y',order:2},
+        {label:'Closing Balance',data:lb,type:'line',borderColor:'#1e293b',backgroundColor:'transparent',borderWidth:2.5,pointRadius:3,pointBackgroundColor:'#1e293b',tension:.4,yAxisID:'y2',order:1},
+      ]
+    },
+    options:{responsive:true,interaction:{mode:'index'},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{const v=ctx.parsed.y;return ctx.dataset.label+': €'+Math.round(v)+'K'}}}},scales:{y:{ticks:{callback:v=>'€'+v+'K'},grid:{color:'#f1f5f9'},title:{display:true,text:'EUR (K)'}},y2:{position:'right',ticks:{callback:v=>'€'+v+'K'},grid:{drawOnChartArea:false}}}}
+  });
+}
+
+function buildPLTable(d){
+  const opRes=d.rev.map((v,i)=>v-d.cost[i]);
+  const rbt=opRes.map((v,i)=>v+B.finInc[i]);
+  const rat=rbt.map((v,i)=>v-B.corpTax[i]);
+  const totalRev=d.rev.reduce((a,b)=>a+b,0);
+  const totalCost=d.cost.reduce((a,b)=>a+b,0);
+  const totalOp=totalRev-totalCost;
+  const totalFin=B.finInc.reduce((a,b)=>a+b,0);
+  const totalRbt=totalOp+totalFin;
+  const totalTax=B.corpTax.reduce((a,b)=>a+b,0);
+  const totalRat=totalRbt-totalTax;
+
+  let h=`<table class="dt"><thead><tr><th>▼ Profit and Loss</th>`;
+  MONTHS.forEach((m,i)=>{h+=`<th class="${ISACT[i]?'ac':'fc'}">${m}</th>`;});
+  h+=`<th style="color:#0f172a">Total</th></tr></thead><tbody>`;
+
+  const row=(lbl,vals,total,indent=false,cls='')=>{
+    let r=`<tr ${cls?`class="${cls}"`:''}><td style="${indent?'padding-left:20px':''}font-weight:${indent?400:600}">${lbl}</td>`;
+    vals.forEach((v,i)=>{r+=`<td class="${ISACT[i]?'ac':'fc'} ${colorCell(v)}">${e(v)}</td>`;});
+    r+=`<td class="total-col ${colorCell(total)}">${e(total)}</td></tr>`;
+    return r;
+  };
+
+  h+=row('Revenue',d.rev,totalRev,false,'sec-hdr');
+  h+=row('Gross margin',d.rev,totalRev,true);
+  h+=row('Total costs',d.cost,totalCost,false,'sec-hdr');
+  h+=row('Operating result',opRes,totalOp,false,'total-row');
+  h+=row('Financial income and exp.',B.finInc,totalFin,true);
+  h+=row('Result before taxation',rbt,totalRbt,false,'total-row');
+  h+=row('Corporate income tax',B.corpTax,totalTax,true);
+  h+=row('Result after taxation',rat,totalRat,false,'total-row');
+  h+=`</tbody></table>`;
+  return h;
+}
+
+function buildBSTable(){
+  const assets=B.fa.map((v,i)=>v+B.ca[i]);
+  const totEL=B.eq.map((v,i)=>v+B.ncl[i]+B.cl[i]);
+  let h=`<table class="dt"><thead><tr><th>▼ Balance sheet</th>`;
+  MONTHS.forEach((m,i)=>{h+=`<th class="${ISACT[i]?'ac':'fc'}">${m}</th>`;});
+  h+=`</tr></thead><tbody>`;
+
+  const row=(lbl,vals,indent=false,bold=false)=>{
+    let r=`<tr><td style="${indent?'padding-left:20px':''}font-weight:${bold?700:indent?400:600}">${lbl}</td>`;
+    vals.forEach((v,i)=>{r+=`<td class="${ISACT[i]?'ac':'fc'}">${e(v)}</td>`;});
+    r+=`</tr>`;
+    return r;
+  };
+
+  h+=row('▶ Fixed assets',B.fa,true);
+  h+=row('▶ Current assets',B.ca,true);
+  h+=`<tr class="total-row"><td>Assets</td>${B.fa.map((v,i)=>`<td class="${ISACT[i]?'ac':'fc'}">${e(v+B.ca[i])}</td>`).join('')}</tr>`;
+  h+=row('▶ Equity',B.eq,true);
+  h+=row('▶ Non-current liabilities',B.ncl,true);
+  h+=row('▶ Current liabilities',B.cl,true);
+  h+=`<tr class="total-row"><td>Equity and liabilities</td>${B.eq.map((v,i)=>`<td class="${ISACT[i]?'ac':'fc'}">${e(v+B.ncl[i]+B.cl[i])}</td>`).join('')}</tr>`;
+  h+=`</tbody></table>`;
+  return h;
+}
+
+// ═══════════════════════════════════════════════════════
+// MODULE: REVENUE
+// ═══════════════════════════════════════════════════════
+function renderRevenue(){
+  const s=SC[scen];
+  const custAdj=s.custAdj;
+  const cStart=REV_BASE.cStart.map((v,i)=>v+Math.floor(custAdj[i]*0.5));
+  const cPro=REV_BASE.cPro.map((v,i)=>v+Math.floor(custAdj[i]*0.35));
+  const cEnt=REV_BASE.cEnt.map((v,i)=>v+Math.floor(custAdj[i]*0.15));
+  const totalC=cStart.map((v,i)=>v+cPro[i]+cEnt[i]);
+  const mrrS=cStart.map(v=>v*380);    // avg monthly order: specialty shop
+  const mrrP=cPro.map(v=>v*2800);   // avg monthly order: regional chain
+  const mrrE=cEnt.map(v=>v*18000);  // avg monthly order: national group
+  const mrr=mrrS.map((v,i)=>v+mrrP[i]+mrrE[i]);
+  const d=getScenData();
+  const svcRev=d.rev.map((v,i)=>v-mrr[i]);
+  const totalRevYear=d.rev.reduce((a,b)=>a+b,0);
+  const mrrDec=mrr[11];
+  const acv=totalC[11]>0?Math.round(totalRevYear/totalC[11]):0;
+  const partnerRev=Math.round(totalRevYear*0.42);
+  const peakRevVal=Math.max(...d.rev);
+  const peakRevMonth=MONTHS[d.rev.indexOf(peakRevVal)];
+  const peakAccounts=Math.max(...totalC);
+  const peakAccountsMonth=MONTHS[totalC.indexOf(peakAccounts)];
+  const newAccountsYTD=peakAccounts-totalC[0];
+
+  document.getElementById('content').innerHTML=`
+${calloutHTML()}
+<div class="kpi-grid">
+  <div class="kpi-card"><div class="kpi-lbl">Annual Revenue 2026</div><div class="kpi-val">${e(totalRevYear)}</div><div class="kpi-chg neu">Full year (act.+prognosis)</div></div>
+  <div class="kpi-card"><div class="kpi-lbl">Peak Month Revenue</div><div class="kpi-val">${e(peakRevVal)}</div><div class="kpi-chg neu">${peakRevMonth} — pre-summer peak</div></div>
+  <div class="kpi-card"><div class="kpi-lbl">Unique Accounts FY2026</div><div class="kpi-val">${peakAccounts}</div><div class="kpi-chg pos">${totalC[0]} year-round · ${peakAccounts-totalC[0]} seasonal only</div></div>
+  <div class="kpi-card"><div class="kpi-lbl">Distributor Revenue</div><div class="kpi-val">${e(partnerRev)}</div><div class="kpi-chg neu">~42% via distributors</div></div>
+</div>
+<div class="cg1">
+  <div class="cc">
+    <div class="cc-hdr"><div><div class="cc-title">Revenue breakdown — recurring vs. one-off</div><div class="cc-sub">Frame-contract revenue vs. spot and promotional orders</div></div></div>
+    <canvas id="ch-rev-split" height="100"></canvas>
+    <div class="legend" style="margin-top:10px">
+      <div class="legend-item"><div class="ld" style="background:#2563eb"></div>Frame-contract orders</div>
+      <div class="legend-item"><div class="ld" style="background:#4fc3a1"></div>Spot &amp; promotional orders</div>
+    </div>
+  </div>
+</div>
+<div class="cg2">
+  <div class="cc">
+    <div class="cc-hdr"><div><div class="cc-title">Revenue by account tier</div><div class="cc-sub">Specialty · Regional chain · National group</div></div></div>
+    <canvas id="ch-mrr" height="140"></canvas>
+  </div>
+  <div class="cc">
+    <div class="cc-hdr"><div><div class="cc-title">Active accounts by tier</div><div class="cc-sub">Ordering accounts per month</div></div></div>
+    <canvas id="ch-clients" height="140"></canvas>
+  </div>
+</div>
+<div class="cc" style="margin-bottom:16px">
+  <div class="cc-hdr"><div><div class="cc-title">Revenue by channel</div><div class="cc-sub">Via distributor vs direct-to-retailer</div></div></div>
+  <canvas id="ch-channel" height="90"></canvas>
+  <div class="legend" style="margin-top:10px">
+    <div class="legend-item"><div class="ld" style="background:#2563eb"></div>Via distributor</div>
+    <div class="legend-item"><div class="ld" style="background:#94a3b8"></div>Direct to retailer</div>
+  </div>
+</div>`;
+
+  // Revenue split chart
+  mkChart('ch-rev-split',{
+    type:'bar',data:{labels:MONTHS,datasets:[
+      {label:'SaaS/MRR',data:mrr,backgroundColor:'rgba(37,99,235,0.75)',stack:'a'},
+      {label:'Services',data:svcRev.map(v=>Math.max(0,v)),backgroundColor:'rgba(79,195,161,0.65)',stack:'a'},
+    ]},
+    options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+e(ctx.parsed.y)}}},scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:v=>e(v)},grid:{color:'#f1f5f9'}}}}
+  });
+
+  // MRR by tier
+  mkChart('ch-mrr',{
+    type:'line',data:{labels:MONTHS,datasets:[
+      {label:'National groups',data:mrrE,borderColor:'#7c3aed',backgroundColor:'rgba(124,58,237,0.08)',fill:true,tension:.4,borderWidth:2,pointRadius:2},
+      {label:'Regional chains',data:mrrP,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.06)',fill:true,tension:.4,borderWidth:2,pointRadius:2},
+      {label:'Specialty shops',data:mrrS,borderColor:'#4fc3a1',backgroundColor:'rgba(79,195,161,0.06)',fill:true,tension:.4,borderWidth:2,pointRadius:2},
+    ]},
+    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{y:{ticks:{callback:v=>e(v)},grid:{color:'#f1f5f9'}}}}
+  });
+
+  // Clients
+  mkChart('ch-clients',{
+    type:'bar',data:{labels:MONTHS,datasets:[
+      {label:'National groups',data:cEnt,backgroundColor:'#7c3aed',stack:'a'},
+      {label:'Regional chains',data:cPro,backgroundColor:'#2563eb',stack:'a'},
+      {label:'Specialty shops',data:cStart,backgroundColor:'#93c5fd',stack:'a'},
+    ]},
+    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{x:{stacked:true},y:{stacked:true,grid:{color:'#f1f5f9'}}}}
+  });
+
+  // Channel
+  const pct38=d.rev.map(v=>Math.round(v*0.42));
+  const pct62=d.rev.map(v=>Math.round(v*0.58));
+  mkChart('ch-channel',{
+    type:'bar',data:{labels:MONTHS,datasets:[
+      {label:'Via distributor',data:pct38,backgroundColor:'rgba(37,99,235,0.7)',stack:'a'},
+      {label:'Direct',data:pct62,backgroundColor:'rgba(148,163,184,0.6)',stack:'a'},
+    ]},
+    options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+e(ctx.parsed.y)}}},scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:v=>e(v)},grid:{color:'#f1f5f9'}}}}
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// MODULE: MARKETING
+// ═══════════════════════════════════════════════════════
+function renderMarketing(){
+  const s=SC[scen];
+  const budgetAdj=scen==='bank-loan'?10000:scen==='hire-sales'?8000:scen==='new-product'?12000:0;
+  const budget=MKT_BASE.budget.map((v,i)=>i>=4?v+(budgetAdj):i>=3&&budgetAdj>0?v+Math.round(budgetAdj*0.5):v);
+  const totalBudget=budget.reduce((a,b)=>a+b,0);
+  // Apply scenario lead/funnel adjustments (scaled proportionally for demos/trials/conv)
+  const leads=MKT_BASE.leads.map((v,i)=>v+(s.leadsAdj[i]||0));
+  const demos=MKT_BASE.demos.map((v,i)=>v+Math.round((s.leadsAdj[i]||0)*0.55));
+  const trials=MKT_BASE.trials.map((v,i)=>v+Math.round((s.leadsAdj[i]||0)*0.28));
+  const conv=MKT_BASE.conv.map((v,i)=>v+Math.round((s.leadsAdj[i]||0)*0.18));
+  const totalLeads=leads.reduce((a,b)=>a+b,0);
+  const totalConv=conv.reduce((a,b)=>a+b,0);
+  const avgCAC=Math.round(totalBudget/Math.max(1,totalConv));
+  const mktNote=s.mktNote;
+
+  document.getElementById('content').innerHTML=`
+${calloutHTML()}
+${mktNote?`<div class="sc-callout" style="background:#f8fafc;border-color:#e2e8f0;color:#475569"><span class="sc-callout-icon">💡</span><div>${mktNote}</div></div>`:''}
+<div class="kpi-grid">
+  <div class="kpi-card"><div class="kpi-lbl">Total Mkt Budget 2026</div><div class="kpi-val">${e(totalBudget)}</div><div class="kpi-chg neu">~${Math.round(totalBudget/MKT_BASE.budget.reduce((a,b)=>a+b,0)*100-100)>0?'+':''}${Math.round(totalBudget/MKT_BASE.budget.reduce((a,b)=>a+b,0)*100-100)}% vs base</div></div>
+  <div class="kpi-card"><div class="kpi-lbl">Avg CAC (blended)</div><div class="kpi-val">${e(avgCAC)}</div><div class="kpi-chg neu">Marketing spend only</div></div>
+  <div class="kpi-card"><div class="kpi-lbl">Leads Generated</div><div class="kpi-val">${totalLeads}</div><div class="kpi-chg neu">${Math.round(totalConv/totalLeads*100)}% trial conversion</div></div>
+  <div class="kpi-card"><div class="kpi-lbl">Active Partners</div><div class="kpi-val">12</div><div class="kpi-chg pos">↑ 3 new Q2/Q3</div></div>
+</div>
+<div class="cg2">
+  <div class="cc">
+    <div class="cc-hdr"><div><div class="cc-title">Lead-to-client funnel</div><div class="cc-sub">Full year 2026 · all channels</div></div></div>
+    <div class="funnel">
+      ${funnelRow('Website Visitors','5,840','#e2e8f0',100,'#cbd5e1')}
+      ${funnelRow('Qualified Leads',''+totalLeads,'#bfdbfe',Math.round(totalLeads/5840*100),'#93c5fd')}
+      ${funnelRow('Demo Booked',''+demos.reduce((a,b)=>a+b,0),'#a5b4fc',Math.round(demos.reduce((a,b)=>a+b,0)/5840*100),'#818cf8')}
+      ${funnelRow('Free Trial',''+trials.reduce((a,b)=>a+b,0),'#93c5fd',Math.round(trials.reduce((a,b)=>a+b,0)/5840*100),'#2563eb')}
+      ${funnelRow('Converted Client',''+totalConv,'#6ee7b7',Math.round(totalConv/5840*100),'#4fc3a1')}
+    </div>
+  </div>
+  <div class="cc">
+    <div class="cc-hdr"><div><div class="cc-title">Monthly marketing budget</div><div class="cc-sub">vs. new clients acquired</div></div></div>
+    <canvas id="ch-mkt-budget" height="170"></canvas>
+  </div>
+</div>
+<div class="cg2">
+  <div class="cc">
+    <div class="cc-hdr"><div><div class="cc-title">CAC trend</div><div class="cc-sub">Customer acquisition cost per channel</div></div></div>
+    <canvas id="ch-cac" height="155"></canvas>
+  </div>
+  <div class="cc">
+    <div class="cc-hdr"><div><div class="cc-title">Partner network</div><div class="cc-sub">Go-to-market distribution</div></div></div>
+    <div style="padding:8px 0">
+      ${partnerRow('Netherlands','Albert Heijn, Jumbo, Spar','3 national retailers','#2563eb',80)}
+      ${partnerRow('Belgium','Colruyt, Delhaize','2 distributors','#4fc3a1',30)}
+      ${partnerRow('Germany','EDEKA distributor','1 distributor','#7c3aed',18)}
+      ${partnerRow('Food service NL','Sligro, Bidfood','2 wholesalers','#d97706',22)}
+      ${partnerRow('E-commerce','Picnic, Gorillas','2 platforms','#94a3b8',10)}
+    </div>
+    <div style="margin-top:12px;font-size:12px;color:var(--txt2)">Target: 8 distributor partnerships by end 2026 · Regional exclusivity</div>
+  </div>
+</div>`;
+
+  mkChart('ch-mkt-budget',{
+    type:'bar',data:{labels:MONTHS,datasets:[
+      {label:'Budget (€)',data:budget,backgroundColor:'rgba(37,99,235,0.6)',yAxisID:'y'},
+      {label:'New Clients',data:conv,type:'line',borderColor:'#4fc3a1',backgroundColor:'transparent',borderWidth:2,pointRadius:4,pointBackgroundColor:'#4fc3a1',yAxisID:'y2',tension:.35},
+    ]},
+    options:{responsive:true,interaction:{mode:'index'},plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{y:{ticks:{callback:v=>'€'+v/1000+'K'},grid:{color:'#f1f5f9'}},y2:{position:'right',grid:{drawOnChartArea:false},title:{display:true,text:'Clients'}}}}
+  });
+
+  // CAC per month = budget / conv (0 conv → null to avoid spikes)
+  const cacAdj=budget.map((b,i)=>conv[i]>0?Math.round(b/conv[i]):null);
+  mkChart('ch-cac',{
+    type:'line',data:{labels:MONTHS,datasets:[
+      {label:'Partner CAC',data:cacAdj.map(v=>v!=null?Math.round(v*0.7):null),borderColor:'#2563eb',backgroundColor:'transparent',borderWidth:2,pointRadius:3,tension:.35,spanGaps:true},
+      {label:'Direct CAC',data:cacAdj.map(v=>v!=null?Math.round(v*1.4):null),borderColor:'#94a3b8',backgroundColor:'transparent',borderWidth:2,pointRadius:3,tension:.35,spanGaps:true},
+    ]},
+    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{y:{ticks:{callback:v=>'€'+v.toLocaleString('nl-NL')},grid:{color:'#f1f5f9'}}}}
+  });
+}
+
+function funnelRow(lbl,val,_color,pctW,barColor){
+  return `<div class="funnel-row">
+    <div class="funnel-lbl">${lbl}</div>
+    <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:${Math.max(pctW,5)}%;background:${barColor}">${val}</div></div>
+    <div class="funnel-val">${val}</div>
+  </div>`;
+}
+function partnerRow(country,systems,count,color,pct){
+  return `<div style="margin-bottom:10px">
+    <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+      <span style="font-size:13px;font-weight:500">${country}</span>
+      <span style="font-size:11px;color:var(--txt2)">${count} · ${systems}</span>
+    </div>
+    <div class="pb-wrap"><div class="pb" style="width:${pct}%;background:${color}"></div></div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// MODULE: HR
+// ═══════════════════════════════════════════════════════
+function renderHR(){
+  const s=SC[scen];
+
+  // hire-sales: +2 KAMs from March (idx 2), +2 warehouse from June (idx 5) = +4 by Dec
+  // new-product: +1 food technologist +1 production operator from January (idx 0) = +2
+  const hc=scen==='hire-sales'
+    ? HR_BASE.hc.map((v,i)=>v+(i>=5?4:i>=2?2:0))
+    : scen==='new-product'
+    ? HR_BASE.hc.map(v=>v+2)
+    : [...HR_BASE.hc];
+
+  const salary=HR_BASE.salary.map((v,i)=>{
+    if(scen==='hire-sales'){
+      // +2 KAMs @€5K each from March; +2 warehouse @€2.8K each from June
+      return v+(i>=2?2*5000:0)+(i>=5?2*2800:0);
+    }
+    if(scen==='new-product'){
+      // +1 food technologist @€4.5K + 1 production operator @€3K from January
+      return v+4500+3000;
+    }
+    return v;
+  });
+
+  const d=getScenData();
+  // Annual revenue per FTE = full-year revenue ÷ December headcount
+  const annualRev=d.rev.reduce((a,b)=>a+b,0);
+  const revPerFTE=Math.round(annualRev/hc[11]);
+  // Open roles = total planned new hires minus those already active (Mar+Apr base = 2 filled)
+  const scenExtraOpen={'new-product':0,'hire-sales':4}[scen]||0;
+  const openRoles=6+scenExtraOpen; // 6 base roles still to fill (May–Dec) + any scenario extras
+  const openRolesNote=scen==='hire-sales'?'incl. 4 scenario hires':scen==='new-product'?'incl. 2 Jan scenario hires (filled)':'to fill May – Dec 2026';
+  const hrNote=s.hrNote;
+
+  const depts={
+    // hire-sales: +2 warehouse from June; new-product: +2 production ops from Jan
+    Warehouse:HR_BASE.depts.Warehouse.map((v,i)=>{
+      if(scen==='hire-sales'&&i>=5)return v+2;
+      if(scen==='new-product')return v+2;
+      return v;
+    }),
+    // hire-sales: +2 KAMs from March
+    Sales:HR_BASE.depts.Sales.map((v,i)=>scen==='hire-sales'&&i>=2?v+2:v),
+    Logistics:HR_BASE.depts.Logistics,
+    Finance:HR_BASE.depts.Finance,
+    Management:HR_BASE.depts.Management,
+  };
+
+  document.getElementById('content').innerHTML=`
+${calloutHTML()}
+${hrNote?`<div class="sc-callout" style="background:#f8fafc;border-color:#e2e8f0;color:#475569"><span class="sc-callout-icon">💡</span><div>${hrNote}</div></div>`:''}
+<div class="kpi-grid">
+  <div class="kpi-card"><div class="kpi-lbl">Headcount (Dec)</div><div class="kpi-val">${hc[11]}</div><div class="kpi-chg pos">↑ ${hc[11]-hc[0]} hired in 2026</div></div>
+  <div class="kpi-card"><div class="kpi-lbl">Total Payroll (Dec)</div><div class="kpi-val">${e(salary[11])}</div><div class="kpi-chg ${salary[11]>HR_BASE.salary[11]?'neg':'neu'}">${salary[11]===HR_BASE.salary[11]?'Same as base':'vs base: +'+e(salary[11]-HR_BASE.salary[11],true)}</div></div>
+  <div class="kpi-card"><div class="kpi-lbl">Annual Rev. per FTE</div><div class="kpi-val">${e(revPerFTE)}</div><div class="kpi-chg neu">Full-year revenue ÷ Dec headcount</div></div>
+  <div class="kpi-card"><div class="kpi-lbl">Open Roles</div><div class="kpi-val">${openRoles}</div><div class="kpi-chg neu">${openRolesNote}</div></div>
+</div>
+<div class="cg2">
+  <div class="cc">
+    <div class="cc-hdr"><div><div class="cc-title">Headcount growth</div><div class="cc-sub">FTE by month · 2026</div></div></div>
+    <canvas id="ch-hc" height="155"></canvas>
+  </div>
+  <div class="cc">
+    <div class="cc-hdr"><div><div class="cc-title">Department split</div><div class="cc-sub">Headcount by function (December)</div></div></div>
+    <canvas id="ch-dept" height="155"></canvas>
+  </div>
+</div>
+<div class="cc" style="margin-bottom:16px">
+  <div class="cc-hdr"><div><div class="cc-title">Monthly salary cost vs revenue</div><div class="cc-sub">Staff cost as % of revenue</div></div></div>
+  <canvas id="ch-salary" height="95"></canvas>
+</div>
+<div class="cc" style="margin-bottom:16px">
+  <div class="cc-hdr">
+    <div>
+      <div class="cc-title">Hiring plan 2026</div>
+      <div class="cc-sub">New roles only · Existing team Jan 2026: ${HR_BASE.hc[0]} FTE</div>
+    </div>
+    <div style="font-size:13px;font-weight:700;color:var(--blue)">${hc[11]-HR_BASE.hc[0]} new hires planned</div>
+  </div>
+  <table class="dt">
+    <thead><tr><th>Role</th><th>Department</th><th>Start</th><th>Salary / mo</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr class="sec-hdr"><td colspan="5">Base plan — all scenarios</td></tr>
+      ${hiringRow('Logistics Coordinator',   'Logistics', 'Mar 2026','€3,500',       '<span class="st st-done">Active</span>')}
+      ${hiringRow('Warehouse Operator',      'Warehouse', 'Apr 2026','€2,800',       '<span class="st st-done">Active</span>')}
+      ${hiringRow('Sales Representative',    'Sales',     'May 2026','€3,200 + comm.','<span class="st st-prog">In hiring</span>')}
+      ${hiringRow('Warehouse Operator',      'Warehouse', 'Jun 2026','€2,800',       '<span class="st st-prog">In hiring</span>')}
+      ${hiringRow('Logistics Officer',       'Logistics', 'Jul 2026','€4,000',       '<span class="st st-plan">Planned</span>')}
+      ${hiringRow('Office Coordinator',      'Management','Aug 2026','€3,200',       '<span class="st st-plan">Planned</span>')}
+      ${hiringRow('Warehouse Operator',      'Warehouse', 'Sep 2026','€2,800',       '<span class="st st-plan">Planned</span>')}
+      ${hiringRow('Warehouse Operator',      'Warehouse', 'Dec 2026','€2,800',       '<span class="st st-plan">Planned</span>')}
+      ${scen==='new-product'?`<tr class="sec-hdr"><td colspan="5">Artisan Collection — scenario hires (+2)</td></tr>`:''}
+      ${scen==='new-product'?hiringRow('Food Technologist (Artisan)', 'Warehouse','Jan 2026','€4,500','<span class="st st-prog">Scenario hire</span>'):''}
+      ${scen==='new-product'?hiringRow('Production Operator (Artisan)','Warehouse','Jan 2026','€3,000','<span class="st st-prog">Scenario hire</span>'):''}
+      ${scen==='hire-sales'?`<tr class="sec-hdr"><td colspan="5">Hire More Sales — scenario hires (+4)</td></tr>`:''}
+      ${scen==='hire-sales'?hiringRow('Key Account Manager #1','Sales',    'Mar 2026','€5,000 + comm.','<span class="st st-prog">Scenario hire</span>'):''}
+      ${scen==='hire-sales'?hiringRow('Key Account Manager #2','Sales',    'Mar 2026','€5,000 + comm.','<span class="st st-prog">Scenario hire</span>'):''}
+      ${scen==='hire-sales'?hiringRow('Warehouse Operator',    'Warehouse','Jun 2026','€2,800',        '<span class="st st-plan">Scenario hire</span>'):''}
+      ${scen==='hire-sales'?hiringRow('Warehouse Operator',    'Warehouse','Jun 2026','€2,800',        '<span class="st st-plan">Scenario hire</span>'):''}
+    </tbody>
+  </table>
+</div>`;
+
+  mkChart('ch-hc',{
+    type:'bar',data:{labels:MONTHS,datasets:[
+      {label:'Warehouse',data:depts.Warehouse,backgroundColor:'#2563eb',stack:'a'},
+      {label:'Sales',data:depts.Sales,backgroundColor:'#4fc3a1',stack:'a'},
+      {label:'Logistics',data:depts.Logistics,backgroundColor:'#7c3aed',stack:'a'},
+      {label:'Finance',data:depts.Finance,backgroundColor:'#f59e0b',stack:'a'},
+      {label:'Management',data:depts.Management,backgroundColor:'#94a3b8',stack:'a'},
+    ]},
+    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{x:{stacked:true},y:{stacked:true,grid:{color:'#f1f5f9'}}}}
+  });
+
+  const decDept={
+    Warehouse:depts.Warehouse[11],Sales:depts.Sales[11],Logistics:depts.Logistics[11],
+    Finance:depts.Finance[11],Management:depts.Management[11]
+  };
+  mkChart('ch-dept',{
+    type:'doughnut',data:{labels:Object.keys(decDept),datasets:[{data:Object.values(decDept),backgroundColor:['#2563eb','#4fc3a1','#7c3aed','#f59e0b','#94a3b8'],borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,plugins:{legend:{position:'right',labels:{boxWidth:12,font:{size:12}}}}}
+  });
+
+  mkChart('ch-salary',{
+    type:'bar',data:{labels:MONTHS,datasets:[
+      {label:'Salary Cost',data:salary,backgroundColor:'rgba(37,99,235,0.6)',yAxisID:'y'},
+      {label:'Revenue',data:d.rev,type:'line',borderColor:'#4fc3a1',backgroundColor:'transparent',borderWidth:2,pointRadius:2,tension:.4,yAxisID:'y'},
+    ]},
+    options:{responsive:true,interaction:{mode:'index'},plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{y:{ticks:{callback:v=>e(v)},grid:{color:'#f1f5f9'}}}}
+  });
+}
+function hiringRow(name,dept,start,sal,st){
+  return `<tr><td>${name}</td><td class="fc" style="text-align:left">${dept}</td><td style="text-align:left">${start}</td><td>${sal}</td><td style="text-align:left">${st}</td></tr>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// MODULE: LOGISTICS
+// ═══════════════════════════════════════════════════════
+function renderLogistics(){
+  const s=SC[scen];
+  const logNote=s.logNote;
+  // New Product: inventory builds Feb–Mar (pre-production), shipments lift from April launch
+  // Hire Sales: new accounts ramp from July; warehouse volume lifts Aug onwards
+  const invAdj=scen==='new-product'?[0,25,55,80,60,40,30,28,26,24,28,28]:
+               scen==='hire-sales'? [0,0,0,0,0,0,18,28,24,20,22,18]:Array(12).fill(0);
+  const shipAdj=scen==='new-product'?[0,0,0,28,58,42,25,20,16,14,15,16]:
+                scen==='hire-sales'?[0,0,0,0,0,12,38,52,42,32,30,28]:Array(12).fill(0);
+  const inventory=LOG_BASE.inventory.map((v,i)=>v+invAdj[i]);
+  const shipments=LOG_BASE.shipments.map((v,i)=>v+shipAdj[i]);
+  const poCount=LOG_BASE.poCount.map((v,i)=>v+(s.poAdj[i]||0));
+  const suppOTD=LOG_BASE.suppOTD.map((v,i)=>Math.min(100,v+(s.otdAdj[i]||0)));
+  const wareUsage=LOG_BASE.wareUsage.map((v,i)=>Math.min(100,v+(s.wareAdj[i]||0)));
+  const dio=LOG_BASE.dio.map((v,i)=>Math.max(0,v+(s.dioAdj[i]||0)));
+
+  document.getElementById('content').innerHTML=`
+${calloutHTML()}
+${logNote?`<div class="sc-callout" style="background:#f8fafc;border-color:#e2e8f0;color:#475569"><span class="sc-callout-icon">💡</span><div>${logNote}</div></div>`:''}
+<div class="kpi-grid">
+  <div class="kpi-card"><div class="kpi-lbl">Inventory Value (Dec)</div><div class="kpi-val">${e(inventory[11]*1000)}</div><div class="kpi-chg neu">Finished goods + raw materials</div></div>
+  <div class="kpi-card"><div class="kpi-lbl">Shipments (Jun peak)</div><div class="kpi-val">${shipments[5]}</div><div class="kpi-chg pos">↑ ${shipments[5]-shipments[0]} vs Jan baseline</div></div>
+  <div class="kpi-card"><div class="kpi-lbl">Supplier OTD (Dec)</div><div class="kpi-val">${suppOTD[11]}%</div><div class="kpi-chg ${suppOTD[11]>=LOG_BASE.suppOTD[11]?'pos':'neg'}">↑ ${suppOTD[11]-LOG_BASE.suppOTD[0]}pp vs Jan baseline</div></div>
+  <div class="kpi-card"><div class="kpi-lbl">Warehouse Utilisation</div><div class="kpi-val">${Math.max(...wareUsage)}%</div><div class="kpi-chg ${Math.max(...wareUsage)<=85?'pos':'neu'}">${Math.max(...wareUsage)<=85?'Within target ≤ 85%':'Peak — target ≤ 85%'}</div></div>
+</div>
+<div class="cg2">
+  <div class="cc">
+    <div class="cc-hdr"><div><div class="cc-title">Inventory value &amp; outbound shipments</div><div class="cc-sub">Stock value (€K, left) vs shipments count (right)</div></div></div>
+    <canvas id="ch-inv" height="155"></canvas>
+  </div>
+  <div class="cc">
+    <div class="cc-hdr"><div><div class="cc-title">Incoming purchase orders</div><div class="cc-sub">PO count per month</div></div></div>
+    <canvas id="ch-po" height="155"></canvas>
+  </div>
+</div>
+<div class="cg2">
+  <div class="cc">
+    <div class="cc-hdr"><div><div class="cc-title">Supplier on-time delivery</div><div class="cc-sub">% of deliveries received within agreed lead time</div></div></div>
+    <canvas id="ch-otd" height="155"></canvas>
+  </div>
+  <div class="cc">
+    <div class="cc-hdr"><div><div class="cc-title">Days Inventory Outstanding (DIO)</div><div class="cc-sub">Avg days stock is held before sold / shipped</div></div></div>
+    <canvas id="ch-dio" height="155"></canvas>
+  </div>
+</div>`;
+
+  mkChart('ch-inv',{
+    type:'bar',data:{labels:MONTHS,datasets:[
+      {label:'Inventory (€K)',data:inventory,backgroundColor:MONTHS.map((_,i)=>ISACT[i]?'rgba(37,99,235,0.7)':'rgba(37,99,235,0.45)'),yAxisID:'y',order:2},
+      {label:'Shipments',data:shipments,type:'line',borderColor:'#4fc3a1',backgroundColor:'transparent',borderWidth:2.5,pointRadius:3,pointBackgroundColor:'#4fc3a1',yAxisID:'y2',tension:.35,order:1},
+    ]},
+    options:{responsive:true,interaction:{mode:'index'},plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+(ctx.datasetIndex===0?'€'+ctx.parsed.y+'K':ctx.parsed.y)}}},scales:{y:{ticks:{callback:v=>'€'+v+'K'},grid:{color:'#f1f5f9'}},y2:{position:'right',grid:{drawOnChartArea:false},title:{display:true,text:'Shipments'}}}}
+  });
+
+  mkChart('ch-po',{
+    type:'bar',data:{labels:MONTHS,datasets:[
+      {label:'Purchase Orders',data:poCount,backgroundColor:MONTHS.map((_,i)=>ISACT[i]?'#7c3aed':'rgba(124,58,237,0.5)'),borderRadius:3},
+    ]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{grid:{color:'#f1f5f9'},ticks:{stepSize:5}}}}
+  });
+
+  mkChart('ch-otd',{
+    type:'line',data:{labels:MONTHS,datasets:[
+      {label:'Supplier OTD %',data:suppOTD,borderColor:'#4fc3a1',backgroundColor:'rgba(79,195,161,0.1)',fill:true,borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#4fc3a1',tension:.35},
+      {label:'Target (95%)',data:Array(12).fill(95),borderColor:'#94a3b8',borderDash:[5,5],borderWidth:1.5,pointRadius:0},
+    ]},
+    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{y:{min:80,max:100,ticks:{callback:v=>v+'%'},grid:{color:'#f1f5f9'}}}}
+  });
+
+  mkChart('ch-dio',{
+    type:'line',data:{labels:MONTHS,datasets:[
+      {label:'DIO (days)',data:dio,borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,0.1)',fill:true,borderWidth:2.5,pointRadius:3,tension:.35},
+      {label:'Target (30d)',data:Array(12).fill(30),borderColor:'#94a3b8',borderDash:[5,5],borderWidth:1.5,pointRadius:0},
+    ]},
+    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{y:{min:0,max:60,ticks:{callback:v=>v+'d'},grid:{color:'#f1f5f9'}}}}
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// MODULE: PROJECTS
+// ═══════════════════════════════════════════════════════
+function renderProjects(){
+  const s=SC[scen];
+  const prjNote=s.prjNote;
+  const health={...PRJ_BASE.health};
+  if(scen==='new-product'){health['Artisan Collection']+=15;health['ERP Upgrade']+=5;}
+  if(scen==='bank-loan'){health['WMS Implementation']+=12;health['Supplier Portal']+=10;}
+  if(scen==='push-receivables'){health['ERP Upgrade']+=8;}
+  if(scen==='hire-sales'){health['WMS Implementation']+=6;}
+  const budgetBurn=PRJ_BASE.budgetBurn.map((v,i)=>v+(s.burnAdj[i]||0));
+  const totalBudget=budgetBurn.reduce((a,b)=>a+b,0);
+  const onTime=scen==='bank-loan'?92:scen==='new-product'?80:scen==='push-receivables'?88:86;
+
+  document.getElementById('content').innerHTML=`
+${calloutHTML()}
+${prjNote?`<div class="sc-callout" style="background:#f8fafc;border-color:#e2e8f0;color:#475569"><span class="sc-callout-icon">💡</span><div>${prjNote}</div></div>`:''}
+<div class="kpi-grid">
+  <div class="kpi-card"><div class="kpi-lbl">Active Projects</div><div class="kpi-val">${scen==='new-product'?7:scen==='bank-loan'?7:6}</div><div class="kpi-chg neu">1 completed in Jan–Feb</div></div>
+  <div class="kpi-card"><div class="kpi-lbl">Total Project Budget</div><div class="kpi-val">${e(totalBudget*1000)}</div><div class="kpi-chg neu">Full year 2026 plan</div></div>
+  <div class="kpi-card"><div class="kpi-lbl">On-time Delivery</div><div class="kpi-val">${onTime}%</div><div class="kpi-chg ${onTime>=86?'pos':'neu'}">Last 3 milestones</div></div>
+  <div class="kpi-card"><div class="kpi-lbl">Avg. Initiative Health</div><div class="kpi-val">${Math.round(Object.values(health).reduce((a,b)=>a+b,0)/Object.values(health).length)}%</div><div class="kpi-chg neu">Across all active projects</div></div>
+</div>
+<div class="cg1">
+  <div class="cc">
+    <div class="cc-hdr"><div><div class="cc-title">Project timeline 2026</div><div class="cc-sub">Key operational initiatives and milestones</div></div></div>
+    <div class="gantt-wrap">${buildGantt()}</div>
+  </div>
+</div>
+<div class="cg2">
+  <div class="cc">
+    <div class="cc-hdr"><div><div class="cc-title">Initiative progress</div><div class="cc-sub">Completion % by project</div></div></div>
+    <canvas id="ch-feat" height="160"></canvas>
+  </div>
+  <div class="cc">
+    <div class="cc-hdr"><div><div class="cc-title">Monthly project budget burn</div><div class="cc-sub">Total spend across all initiatives (€K)</div></div></div>
+    <canvas id="ch-vel" height="160"></canvas>
+  </div>
+</div>`;
+
+  mkChart('ch-feat',{
+    type:'bar',data:{
+      labels:Object.keys(health),
+      datasets:[{label:'Completion %',data:Object.values(health),backgroundColor:['#2563eb','#7c3aed','#16a34a','#4fc3a1','#f59e0b','#94a3b8'],borderRadius:4}]
+    },
+    options:{responsive:true,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{max:100,ticks:{callback:v=>v+'%'},grid:{color:'#f1f5f9'}}}}
+  });
+
+  mkChart('ch-vel',{
+    type:'bar',data:{labels:MONTHS,datasets:[
+      {label:'Budget Burn (€K)',data:budgetBurn,backgroundColor:MONTHS.map((_,i)=>ISACT[i]?'rgba(124,58,237,0.7)':'rgba(124,58,237,0.45)'),borderRadius:3},
+    ]},
+    options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'€'+ctx.parsed.y+'K'}}},scales:{y:{ticks:{callback:v=>'€'+v+'K'},grid:{color:'#f1f5f9'}}}}
+  });
+}
+
+function buildGantt(){
+  const milestones=[
+    {lbl:'ERP Upgrade',start:0,len:4,color:'#2563eb',st:'st-prog'},
+    {lbl:'WMS Implementation',start:2,len:5,color:'#7c3aed',st:'st-prog'},
+    {lbl:'Artisan Collection',start:scen==='new-product'?0:3,len:scen==='new-product'?4:2,color:'#16a34a',st:scen==='new-product'?'st-prog':'st-plan'},
+    {lbl:'Process Optimisation',start:0,len:6,color:'#4fc3a1',st:'st-prog'},
+    {lbl:'Supplier Portal',start:scen==='bank-loan'?3:4,len:3,color:'#f59e0b',st:scen==='bank-loan'?'st-prog':'st-plan'},
+    {lbl:'Warehouse Expansion',start:scen==='new-product'?6:9,len:3,color:'#dc2626',st:scen==='new-product'?'st-plan':'st-plan'},
+    {lbl:'Sustainability Plan',start:7,len:4,color:'#94a3b8',st:'st-plan'},
+  ];
+  const labels=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  let h=`<div style="display:grid;grid-template-columns:170px repeat(12,1fr);gap:4px;margin-bottom:8px;font-size:10px;color:var(--txt2)">
+    <div></div>${labels.map(l=>`<div style="text-align:center">${l}</div>`).join('')}
+  </div>`;
+  milestones.forEach(m=>{
+    h+=`<div style="display:grid;grid-template-columns:170px repeat(12,1fr);gap:4px;margin-bottom:5px;align-items:center">`;
+    h+=`<div style="font-size:12px;font-weight:500;color:var(--txt)">${m.lbl}</div>`;
+    for(let i=0;i<12;i++){
+      if(i===m.start){
+        h+=`<div style="grid-column:${i+2}/span ${m.len};background:${m.color};border-radius:4px;height:20px;display:flex;align-items:center;padding:0 6px"><span class="st ${m.st}" style="font-size:9px">${({'st-done':'Done','st-prog':'Active','st-plan':'Planned','st-risk':'At risk'})[m.st]||''}</span></div>`;
+        i+=m.len-1;
+      } else {
+        h+=`<div style="background:#f3f4f6;border-radius:2px;height:20px"></div>`;
+      }
+    }
+    h+=`</div>`;
+  });
+  return h;
+}
+
+// ═══════════════════════════════════════════════════════
+// MODULE: COMPARE SCENARIOS
+// ═══════════════════════════════════════════════════════
+function renderCompare(){
+  const SCENS=['base','new-product','bank-loan','push-receivables','hire-sales'];
+  const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  // ── compute KPIs per scenario ──
+  const K={};
+  SCENS.forEach(s=>{
+    const sc=SC[s];
+    const rev=B.rev.map((v,i)=>v+sc.rAdj[i]).reduce((a,b)=>a+b,0);
+    const cost=B.cost.map((v,i)=>v+sc.cAdj[i]).reduce((a,b)=>a+b,0);
+    const opRes=rev-cost;
+    const liqBals=B.liqBal.map((v,i)=>v+(sc.lbAdj[i]||0));
+    const eoyLiq=liqBals[11]*1000;
+    const peakLiq=Math.max(...liqBals)*1000;
+    const peakMon=MN[liqBals.indexOf(Math.max(...liqBals))];
+    const q1Min=Math.min(liqBals[0],liqBals[1],liqBals[2])*1000;
+    let hcEOY=HR_BASE.hc[11];
+    if(s==='new-product')hcEOY+=2;
+    if(s==='hire-sales')hcEOY+=4;
+    K[s]={rev,cost,opRes,eoyLiq,peakLiq,peakMon,q1Min,hcEOY};
+  });
+
+  // ── helpers ──
+  const best=(key,hib=true)=>{const vals=SCENS.map(s=>K[s][key]);return hib?Math.max(...vals):Math.min(...vals);};
+  const worst=(key,hib=true)=>{const vals=SCENS.map(s=>K[s][key]);return hib?Math.min(...vals):Math.max(...vals);};
+  const cls=(val,key,hib=true)=>{
+    if(hib===null)return 'cmp-neutral';
+    if(val===best(key,hib))return 'cmp-best';
+    if(val===worst(key,hib))return 'cmp-worst';
+    return 'cmp-neutral';
+  };
+  const delta=(val,key)=>{
+    const d=val-K['base'][key];
+    if(d===0)return`<span class="cmp-delta neu">— same</span>`;
+    return`<span class="cmp-delta ${d>0?'pos':'neg'}">${d>0?'▲ +':'▼ '}${key==='hcEOY'?Math.abs(d)+' FTE':e(Math.abs(d),true)} vs base</span>`;
+  };
+
+  // ── advisor picks ──
+  const picks=[
+    {goal:'Best operating result', s:'new-product', why:`+€${Math.round((K['new-product'].opRes-K['base'].opRes)/1000)}K vs base`},
+    {goal:'Best year-end cash',    s:'new-product', why:`${e(K['new-product'].eoyLiq)} in December`},
+    {goal:'Safest Q1 liquidity',   s:'bank-loan',   why:`€${Math.round(K['bank-loan'].q1Min/1000)}K floor Jan–Mar`},
+    {goal:'Cash boost, no cost',   s:'push-receivables', why:'Zero extra cost, €350K uplift'},
+    {goal:'Best 2027 growth base', s:'hire-sales',  why:'Food service pipeline builds now'},
+  ];
+
+  // ── row data ──
+  const rows=[
+    {lbl:'Full-year Revenue', sub:'Jan–Dec 2026 total', key:'rev', fmt:e, hib:true},
+    {lbl:'Total Costs',       sub:'COGS + overheads',   key:'cost', fmt:e, hib:false},
+    {lbl:'Operating Result',  sub:'Revenue minus costs', key:'opRes', fmt:e, hib:true},
+    {lbl:'Year-end Cash',     sub:'Dec 2026 balance',   key:'eoyLiq', fmt:e, hib:true},
+    {lbl:'Peak Cash',         sub:'Highest month balance', key:'peakLiq', fmt:e, hib:true},
+    {lbl:'Q1 Cash Floor',     sub:'Lowest of Jan–Mar',  key:'q1Min', fmt:e, hib:true},
+    {lbl:'Year-end Headcount',sub:'FTE in December',    key:'hcEOY', fmt:v=>v+' FTE', hib:null},
+  ];
+
+  // ── column headers ──
+  const scenColors={'base':'#475569','new-product':'#16a34a','bank-loan':'#7c3aed','push-receivables':'#d97706','hire-sales':'#dc2626'};
+  const hdrCells=SCENS.map(s=>`<th class="scen-hdr" style="background:${scenColors[s]}">${SC[s].lbl}</th>`).join('');
+
+  // ── table rows ──
+  let tRows='';
+  rows.forEach((r,ri)=>{
+    if(ri===3) tRows+=`<tr class="cmp-sect-hdr"><td colspan="${SCENS.length+1}">Cash &amp; Liquidity</td></tr>`;
+    if(ri===6) tRows+=`<tr class="cmp-sect-hdr"><td colspan="${SCENS.length+1}">People</td></tr>`;
+    tRows+=`<tr>`;
+    tRows+=`<td><div class="cmp-metric-lbl">${r.lbl}</div><div class="cmp-metric-sub">${r.sub}</div></td>`;
+    SCENS.forEach((s,si)=>{
+      const v=K[s][r.key];
+      const c=cls(v,r.key,r.hib);
+      const icon=r.hib!==null?(c==='cmp-best'?' 🏆':c==='cmp-worst'?' 🔴':''):'';
+      tRows+=`<td class="${c}"><div class="cmp-val-main">${r.fmt(v)}${icon}</div>${si>0?delta(v,r.key):''}</td>`;
+    });
+    tRows+=`</tr>`;
+  });
+
+  // ── advisor summary ──
+  const bestRevScen=SCENS.reduce((a,b)=>K[a].rev>K[b].rev?a:b);
+  const bestCashScen=SCENS.reduce((a,b)=>K[a].eoyLiq>K[b].eoyLiq?a:b);
+  const bestQ1Scen=SCENS.reduce((a,b)=>K[a].q1Min>K[b].q1Min?a:b);
+
+  document.getElementById('content').innerHTML=`
+<div class="advisor-card">
+  <div class="advisor-card-hdr">
+    <div class="advisor-av-lg">✦</div>
+    <div>
+      <div class="advisor-title">One Day AI · Scenario Comparison</div>
+      <div class="advisor-sub">FY 2026 forecast · Polar Bear Icecream · All scenarios side by side</div>
+    </div>
+  </div>
+  <div class="advisor-recs">
+    ${picks.map(p=>`
+    <div class="advisor-rec">
+      <div class="rec-goal">${p.goal}</div>
+      <div class="rec-winner" style="color:${scenColors[p.s]}">${SC[p.s].lbl}</div>
+      <div class="rec-why">${p.why}</div>
+    </div>`).join('')}
+  </div>
+  <div class="advisor-summary">
+    <strong>New Product</strong> is your highest-impact option: best operating result (+€${Math.round((K['new-product'].opRes-K['base'].opRes)/1000)}K vs base) and strongest year-end cash (${e(K['new-product'].eoyLiq)}),
+    driven by cumulative Artisan revenue building from April through December.
+    <strong>Push Receivables</strong> is the lowest-risk lever — zero extra cost or headcount, yet a €${Math.round((K['push-receivables'].eoyLiq-K['base'].eoyLiq)/1000)}K uplift in year-end cash through faster debtor collection.
+    If Q1 liquidity is the primary constraint — production costs run at €280–335K/month before any revenue arrives — <strong>Bank Loan</strong> is the right call:
+    it raises your January–March cash floor from <strong>€${Math.round(K['base'].q1Min/1000)}K to €${Math.round(K['bank-loan'].q1Min/1000)}K</strong> for just €15–17K in interest.
+    For maximum impact, consider combining Bank Loan (Q1 safety net) with New Product (summer growth upside) — they address different risks and complement each other directly.
+  </div>
+</div>
+
+<div class="cmp-wrap">
+  <div style="padding:14px 16px 10px;border-bottom:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center">
+    <div>
+      <div style="font-size:14px;font-weight:700;color:var(--txt)">Key outcome comparison</div>
+      <div style="font-size:11px;color:var(--txt2);margin-top:2px">FY 2026 · Deltas shown vs Base scenario · 🏆 best &nbsp; 🔴 worst in each row</div>
+    </div>
+  </div>
+  <div style="overflow-x:auto">
+    <table class="cmp-tbl">
+      <thead>
+        <tr>
+          <th style="text-align:left;background:#f8fafc;min-width:180px">Metric</th>
+          ${hdrCells}
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="cmp-sect-hdr"><td colspan="${SCENS.length+1}">Revenue &amp; Profitability</td></tr>
+        ${tRows}
+      </tbody>
+    </table>
+  </div>
+</div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+
+function renderChat(){
+  document.getElementById('chat-ctx-mod').textContent=MODULE_META[mod]?MODULE_META[mod].title:mod;
+  document.getElementById('chat-ctx-scen').textContent=(mod==='my-dashboard') ? 'Widget mode' : (SC[scen]?SC[scen].lbl:scen);
+
+  chatHistory=[];
+
+  const isWidgetMode = (mod === 'my-dashboard');
+
+  if(isWidgetMode){
+    document.getElementById('chat-msgs').innerHTML=`
+      <div class="chat-welcome">
+        <div class="chat-welcome-av">✦</div>
+        <div class="chat-welcome-title">Dashboard builder</div>
+        <div class="chat-welcome-body">Vertel me welke widget je wilt — een grafiek, KPI-kaart of tabel. Ik genereer hem direct voor jou.</div>
+        <div class="chat-hints">
+          <div class="chat-hint">Maak een staafgrafiek van de maandelijkse omzet</div>
+          <div class="chat-hint">Voeg een KPI-kaart toe met MRR, omzet en marge</div>
+          <div class="chat-hint">Toon de teamverdeling als cirkeldiagram</div>
+          <div class="chat-hint">Wat is onze beste maand in de base case?</div>
+        </div>
+      </div>`;
+  } else {
+    document.getElementById('chat-msgs').innerHTML=`
+      <div class="chat-welcome">
+        <div class="chat-welcome-av">✦</div>
+        <div class="chat-welcome-title">Hi, I'm One Day AI</div>
+        <div class="chat-welcome-body">I have full access to all your Polar Bear Icecream data — every module, all five scenarios. Ask me anything.</div>
+        <div class="chat-hints">
+          <div class="chat-hint">Which scenario gives the best cash position?</div>
+          <div class="chat-hint">What's our biggest risk in Q1?</div>
+          <div class="chat-hint">Compare headcount costs across scenarios</div>
+        </div>
+      </div>`;
+  }
+
+  // Make hints clickable
+  document.querySelectorAll('.chat-hint').forEach(h=>{
+    h.addEventListener('click',()=>{
+      const inp=document.getElementById('chat-inp');
+      if(inp.disabled)return;
+      inp.value=h.textContent;
+      inp.style.height='auto';
+      inp.style.height=Math.min(inp.scrollHeight,180)+'px';
+      inp.focus();
+    });
+  });
+
+  // Update placeholder
+  const inp = document.getElementById('chat-inp');
+  if(inp && !inp.disabled){
+    inp.placeholder = isWidgetMode ? 'Beschrijf een widget of stel een datavraag…' : 'Ask One Day AI…';
+  }
+
+  updateChatKeyUI();
+}
+
+function switchChatTab(tab){
+  document.getElementById('chat-pane-chat').classList.toggle('hidden', tab!=='chat');
+  document.getElementById('chat-pane-connect').classList.toggle('hidden', tab!=='connect');
+  document.getElementById('chat-tab-chat').classList.toggle('active', tab==='chat');
+  document.getElementById('chat-tab-connect').classList.toggle('active', tab==='connect');
+}
+
+// ── Claude API helpers ──────────────────────────────────
+
+// ── Compute all data for a given scenario key ──────────
+function computeAllScenData(sk){
+  const s=SC[sk];
+  const rev=B.rev.map((v,i)=>v+s.rAdj[i]);
+  const cost=B.cost.map((v,i)=>v+s.cAdj[i]);
+  const opRes=rev.map((v,i)=>v-cost[i]);
+  const lb=B.liqBal.map((v,i)=>v+(s.lbAdj[i]||0));
+
+  const custAdj=s.custAdj||Array(12).fill(0);
+  const cStart=REV_BASE.cStart.map((v,i)=>v+Math.floor(custAdj[i]*0.5));
+  const cPro=REV_BASE.cPro.map((v,i)=>v+Math.floor(custAdj[i]*0.35));
+  const cEnt=REV_BASE.cEnt.map((v,i)=>v+Math.floor(custAdj[i]*0.15));
+  const totalC=cStart.map((v,i)=>v+cPro[i]+cEnt[i]);
+  const mrr=cStart.map((v,i)=>v*380+cPro[i]*2800+cEnt[i]*18000);
+
+  const hc=sk==='hire-sales'?HR_BASE.hc.map((v,i)=>v+(i>=5?4:i>=2?2:0))
+           :sk==='new-product'?HR_BASE.hc.map(v=>v+2):[...HR_BASE.hc];
+  const salary=HR_BASE.salary.map((v,i)=>{
+    if(sk==='hire-sales') return v+(i>=2?10000:0)+(i>=5?5600:0);
+    if(sk==='new-product') return v+7500;
+    return v;
+  });
+  const depts={
+    Warehouse:HR_BASE.depts.Warehouse.map((v,i)=>sk==='hire-sales'&&i>=5?v+2:sk==='new-product'?v+2:v),
+    Sales:HR_BASE.depts.Sales.map((v,i)=>sk==='hire-sales'&&i>=2?v+2:v),
+    Logistics:HR_BASE.depts.Logistics,Finance:HR_BASE.depts.Finance,Management:HR_BASE.depts.Management,
+  };
+
+  const invAdj=sk==='new-product'?[0,25,55,80,60,40,30,28,26,24,28,28]:sk==='hire-sales'?[0,0,0,0,0,0,18,28,24,20,22,18]:Array(12).fill(0);
+  const shipAdj=sk==='new-product'?[0,0,0,28,58,42,25,20,16,14,15,16]:sk==='hire-sales'?[0,0,0,0,0,12,38,52,42,32,30,28]:Array(12).fill(0);
+  const inventory=LOG_BASE.inventory.map((v,i)=>v+invAdj[i]);
+  const shipments=LOG_BASE.shipments.map((v,i)=>v+shipAdj[i]);
+  const poCount=LOG_BASE.poCount.map((v,i)=>v+(s.poAdj[i]||0));
+  const suppOTD=LOG_BASE.suppOTD.map((v,i)=>Math.min(100,v+(s.otdAdj[i]||0)));
+  const wareUsage=LOG_BASE.wareUsage.map((v,i)=>Math.min(100,v+(s.wareAdj[i]||0)));
+  const dio=LOG_BASE.dio.map((v,i)=>Math.max(0,v+(s.dioAdj[i]||0)));
+
+  const budgetAdj=sk==='bank-loan'?10000:sk==='hire-sales'?8000:sk==='new-product'?12000:0;
+  const mktBudget=MKT_BASE.budget.map((v,i)=>i>=4?v+budgetAdj:i>=3&&budgetAdj>0?v+Math.round(budgetAdj*0.5):v);
+  const mktLeads=MKT_BASE.leads.map((v,i)=>v+(s.leadsAdj[i]||0));
+  const mktDemos=MKT_BASE.demos.map((v,i)=>v+Math.round((s.leadsAdj[i]||0)*0.55));
+  const mktTrials=MKT_BASE.trials.map((v,i)=>v+Math.round((s.leadsAdj[i]||0)*0.28));
+  const mktConv=MKT_BASE.conv.map((v,i)=>v+Math.round((s.leadsAdj[i]||0)*0.18));
+  const mktCAC=mktBudget.map((b,i)=>mktConv[i]>0?Math.round(b/mktConv[i]):null);
+
+  const health={...PRJ_BASE.health};
+  if(sk==='new-product'){health['Artisan Collection']+=15;health['ERP Upgrade']+=5;}
+  if(sk==='bank-loan'){health['WMS Implementation']+=12;health['Supplier Portal']+=10;}
+  if(sk==='push-receivables'){health['ERP Upgrade']+=8;}
+  if(sk==='hire-sales'){health['WMS Implementation']+=6;}
+  const budgetBurn=PRJ_BASE.budgetBurn.map((v,i)=>v+(s.burnAdj[i]||0));
+
+  return {rev,cost,opRes,lb,mrr,totalC,cStart,cPro,cEnt,hc,salary,depts,
+          inventory,shipments,poCount,suppOTD,wareUsage,dio,
+          mktBudget,mktLeads,mktDemos,mktTrials,mktConv,mktCAC,
+          health,budgetBurn};
+}
+
+function buildSystemPrompt(){
+  const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const scenLabel=SC[scen]?SC[scen].lbl:scen;
+  const modLabel=MODULE_META[mod]?MODULE_META[mod].title:mod;
+  const fK=v=>Math.round(v/1000);
+  const row=(label,arr)=>label+': '+M.map((m,i)=>`${m} €${fK(arr[i])}K`).join(', ');
+  const rowRaw=(label,arr,suffix='')=>label+': '+M.map((m,i)=>`${m} ${arr[i]}${suffix}`).join(', ');
+
+  // Compute data for ALL scenarios
+  const ALL=['base','new-product','bank-loan','push-receivables','hire-sales'];
+  const SD={};
+  ALL.forEach(sk=>{ SD[sk]=computeAllScenData(sk); });
+
+  // Active scenario full data
+  const d=SD[scen];
+
+  // Hiring plan (active scenario)
+  const hiringPlan=[
+    {role:'Logistics Coordinator',dept:'Logistics',start:'Mar 2026',salary:'€3,500/mo',status:'Active'},
+    {role:'Warehouse Operator',dept:'Warehouse',start:'Apr 2026',salary:'€2,800/mo',status:'Active'},
+    {role:'Sales Representative',dept:'Sales',start:'May 2026',salary:'€3,200/mo + comm.',status:'In hiring'},
+    {role:'Warehouse Operator',dept:'Warehouse',start:'Jun 2026',salary:'€2,800/mo',status:'In hiring'},
+    {role:'Logistics Officer',dept:'Logistics',start:'Jul 2026',salary:'€4,000/mo',status:'Planned'},
+    {role:'Office Coordinator',dept:'Management',start:'Aug 2026',salary:'€3,200/mo',status:'Planned'},
+    {role:'Warehouse Operator',dept:'Warehouse',start:'Sep 2026',salary:'€2,800/mo',status:'Planned'},
+    {role:'Warehouse Operator',dept:'Warehouse',start:'Dec 2026',salary:'€2,800/mo',status:'Planned'},
+    ...(scen==='new-product'?[
+      {role:'Food Technologist (Artisan)',dept:'Warehouse',start:'Jan 2026',salary:'€4,500/mo',status:'Scenario hire'},
+      {role:'Production Operator (Artisan)',dept:'Warehouse',start:'Jan 2026',salary:'€3,000/mo',status:'Scenario hire'},
+    ]:[]),
+    ...(scen==='hire-sales'?[
+      {role:'Key Account Manager #1',dept:'Sales',start:'Mar 2026',salary:'€5,000/mo + comm.',status:'Scenario hire'},
+      {role:'Key Account Manager #2',dept:'Sales',start:'Mar 2026',salary:'€5,000/mo + comm.',status:'Scenario hire'},
+      {role:'Warehouse Operator',dept:'Warehouse',start:'Jun 2026',salary:'€2,800/mo',status:'Scenario hire'},
+      {role:'Warehouse Operator',dept:'Warehouse',start:'Jun 2026',salary:'€2,800/mo',status:'Scenario hire'},
+    ]:[]),
+  ];
+
+  // Build scenario comparison summary (all 5 side-by-side)
+  const cmpLine=(label,fn)=>label+': '+ALL.map(sk=>`${SC[sk].lbl}=${fn(SD[sk])}`).join(' | ');
+
+  const scenComparison=`
+━━ ALL-SCENARIO COMPARISON ━━
+${cmpLine('Annual Revenue',d=>` €${fK(d.rev.reduce((a,b)=>a+b,0))}K`)}
+${cmpLine('Annual Costs',d=>` €${fK(d.cost.reduce((a,b)=>a+b,0))}K`)}
+${cmpLine('Operating Result',d=>` €${fK(d.opRes.reduce((a,b)=>a+b,0))}K`)}
+${cmpLine('Min Monthly Cash (€K)',d=>` €${Math.min(...d.lb)}K`)}
+${cmpLine('EOY Cash (€K)',d=>` €${d.lb[11]}K`)}
+${cmpLine('Dec Headcount',d=>` ${d.hc[11]} FTE`)}
+${cmpLine('Annual Salary Cost',d=>` €${fK(d.salary.reduce((a,b)=>a+b,0))}K`)}
+${cmpLine('Annual Mkt Budget',d=>` €${fK(d.mktBudget.reduce((a,b)=>a+b,0))}K`)}
+${cmpLine('Annual Conversions',d=>` ${d.mktConv.reduce((a,b)=>a+b,0)}`)}
+${cmpLine('Peak Warehouse %',d=>` ${Math.max(...d.wareUsage)}%`)}
+${cmpLine('Annual Project Burn',d=>` €${d.budgetBurn.reduce((a,b)=>a+b,0)}K`)}
+${cmpLine('Avg Project Health',d=>` ${Math.round(Object.values(d.health).reduce((a,b)=>a+b,0)/Object.values(d.health).length)}%`)}`;
+
+  const ganttProjects=[
+    {name:'ERP Upgrade',start:'Jan',end:'Apr',status:'Active'},
+    {name:'WMS Implementation',start:'Mar',end:'Jul',status:'Active'},
+    {name:'Artisan Collection',start:scen==='new-product'?'Jan':'Apr',end:scen==='new-product'?'Apr':'May',status:scen==='new-product'?'Active':'Planned'},
+    {name:'Process Optimisation',start:'Jan',end:'Jun',status:'Active'},
+    {name:'Supplier Portal',start:scen==='bank-loan'?'Apr':'May',end:scen==='bank-loan'?'Jun':'Jul',status:scen==='bank-loan'?'Active':'Planned'},
+    {name:'Warehouse Expansion',start:scen==='new-product'?'Jul':'Oct',end:'Dec',status:'Planned'},
+    {name:'Sustainability Plan',start:'Aug',end:'Nov',status:'Planned'},
+  ];
+
+  return `You are One Day AI, a sharp and concise financial analyst embedded in the Polar Bear Icecream BV business dashboard (FY 2026). You have full access to all monthly data across every module and tab, for ALL scenarios.
+
+Company: Polar Bear Icecream BV — Dutch premium ice cream brand, seasonal business (Q2/Q3 peak), sells via distributors and direct accounts.
+Current scenario: ${scenLabel} | Active module: ${modLabel}
+${scenComparison}
+
+━━ ACTIVE SCENARIO DETAIL: ${scenLabel} ━━
+
+── Finance ──
+${row('Revenue',d.rev)}
+${row('Costs',d.cost)}
+${row('Operating Result',d.opRes)}
+${row('Liquidity Balance',d.lb.map(v=>v*1000))}
+
+── Revenue ──
+${row('MRR',d.mrr)}
+${rowRaw('Total Customers',d.totalC,' accounts')}
+${rowRaw('Specialty Shops',d.cStart)} | ${rowRaw('Regional Chains',d.cPro)} | ${rowRaw('National Groups',d.cEnt)}
+${rowRaw('Via Distributor %',REV_BASE.partner,'%')}
+
+── Marketing ──
+${row('Budget',d.mktBudget)}
+${rowRaw('Leads',d.mktLeads)} | ${rowRaw('Demos',d.mktDemos)} | ${rowRaw('Trials',d.mktTrials)} | ${rowRaw('Conversions',d.mktConv)}
+${rowRaw('CAC €',d.mktCAC.map(v=>v??0))}
+
+── HR ──
+${rowRaw('Headcount',d.hc,' FTE')}
+${row('Salary Cost',d.salary)}
+Departments — Warehouse: ${rowRaw('',d.depts.Warehouse)} | Sales: ${rowRaw('',d.depts.Sales)} | Logistics: ${rowRaw('',d.depts.Logistics)} | Finance: ${rowRaw('',d.depts.Finance)} | Management: ${rowRaw('',d.depts.Management)}
+Hiring plan (${hiringPlan.length} hires):
+${hiringPlan.map(h=>`  • ${h.role} | ${h.dept} | ${h.start} | ${h.salary} | ${h.status}`).join('\n')}
+
+── Logistics ──
+${row('Inventory Value',d.inventory)}
+${rowRaw('Outbound Shipments',d.shipments,' units')}
+${rowRaw('Supplier OTD %',d.suppOTD,'%')}
+${rowRaw('Warehouse Usage %',d.wareUsage,'%')}
+${rowRaw('DIO days',d.dio,' d')}
+${rowRaw('Purchase Orders',d.poCount)}
+
+── Projects ──
+${rowRaw('Budget Burn €K',d.budgetBurn)} | Annual total: €${d.budgetBurn.reduce((a,b)=>a+b,0)}K
+Project health: ${Object.entries(d.health).map(([k,v])=>`${k} ${v}%`).join(' | ')}
+Timeline: ${ganttProjects.map(p=>`${p.name} (${p.start}–${p.end}, ${p.status})`).join(' | ')}
+
+You give brief, direct answers using the data above. Use €K figures. When comparing scenarios, reference the ALL-SCENARIO COMPARISON table. Do not repeat context the user already knows. Be conversational but precise. Keep answers under 150 words unless detail is explicitly requested.`;
+}
+
+// ── Widget system prompt ────────────────────────────────
+function buildWidgetSystemPrompt(){
+  const widgetList = widgets.length
+    ? widgets.map(w=>`• id="${w.id}" title="${w.title}" size="${w.size||'medium'}"`).join('\n')
+    : '(geen widgets aanwezig)';
+
+  // Compact data snapshot for embedding in widgets
+  const snap = {
+    monthly: B ? [
+      'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'
+    ].map((m,i)=>({
+      month:m,
+      revenue: B.rev ? B.rev[i] : 0,
+      costs:   B.cost ? B.cost[i] : 0,
+    })) : [],
+    scenarios: SC ? Object.entries(SC).map(([k,s])=>({key:k, label:s.lbl})) : [],
+  };
+
+  return `Je bent One Day AI, een dashboard-assistent voor Polar Bear Icecream BV. Je helpt de gebruiker een persoonlijk dashboard samenstellen via chat.
+
+## KRITIEKE REGEL
+Geef ALTIJD en UITSLUITEND een geldig JSON-object terug. Nooit plain tekst, nooit markdown — alleen pure JSON.
+
+## Responschema
+{
+  "type": "widget" | "answer" | "both",
+  "widget": {
+    "id":     "kebab-case-id",
+    "title":  "Leesbare naam",
+    "code":   "// React JSX component — zie regels hieronder",
+    "action": "add" | "update" | "remove",
+    "size":   "small" | "medium" | "large" | "wide"
+  },
+  "answer": "Tekst (alleen bij type answer of both)"
+}
+
+## Widget-code regels
+1. De component heet altijd **Widget**: function Widget() { … }
+2. JSX is beschikbaar via Babel (React is globaal: window.React / window.ReactDOM)
+3. Embed de data DIRECT in de component — NOOIT fetch, XHR, WebSocket of eval gebruiken
+4. Gebruik inline styles; maak het visueel aantrekkelijk en professioneel
+5. Voor eenvoudige staafdiagrammen: gebruik <svg> inline — geen externe libraries
+6. Houd de componentcode volledig zelfstandig (geen imports)
+
+## Wat je NIET mag
+- Het app-raamwerk, navigatie of API-integratie aanpassen
+- fetch(), XMLHttpRequest, WebSocket, eval(), document.cookie, localStorage, window.parent gebruiken
+
+## Huidige widgets
+${widgetList}
+
+## Bedrijfsdata (gebruik in widgets)
+Bedrijf: Polar Bear Icecream BV — Dutch premium ice cream, seizoenspiek Q2/Q3
+${JSON.stringify(snap, null, 2)}
+
+## Voorbeeldresponse (widget)
+{"type":"widget","widget":{"id":"revenue-bar","title":"Maandelijkse Omzet","action":"add","size":"medium","code":"function Widget(){const data=[{m:'Jan',v:42000},{m:'Feb',v:38000},{m:'Mar',v:51000}];const max=Math.max(...data.map(d=>d.v));return(<div style={{padding:'4px 0'}}><div style={{fontSize:'13px',fontWeight:'700',color:'#1f2937',marginBottom:'12px'}}>Omzet per maand</div>{data.map((d,i)=><div key={i} style={{marginBottom:'6px'}}><div style={{display:'flex',justifyContent:'space-between',fontSize:'11px',color:'#6b7280',marginBottom:'2px'}}><span>{d.m}</span><span>€{d.v.toLocaleString('nl-NL')}</span></div><div style={{background:'#f3f4f6',borderRadius:'3px',height:'8px'}}><div style={{width:(d.v/max*100)+'%',height:'100%',background:'#2563eb',borderRadius:'3px'}}/></div></div>)}</div>);}"}}
+
+## Voorbeeldresponse (datavraag)
+{"type":"answer","answer":"De omzet in het basisscenario piekt in juni met €124K — typisch voor het ijsseizoen."}
+
+Reageer ALTIJD met geldig JSON. Dit is een harde vereiste.`;
+}
+
+// Parse JSON from Claude response (handles wrapped/plain JSON)
+function parseClaudeJSON(text){
+  try{ return JSON.parse(text.trim()); }catch{}
+  const m = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+  if(m){ try{ return JSON.parse(m[1]); }catch{} }
+  const o = text.match(/\{[\s\S]*\}/);
+  if(o){ try{ return JSON.parse(o[0]); }catch{} }
+  return null;
+}
+
+async function callClaudeAPI(messages){
+  const isWidget = (mod === 'my-dashboard');
+  const resp=await fetch('/api/messages',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key': claudeApiKey,
+    },
+    body:JSON.stringify({
+      model:'claude-sonnet-4-6',
+      max_tokens: isWidget ? 4096 : 512,
+      system: isWidget ? buildWidgetSystemPrompt() : buildSystemPrompt(),
+      messages:messages
+    })
+  });
+  if(!resp.ok){
+    const err=await resp.json().catch(()=>({}));
+    throw new Error(err.error?.message||`HTTP ${resp.status}`);
+  }
+  const data=await resp.json();
+  return data.content[0].text;
+}
+
+function updateChatKeyUI(){
+  const status=document.getElementById('chat-key-status');
+  const btn=document.getElementById('chat-key-btn');
+  const keyInp=document.getElementById('chat-key-inp');
+  const inp=document.getElementById('chat-inp');
+  const sendBtn=document.getElementById('chat-send-btn');
+  const dot=document.getElementById('chat-conn-dot');
+  if(claudeApiKey){
+    keyInp.value='••••••••••••••••';
+    keyInp.disabled=true;
+    btn.textContent='Disconnect';
+    btn.classList.add('connected');
+    status.textContent='✓ Connected — ready to answer your questions.';
+    inp.disabled=false;
+    sendBtn.disabled=false;
+    inp.placeholder='Ask anything about your data…';
+    if(dot) dot.style.display='inline-block';
+  } else {
+    keyInp.value='';
+    keyInp.disabled=false;
+    btn.textContent='Connect';
+    btn.classList.remove('connected');
+    status.textContent='';
+    inp.disabled=true;
+    sendBtn.disabled=true;
+    inp.placeholder='Connect your API key to start chatting…';
+    if(dot) dot.style.display='none';
+  }
+}
+
+async function sendChat(){
+  const inp=document.getElementById('chat-inp');
+  const txt=inp.value.trim();
+  if(!txt||inp.disabled)return;
+  const c=document.getElementById('chat-msgs');
+
+  // Add user message
+  c.innerHTML+=`<div class="cmsg user"><div class="cmsg-av">👤</div><div class="cmsg-text">${txt.replace(/</g,'&lt;')}</div></div>`;
+  chatHistory.push({role:'user',content:txt});
+  inp.value='';
+  inp.style.height='auto';
+
+  // Typing indicator
+  const tid='typing-'+Date.now();
+  c.innerHTML+=`<div class="cmsg ai typing" id="${tid}"><div class="cmsg-av">✦</div><div class="cmsg-text">Thinking…</div></div>`;
+  c.scrollTop=c.scrollHeight;
+  inp.disabled=true;
+  document.getElementById('chat-send-btn').disabled=true;
+
+  try {
+    const rawReply = await callClaudeAPI(chatHistory);
+    chatHistory.push({role:'assistant', content:rawReply});
+
+    const el = document.getElementById(tid);
+
+    // ── Widget mode (My Dashboard) → route JSON response ──
+    if(mod === 'my-dashboard'){
+      const json = parseClaudeJSON(rawReply);
+
+      if(!json){
+        // Fallback: treat whole response as plain answer
+        const fmtReply = rawReply.replace(/</g,'&lt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+        if(el)el.outerHTML=`<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text">${fmtReply}</div></div>`;
+      } else {
+        let chatBubbleHTML = '';
+        let badgeHTML = '';
+
+        // ── Handle answer ──
+        if((json.type==='answer'||json.type==='both') && json.answer){
+          const fmtAns = json.answer.replace(/</g,'&lt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+          chatBubbleHTML = `<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text">${fmtAns}</div></div>`;
+        }
+
+        // ── Handle widget ──
+        if((json.type==='widget'||json.type==='both') && json.widget){
+          const w = json.widget;
+          if(w.action === 'remove'){
+            applyWidgetAction(w);
+            renderWidgets();
+            badgeHTML = `<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text"><span class="widget-badge ok">✓ Widget '${w.id}' verwijderd</span></div></div>`;
+          } else {
+            const scan = scanCode(w.code||'');
+            if(!scan.safe){
+              badgeHTML = `<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text"><span class="widget-badge err">⚠ Geblokkeerd: ${scan.violations.join(', ')}</span></div></div>`;
+            } else {
+              applyWidgetAction(w);
+              renderWidgets();
+              const verb = w.action==='update' ? 'bijgewerkt' : 'toegevoegd';
+              badgeHTML = `<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text"><span class="widget-badge ok">✓ Widget '${w.title||w.id}' ${verb}</span></div></div>`;
+            }
+          }
+        }
+
+        // Render chat messages
+        if(el){
+          const combined = (chatBubbleHTML || badgeHTML)
+            ? (chatBubbleHTML + badgeHTML)
+            : `<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text">${rawReply.replace(/</g,'&lt;')}</div></div>`;
+          el.outerHTML = combined;
+        }
+      }
+
+    } else {
+      // ── Normal (non-widget) mode: plain text ──
+      const el2 = document.getElementById(tid);
+      const fmtReply = rawReply.replace(/</g,'&lt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+      if(el2) el2.outerHTML=`<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text">${fmtReply}</div></div>`;
+    }
+
+  } catch(e){
+    const el=document.getElementById(tid);
+    if(el)el.outerHTML=`<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text" style="color:#dc2626">Error: ${e.message}</div></div>`;
+    chatHistory.pop();
+  }
+
+  inp.disabled=false;
+  document.getElementById('chat-send-btn').disabled=false;
+  inp.focus();
+  c.scrollTop=c.scrollHeight;
+}
+
+// ═══════════════════════════════════════════════════════
+// NAV DATA
+// ═══════════════════════════════════════════════════════
+const MODULE_META={
+  finance:      {title:'Finance',            sub:'Financial overview · FY 2026'},
+  revenue:      {title:'Revenue',            sub:'Sales & account metrics · FY 2026'},
+  marketing:    {title:'Marketing',          sub:'Trade pipeline, CAC & distributor network · FY 2026'},
+  hr:           {title:'HR',                 sub:'Headcount, hiring & salary plan · FY 2026'},
+  logistics:    {title:'Logistics',          sub:'Inventory, shipments & supplier performance · FY 2026'},
+  projects:     {title:'Projects',           sub:'Operational initiatives & budget tracking · FY 2026'},
+  compare:      {title:'Compare Scenarios',  sub:'All five scenarios · Key outcomes side by side · FY 2026'},
+  'my-dashboard':{title:'My Dashboard',     sub:'Jouw persoonlijke widgets · gebouwd via AI'},
+};
+
+// ═══════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+// MODULE: MY DASHBOARD
+// ═══════════════════════════════════════════════════════
+function renderMyDashboard(){
+  document.getElementById('content').innerHTML = `
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+  <div class="wdb-section-title" style="margin:0">Jouw widgets</div>
+  ${widgets.length > 0 ? `<button onclick="if(confirm('Alle widgets verwijderen?')){widgets=[];saveWidgets();renderWidgets();}" style="font-size:11px;color:var(--txt3);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:4px;transition:all .15s" onmouseover="this.style.color='#dc2626'" onmouseout="this.style.color='var(--txt3)'">Alles wissen</button>` : ''}
+</div>
+<div id="widget-canvas"></div>`;
+  renderWidgets();
+}
+
+function render(){
+  destroyAll();
+  const meta=MODULE_META[mod];
+  document.getElementById('tb-title').textContent=meta.title;
+  document.getElementById('tb-sub').textContent=meta.sub;
+  // Hide scenario bar on compare and my-dashboard views
+  document.querySelector('.scenario-bar').style.display=(mod==='compare'||mod==='my-dashboard')?'none':'';
+  if(mod==='finance')renderFinance();
+  else if(mod==='revenue')renderRevenue();
+  else if(mod==='marketing')renderMarketing();
+  else if(mod==='hr')renderHR();
+  else if(mod==='logistics')renderLogistics();
+  else if(mod==='projects')renderProjects();
+  else if(mod==='compare')renderCompare();
+  else if(mod==='my-dashboard')renderMyDashboard();
+  renderChat();
+}
+
+// ═══════════════════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════════════════
+const MODULES = [
+  {key:'finance',       label:'Finance',           icon:null},
+  {key:'revenue',       label:'Revenue',            icon:null},
+  {key:'marketing',     label:'Marketing',          icon:null},
+  {key:'hr',            label:'HR',                 icon:null},
+  {key:'logistics',     label:'Logistics',          icon:null},
+  {key:'projects',      label:'Projects',           icon:null},
+  {key:'compare',       label:'Compare Scenarios',  icon:'compare'},
+  {key:'my-dashboard',  label:'My Dashboard',       icon:'dashboard'},
+];
+const NAV_ICONS = {
+  briefcase:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;opacity:.8;margin-right:8px"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>`,
+  compare:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;opacity:.7;margin-right:8px"><rect x="3" y="3" width="7" height="18"/><rect x="14" y="3" width="7" height="12"/></svg>`,
+  dashboard:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;opacity:.7;margin-right:8px"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>`,
+};
+
+function renderNav(){
+  const nav = document.getElementById('sb-nav');
+  let html = '';
+
+  // ── Starred section ──
+  if(starredMods.length > 0){
+    html += '<div class="nav-group-label">Starred</div>';
+    starredMods.forEach(key=>{
+      const m = MODULES.find(x=>x.key===key);
+      if(!m) return;
+      const active = mod===key ? ' active' : '';
+      const primary = key==='finance' ? ' nav-item-primary' : '';
+      const icon = m.icon ? (NAV_ICONS[m.icon]||'') : '';
+      html += `<div class="nav-item${primary}${active}" data-module="${key}">${icon}${m.label}<span class="nav-star starred" data-star="${key}" title="Unstar">★</span></div>`;
+    });
+    html += '<div class="nav-divider"></div>';
+  }
+
+  // ── All (unstarred) section ──
+  const unstarred = MODULES.filter(m=>!starredMods.includes(m.key));
+  if(unstarred.length > 0){
+    html += '<div class="nav-group-label">All</div>';
+    unstarred.forEach(m=>{
+      const active = mod===m.key ? ' active' : '';
+      const icon = m.icon ? (NAV_ICONS[m.icon]||'') : '';
+      html += `<div class="nav-item${active}" data-module="${m.key}">${icon}${m.label}<span class="nav-star" data-star="${m.key}" title="Star">☆</span></div>`;
+    });
+  }
+
+  nav.innerHTML = html;
+
+  // Module click (ignore clicks on the star itself)
+  nav.querySelectorAll('.nav-item').forEach(el=>{
+    el.addEventListener('click', e=>{
+      if(e.target.closest('.nav-star')) return;
+      mod = el.dataset.module;
+      renderNav();
+      render();
+    });
+  });
+
+  // Star toggle
+  nav.querySelectorAll('.nav-star').forEach(el=>{
+    el.addEventListener('click', e=>{
+      e.stopPropagation();
+      const key = el.dataset.star;
+      if(starredMods.includes(key)){
+        starredMods = starredMods.filter(k=>k!==key);
+      } else {
+        starredMods = [...starredMods, key];
+      }
+      localStorage.setItem('oneday_starred', JSON.stringify(starredMods));
+      renderNav();
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// EVENTS
+// ═══════════════════════════════════════════════════════
+renderNav();
+
+document.querySelectorAll('.sc-btn').forEach(el=>{
+  el.addEventListener('click',()=>{
+    document.querySelectorAll('.sc-btn').forEach(b=>b.classList.remove('active'));
+    el.classList.add('active');
+    scen=el.dataset.scenario;
+    const s=SC[scen];
+    document.querySelectorAll('.sc-btn').forEach(b=>{
+      if(b.dataset.scenario===scen)b.style.background=s.color;
+      else{b.style.background='';b.style.borderColor='';b.style.color='';}
+    });
+    render();
+  });
+});
+
+// ── Chart resize helper ──
+// Chart.js ResizeObserver fires at transition-start, not end, so charts
+// render at the wrong width until we explicitly resize them after the
+// margin-right transition on .main finishes.
+function resizeAllCharts(){
+  Object.values(chartReg).forEach(c=>{try{c&&c.resize();}catch(e){}});
+}
+document.querySelector('.main').addEventListener('transitionend',e=>{
+  if(e.propertyName==='margin-right') resizeAllCharts();
+});
+
+// ── Chat toggle ──
+document.getElementById('chat-min-btn').addEventListener('click',()=>{
+  document.getElementById('chat-panel').classList.add('hidden');
+  document.getElementById('float-bubble').classList.remove('hidden');
+  document.body.classList.remove('chat-open');
+});
+document.getElementById('float-bubble').addEventListener('click',()=>{
+  document.getElementById('chat-panel').classList.remove('hidden');
+  document.getElementById('float-bubble').classList.add('hidden');
+  document.body.classList.add('chat-open');
+});
+// ── Chat tabs ──
+document.getElementById('chat-tab-chat').addEventListener('click',()=>switchChatTab('chat'));
+document.getElementById('chat-tab-connect').addEventListener('click',()=>switchChatTab('connect'));
+// ── Chat input ──
+document.getElementById('chat-send-btn').addEventListener('click',sendChat);
+document.getElementById('chat-inp').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}
+});
+document.getElementById('chat-inp').addEventListener('input',function(){
+  this.style.height='auto';
+  this.style.height=Math.min(this.scrollHeight,180)+'px';
+});
+
+// ── API key connect / disconnect ──
+document.getElementById('chat-key-btn').addEventListener('click',()=>{
+  if(claudeApiKey){
+    // Disconnect
+    claudeApiKey='';
+    localStorage.removeItem('oneday_api_key');
+    updateChatKeyUI();
+  } else {
+    // Connect
+    const val=document.getElementById('chat-key-inp').value.trim();
+    if(!val.startsWith('sk-ant-')){
+      document.getElementById('chat-key-status').textContent='⚠ Key should start with sk-ant-…';
+      document.getElementById('chat-key-status').style.color='#dc2626';
+      return;
+    }
+    claudeApiKey=val;
+    localStorage.setItem('oneday_api_key',val);
+    document.getElementById('chat-key-status').style.color='';
+    updateChatKeyUI();
+    // Switch back to chat after connecting
+    switchChatTab('chat');
+  }
+});
+// Also connect on Enter in key field
+document.getElementById('chat-key-inp').addEventListener('keypress',e=>{
+  if(e.key==='Enter') document.getElementById('chat-key-btn').click();
+});
+
+// ═══════════════════════════════════════════════════════
+// DATA LOADER
+// ═══════════════════════════════════════════════════════
+async function loadAndRender(){
+  const overlay = document.getElementById('loading-overlay');
+  const msg     = document.getElementById('loading-msg');
+  overlay.classList.remove('hidden');
+
+  try {
+    const resp = await fetch('/api/data');
+    if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const d = await resp.json();
+
+    // Map Supabase rows to the global variables the rest of the app uses
+    B        = d.base_financials;
+    SC       = d.scenarios;
+    REV_BASE = d.revenue;
+    HR_BASE  = d.hr;
+    MKT_BASE = d.marketing;
+    LOG_BASE = d.logistics;
+    PRJ_BASE = d.projects;
+
+    overlay.classList.add('hidden');
+    render();
+  } catch(err){
+    msg.style.display = 'none';
+    const errEl = document.createElement('div');
+    errEl.className = 'loading-error';
+    errEl.textContent = `Could not load dashboard data: ${err.message}. Check that SUPABASE_URL and SUPABASE_ANON_KEY are set in Netlify environment variables.`;
+    overlay.appendChild(errEl);
+  }
+}
+
+// Init
+document.body.classList.add('chat-open');
+loadAndRender();
+</script>
+</body>
+</html>
