@@ -411,12 +411,14 @@ function scanCode(code){
   return { safe: violations.length === 0, violations };
 }
 
-function buildIframeHTML(code){
+function buildIframeHTML(code, scenData){
   // Escape closing script tags to prevent HTML injection
   const safe = code.replace(/<\/script>/gi, '<\\/script>');
+  const dataJson = JSON.stringify(scenData||{}).replace(/<\/script>/gi,'<\\/script>');
   return `<!DOCTYPE html><html lang="nl"><head><meta charset="UTF-8">
 <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:transparent;overflow:hidden}#root{width:100%;min-height:100%;padding:14px}</style>
 </head><body><div id="root"></div>
+<script>window.SCENARIO_DATA=${dataJson};<\/script>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"><\/script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"><\/script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"><\/script>
@@ -471,7 +473,22 @@ function deleteWidget(id){
 // Render a single widget card (returns HTML string)
 function widgetCardHTML(w){
   const iframeId = 'wif-'+w.id;
-  const html = buildIframeHTML(w.code || '');
+  const d = getScenData();
+  const scenData = {
+    scenario: scen,
+    scenarioLabel: SC[scen].lbl,
+    months: MONTHS,
+    adjusted: { rev: d.rev, cost: d.cost, opRes: d.opRes, rbt: d.rbt, rat: d.rat, lb: d.lb },
+    base: { rev: B.rev, cost: B.cost, liqBal: B.liqBal, ca: B.ca },
+    scenarioConfig: SC[scen],
+    allScenarios: Object.fromEntries(Object.entries(SC).map(([k,s])=>[k,{lbl:s.lbl,rAdj:s.rAdj,cAdj:s.cAdj,lbAdj:s.lbAdj}])),
+    revenue: REV_BASE,
+    hr: HR_BASE,
+    marketing: MKT_BASE,
+    logistics: LOG_BASE,
+    projects: PRJ_BASE,
+  };
+  const html = buildIframeHTML(w.code || '', scenData);
   const srcdoc = html.replace(/"/g, '&quot;');
   const h = w.height || (w.size === 'tall' ? 340 : 220);
   return `<div class="widget-card" data-size="${w.size||'medium'}" data-id="${w.id}">
@@ -1651,30 +1668,47 @@ Geef ALTIJD en UITSLUITEND een geldig JSON-object terug. Nooit plain tekst, nooi
   "answer": "Tekst (alleen bij type answer of both)"
 }
 
-## Widget-code regels
-1. De component heet altijd **Widget**: function Widget() { … }
-2. JSX is beschikbaar via Babel (React is globaal: window.React / window.ReactDOM)
-3. Embed de data DIRECT in de component — NOOIT fetch, XHR, WebSocket of eval gebruiken
-4. Gebruik inline styles; maak het visueel aantrekkelijk en professioneel
-5. Voor eenvoudige staafdiagrammen: gebruik <svg> inline — geen externe libraries
-6. Houd de componentcode volledig zelfstandig (geen imports)
+## Widget code rules
+1. The component is always called **Widget**: function Widget() { … }
+2. JSX is available via Babel (React is global: window.React / window.ReactDOM)
+3. Always read live data from **window.SCENARIO_DATA** — never hardcode numbers
+4. Use inline styles; make it visually attractive and professional
+5. For simple bar charts: use inline <svg> — no external libraries
+6. Keep the component fully self-contained (no imports)
 
-## Wat je NIET mag
-- Het app-raamwerk, navigatie of API-integratie aanpassen
-- fetch(), XMLHttpRequest, WebSocket, eval(), document.cookie, localStorage, window.parent gebruiken
+## window.SCENARIO_DATA structure
+{
+  scenario: string,          // e.g. "base", "bank-loan", "hire-sales"
+  scenarioLabel: string,     // e.g. "Base", "Bank Loan"
+  months: string[12],        // ["Jan 26", "Feb 26", ...]
+  adjusted: {
+    rev: number[12],         // monthly revenue for active scenario (€)
+    cost: number[12],        // monthly costs
+    opRes: number[12],       // operating result
+    lb: number[12],          // liquidity balance
+  },
+  base: { rev, cost, liqBal, ca },  // base scenario values
+  revenue: { mrr, totalCustomers, ... },
+  hr: { headcount, ... },
+  marketing: { budget, leads, ... },
+}
 
-## Huidige widgets
+## What you MUST NOT do
+- Modify the app framework, navigation or API integration
+- Use fetch(), XMLHttpRequest, WebSocket, eval(), document.cookie, localStorage, window.parent
+- Hardcode data values — always read from window.SCENARIO_DATA
+
+## Current widgets
 ${widgetList}
 
-## Bedrijfsdata (gebruik in widgets)
-Bedrijf: Polar Bear Icecream BV — Dutch premium ice cream, seizoenspiek Q2/Q3
-${JSON.stringify(snap, null, 2)}
+## Company context
+Polar Bear Icecream BV — Dutch premium ice cream, seasonal peak Q2/Q3
 
-## Voorbeeldresponse (widget)
-{"type":"widget","widget":{"id":"revenue-bar","title":"Maandelijkse Omzet","action":"add","size":"medium","code":"function Widget(){const data=[{m:'Jan',v:42000},{m:'Feb',v:38000},{m:'Mar',v:51000}];const max=Math.max(...data.map(d=>d.v));return(<div style={{padding:'4px 0'}}><div style={{fontSize:'13px',fontWeight:'700',color:'#1f2937',marginBottom:'12px'}}>Omzet per maand</div>{data.map((d,i)=><div key={i} style={{marginBottom:'6px'}}><div style={{display:'flex',justifyContent:'space-between',fontSize:'11px',color:'#6b7280',marginBottom:'2px'}}><span>{d.m}</span><span>€{d.v.toLocaleString('nl-NL')}</span></div><div style={{background:'#f3f4f6',borderRadius:'3px',height:'8px'}}><div style={{width:(d.v/max*100)+'%',height:'100%',background:'#2563eb',borderRadius:'3px'}}/></div></div>)}</div>);}"}}
+## Example response (widget)
+{"type":"widget","widget":{"id":"revenue-bar","title":"Monthly Revenue","action":"add","size":"medium","code":"function Widget(){const {adjusted,months,scenarioLabel}=window.SCENARIO_DATA;const max=Math.max(...adjusted.rev);return(<div style={{padding:'4px 0'}}><div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}}><div style={{fontSize:'13px',fontWeight:'700',color:'#1f2937'}}>Revenue per month</div><div style={{fontSize:'11px',color:'#6b7280'}}>{scenarioLabel}</div></div>{adjusted.rev.map((v,i)=><div key={i} style={{marginBottom:'6px'}}><div style={{display:'flex',justifyContent:'space-between',fontSize:'11px',color:'#6b7280',marginBottom:'2px'}}><span>{months[i]}</span><span>€{Math.round(v/1000)}K</span></div><div style={{background:'#f3f4f6',borderRadius:'3px',height:'8px'}}><div style={{width:(v/max*100)+'%',height:'100%',background:'#2563eb',borderRadius:'3px'}}/></div></div>)}</div>);}"}}
 
-## Voorbeeldresponse (datavraag)
-{"type":"answer","answer":"De omzet in het basisscenario piekt in juni met €124K — typisch voor het ijsseizoen."}
+## Example response (data question)
+{"type":"answer","answer":"Revenue in the base scenario peaks in June at €124K — typical for the ice cream season."}
 
 Reageer ALTIJD met geldig JSON. Dit is een harde vereiste.`;
 }
