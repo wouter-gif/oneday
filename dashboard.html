@@ -391,6 +391,42 @@ let chatHistory = [];  // [{role:'user'|'assistant', content:'...'}]
 // ── Widget state ────────────────────────────────────────
 let widgets = JSON.parse(localStorage.getItem('oneday_widgets') || '[]');
 
+// ── Pinned sections state ───────────────────────────────
+let pinnedSections = JSON.parse(localStorage.getItem('oneday_pinned') || '[]');
+function savePinned(){ localStorage.setItem('oneday_pinned', JSON.stringify(pinnedSections)); }
+function pinSection(id){
+  if(!pinnedSections.includes(id)){ pinnedSections.push(id); savePinned(); }
+  updatePinButtons();
+}
+function unpinSection(id){
+  pinnedSections = pinnedSections.filter(s=>s!==id); savePinned();
+  if(mod==='my-dashboard') render(); else updatePinButtons();
+}
+function updatePinButtons(){
+  document.querySelectorAll('[data-section-id]').forEach(card=>{
+    const id = card.dataset.sectionId;
+    const btn = card.querySelector('.pin-btn');
+    if(!btn) return;
+    const pinned = pinnedSections.includes(id);
+    btn.textContent = pinned ? 'Pinned' : 'Pin';
+    btn.style.color = pinned ? '#2563eb' : '';
+    btn.style.fontWeight = pinned ? '600' : '';
+    btn.onclick = ()=> pinned ? unpinSection(id) : pinSection(id);
+  });
+}
+function addPinButtons(){
+  document.querySelectorAll('[data-section-id]').forEach(card=>{
+    if(card.querySelector('.pin-btn')) return;
+    const hdr = card.querySelector('.cc-hdr');
+    if(!hdr) return;
+    const btn = document.createElement('button');
+    btn.className = 'pin-btn';
+    btn.style.cssText = 'background:none;border:none;cursor:pointer;font-size:11.5px;padding:2px 8px;border-radius:4px;color:var(--txt3);transition:all .15s;font-family:inherit';
+    hdr.appendChild(btn);
+  });
+  updatePinButtons();
+}
+
 // Forbidden patterns for sandboxed widget code
 const WIDGET_FORBIDDEN = [
   { re: /fetch\s*\(/,       name: 'fetch()' },
@@ -625,7 +661,7 @@ ${calloutHTML()}
   <div class="kpi-card"><div class="kpi-lbl">Avg Monthly Costs</div><div class="kpi-val">${e(burnAvg)}</div><div class="kpi-chg neu">Mar – Dec prognosis avg</div></div>
 </div>
 <div class="cg1">
-  <div class="cc">
+  <div class="cc" data-section-id="finance-pl">
     <div class="cc-hdr">
       <div><div class="cc-title">Profit &amp; Loss per period</div><div class="cc-sub">Revenue vs Total Costs · Jan–Dec 2026</div></div>
       <div style="display:flex;gap:6px"><span class="badge-actual">Actual</span><span class="badge-fcst">Prognosis</span></div>
@@ -639,7 +675,7 @@ ${calloutHTML()}
   </div>
 </div>
 <div class="cg1">
-  <div class="cc">
+  <div class="cc" data-section-id="finance-liq">
     <div class="cc-hdr">
       <div><div class="cc-title">Liquidity planning</div><div class="cc-sub">Cash income, expenses &amp; current account balance · Mar 26–Feb 27</div></div>
     </div>
@@ -689,6 +725,7 @@ ${calloutHTML()}
     },
     options:{responsive:true,interaction:{mode:'index'},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{const v=ctx.parsed.y;return ctx.dataset.label+': €'+Math.round(v)+'K'}}}},scales:{y:{ticks:{callback:v=>'€'+v+'K'},grid:{color:'#f1f5f9'},title:{display:true,text:'EUR (K)'}},y2:{position:'right',ticks:{callback:v=>'€'+v+'K'},grid:{drawOnChartArea:false}}}}
   });
+  addPinButtons();
 }
 
 function buildPLTable(d){
@@ -786,7 +823,7 @@ ${calloutHTML()}
   <div class="kpi-card"><div class="kpi-lbl">Distributor Revenue</div><div class="kpi-val">${e(partnerRev)}</div><div class="kpi-chg neu">~42% via distributors</div></div>
 </div>
 <div class="cg1">
-  <div class="cc">
+  <div class="cc" data-section-id="revenue-split">
     <div class="cc-hdr"><div><div class="cc-title">Revenue breakdown — recurring vs. one-off</div><div class="cc-sub">Frame-contract revenue vs. spot and promotional orders</div></div></div>
     <canvas id="ch-rev-split" height="100"></canvas>
     <div class="legend" style="margin-top:10px">
@@ -796,16 +833,16 @@ ${calloutHTML()}
   </div>
 </div>
 <div class="cg2">
-  <div class="cc">
+  <div class="cc" data-section-id="revenue-mrr">
     <div class="cc-hdr"><div><div class="cc-title">Revenue by account tier</div><div class="cc-sub">Specialty · Regional chain · National group</div></div></div>
     <canvas id="ch-mrr" height="140"></canvas>
   </div>
-  <div class="cc">
+  <div class="cc" data-section-id="revenue-clients">
     <div class="cc-hdr"><div><div class="cc-title">Active accounts by tier</div><div class="cc-sub">Ordering accounts per month</div></div></div>
     <canvas id="ch-clients" height="140"></canvas>
   </div>
 </div>
-<div class="cc" style="margin-bottom:16px">
+<div class="cc" data-section-id="revenue-channel" style="margin-bottom:16px">
   <div class="cc-hdr"><div><div class="cc-title">Revenue by channel</div><div class="cc-sub">Via distributor vs direct-to-retailer</div></div></div>
   <canvas id="ch-channel" height="90"></canvas>
   <div class="legend" style="margin-top:10px">
@@ -853,6 +890,7 @@ ${calloutHTML()}
     ]},
     options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+e(ctx.parsed.y)}}},scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:v=>e(v)},grid:{color:'#f1f5f9'}}}}
   });
+  addPinButtons();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -893,13 +931,13 @@ ${mktNote?`<div class="sc-callout" style="background:#f8fafc;border-color:#e2e8f
       ${funnelRow('Converted Client',''+totalConv,'#6ee7b7',Math.round(totalConv/5840*100),'#4fc3a1')}
     </div>
   </div>
-  <div class="cc">
+  <div class="cc" data-section-id="marketing-budget">
     <div class="cc-hdr"><div><div class="cc-title">Monthly marketing budget</div><div class="cc-sub">vs. new clients acquired</div></div></div>
     <canvas id="ch-mkt-budget" height="170"></canvas>
   </div>
 </div>
 <div class="cg2">
-  <div class="cc">
+  <div class="cc" data-section-id="marketing-cac">
     <div class="cc-hdr"><div><div class="cc-title">CAC trend</div><div class="cc-sub">Customer acquisition cost per channel</div></div></div>
     <canvas id="ch-cac" height="155"></canvas>
   </div>
@@ -933,6 +971,7 @@ ${mktNote?`<div class="sc-callout" style="background:#f8fafc;border-color:#e2e8f
     ]},
     options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{y:{ticks:{callback:v=>'€'+v.toLocaleString('nl-NL')},grid:{color:'#f1f5f9'}}}}
   });
+  addPinButtons();
 }
 
 function funnelRow(lbl,val,_color,pctW,barColor){
@@ -1012,16 +1051,16 @@ ${hrNote?`<div class="sc-callout" style="background:#f8fafc;border-color:#e2e8f0
   <div class="kpi-card"><div class="kpi-lbl">Open Roles</div><div class="kpi-val">${openRoles}</div><div class="kpi-chg neu">${openRolesNote}</div></div>
 </div>
 <div class="cg2">
-  <div class="cc">
+  <div class="cc" data-section-id="hr-headcount">
     <div class="cc-hdr"><div><div class="cc-title">Headcount growth</div><div class="cc-sub">FTE by month · 2026</div></div></div>
     <canvas id="ch-hc" height="155"></canvas>
   </div>
-  <div class="cc">
+  <div class="cc" data-section-id="hr-dept">
     <div class="cc-hdr"><div><div class="cc-title">Department split</div><div class="cc-sub">Headcount by function (December)</div></div></div>
     <canvas id="ch-dept" height="155"></canvas>
   </div>
 </div>
-<div class="cc" style="margin-bottom:16px">
+<div class="cc" data-section-id="hr-salary" style="margin-bottom:16px">
   <div class="cc-hdr"><div><div class="cc-title">Monthly salary cost vs revenue</div><div class="cc-sub">Staff cost as % of revenue</div></div></div>
   <canvas id="ch-salary" height="95"></canvas>
 </div>
@@ -1084,6 +1123,7 @@ ${hrNote?`<div class="sc-callout" style="background:#f8fafc;border-color:#e2e8f0
     ]},
     options:{responsive:true,interaction:{mode:'index'},plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{y:{ticks:{callback:v=>e(v)},grid:{color:'#f1f5f9'}}}}
   });
+  addPinButtons();
 }
 function hiringRow(name,dept,start,sal,st){
   return `<tr><td>${name}</td><td class="fc" style="text-align:left">${dept}</td><td style="text-align:left">${start}</td><td>${sal}</td><td style="text-align:left">${st}</td></tr>`;
@@ -1118,21 +1158,21 @@ ${logNote?`<div class="sc-callout" style="background:#f8fafc;border-color:#e2e8f
   <div class="kpi-card"><div class="kpi-lbl">Warehouse Utilisation</div><div class="kpi-val">${Math.max(...wareUsage)}%</div><div class="kpi-chg ${Math.max(...wareUsage)<=85?'pos':'neu'}">${Math.max(...wareUsage)<=85?'Within target ≤ 85%':'Peak — target ≤ 85%'}</div></div>
 </div>
 <div class="cg2">
-  <div class="cc">
+  <div class="cc" data-section-id="logistics-inv">
     <div class="cc-hdr"><div><div class="cc-title">Inventory value &amp; outbound shipments</div><div class="cc-sub">Stock value (€K, left) vs shipments count (right)</div></div></div>
     <canvas id="ch-inv" height="155"></canvas>
   </div>
-  <div class="cc">
+  <div class="cc" data-section-id="logistics-po">
     <div class="cc-hdr"><div><div class="cc-title">Incoming purchase orders</div><div class="cc-sub">PO count per month</div></div></div>
     <canvas id="ch-po" height="155"></canvas>
   </div>
 </div>
 <div class="cg2">
-  <div class="cc">
+  <div class="cc" data-section-id="logistics-otd">
     <div class="cc-hdr"><div><div class="cc-title">Supplier on-time delivery</div><div class="cc-sub">% of deliveries received within agreed lead time</div></div></div>
     <canvas id="ch-otd" height="155"></canvas>
   </div>
-  <div class="cc">
+  <div class="cc" data-section-id="logistics-dio">
     <div class="cc-hdr"><div><div class="cc-title">Days Inventory Outstanding (DIO)</div><div class="cc-sub">Avg days stock is held before sold / shipped</div></div></div>
     <canvas id="ch-dio" height="155"></canvas>
   </div>
@@ -1168,6 +1208,7 @@ ${logNote?`<div class="sc-callout" style="background:#f8fafc;border-color:#e2e8f
     ]},
     options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{y:{min:0,max:60,ticks:{callback:v=>v+'d'},grid:{color:'#f1f5f9'}}}}
   });
+  addPinButtons();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1697,6 +1738,7 @@ Geef ALTIJD en UITSLUITEND een geldig JSON-object terug. Nooit plain tekst, nooi
 - Modify the app framework, navigation or API integration
 - Use fetch(), XMLHttpRequest, WebSocket, eval(), document.cookie, localStorage, window.parent
 - Hardcode data values — always read from window.SCENARIO_DATA
+- Use emojis, icons, or decorative symbols anywhere in widget output — text and numbers only
 
 ## Current widgets
 ${widgetList}
@@ -1885,15 +1927,157 @@ const MODULE_META={
 // RENDER
 // ═══════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════
+// PINNED SECTIONS — render functions for My Dashboard
+// ═══════════════════════════════════════════════════════
+const PINNED_SECTION_META = {
+  'finance-pl':       {title:'Profit & Loss',                module:'Finance'},
+  'finance-liq':      {title:'Liquidity Planning',           module:'Finance'},
+  'revenue-split':    {title:'Revenue Breakdown',            module:'Revenue'},
+  'revenue-mrr':      {title:'Revenue by Account Tier',      module:'Revenue'},
+  'revenue-clients':  {title:'Active Accounts',              module:'Revenue'},
+  'revenue-channel':  {title:'Revenue by Channel',           module:'Revenue'},
+  'marketing-budget': {title:'Marketing Budget',             module:'Marketing'},
+  'marketing-cac':    {title:'CAC Trend',                    module:'Marketing'},
+  'hr-headcount':     {title:'Headcount Growth',             module:'HR'},
+  'hr-dept':          {title:'Department Split',             module:'HR'},
+  'hr-salary':        {title:'Salary Cost vs Revenue',       module:'HR'},
+  'logistics-inv':    {title:'Inventory & Shipments',        module:'Logistics'},
+  'logistics-po':     {title:'Purchase Orders',              module:'Logistics'},
+  'logistics-otd':    {title:'Supplier On-time Delivery',    module:'Logistics'},
+  'logistics-dio':    {title:'Days Inventory Outstanding',   module:'Logistics'},
+};
+
+function renderPinnedSections(){
+  if(pinnedSections.length === 0) return;
+  const d = getScenData();
+  const s = SC[scen];
+
+  // Revenue scenario helpers (needed for revenue charts)
+  const custAdj = s.custAdj || new Array(12).fill(0);
+  const cStart = REV_BASE.cStart.map((v,i)=>v+Math.floor(custAdj[i]*0.5));
+  const cPro   = REV_BASE.cPro.map((v,i)=>v+Math.floor(custAdj[i]*0.35));
+  const cEnt   = REV_BASE.cEnt.map((v,i)=>v+Math.floor(custAdj[i]*0.15));
+  const mrrS   = cStart.map(v=>v*380);
+  const mrrP   = cPro.map(v=>v*2800);
+  const mrrE   = cEnt.map(v=>v*18000);
+  const mrr    = mrrS.map((v,i)=>v+mrrP[i]+mrrE[i]);
+  const svcRev = d.rev.map((v,i)=>v-mrr[i]);
+  const pct42  = d.rev.map(v=>Math.round(v*0.42));
+  const pct58  = d.rev.map(v=>Math.round(v*0.58));
+
+  // HR helpers
+  const hc     = HR_BASE.hc.map((v,i)=>v+(s.hcAdj ? s.hcAdj[i]||0 : 0));
+  const salary = HR_BASE.salary.map((v,i)=>v+(s.salAdj ? s.salAdj[i]||0 : 0));
+  const depts  = {
+    Warehouse:  HR_BASE.depts.Warehouse,  Sales: HR_BASE.depts.Sales,
+    Logistics:  HR_BASE.depts.Logistics,  Finance: HR_BASE.depts.Finance,
+    Management: HR_BASE.depts.Management,
+  };
+
+  // Marketing helpers
+  const leadsAdj = s.leadsAdj || new Array(12).fill(0);
+  const budget   = MKT_BASE.budget.map((v,i)=>{
+    const adj = scen==='bank-loan'?10000:scen==='hire-sales'?8000:scen==='new-product'?12000:0;
+    return i>=4?v+adj:i>=3&&adj>0?v+Math.round(adj*0.5):v;
+  });
+  const conv = MKT_BASE.conv.map((v,i)=>v+Math.round((leadsAdj[i]||0)*0.18));
+  const cacRaw = budget.map((v,i)=>conv[i]>0?Math.round(v/conv[i]):null);
+
+  // Logistics helpers
+  const inventory = LOG_BASE.inventory;
+  const shipments = LOG_BASE.shipments;
+  const suppOTD   = LOG_BASE.suppOTD;
+  const dio       = LOG_BASE.dio;
+  const poCount   = LOG_BASE.poCount;
+
+  pinnedSections.forEach(id=>{
+    const meta = PINNED_SECTION_META[id];
+    if(!meta) return;
+    const p = 'pin-'+id+'-'; // canvas ID prefix to avoid conflicts
+    const wrap = document.getElementById('pinned-section-'+id);
+    if(!wrap) return;
+
+    const unpin = `<button style="background:none;border:none;cursor:pointer;font-size:11.5px;padding:2px 8px;border-radius:4px;color:#2563eb;font-weight:600;font-family:inherit" onclick="unpinSection('${id}')">Pinned</button>`;
+
+    if(id==='finance-pl'){
+      wrap.innerHTML = `<div class="cc-hdr"><div><div class="cc-title">Profit &amp; Loss per period</div><div class="cc-sub">Revenue vs Total Costs · ${scen==='base'?'Base':SC[scen].lbl} scenario</div></div>${unpin}</div><canvas id="${p}ch" height="120"></canvas><div class="legend" style="margin-top:10px"><div class="legend-item"><div class="ld" style="background:#4fc3a1"></div>Revenue</div><div class="legend-item"><div class="ld" style="background:#94a3b8"></div>Total Costs</div><div class="legend-item"><div class="ld-line" style="background:#f59e0b"></div>Operating Result</div></div>`;
+      mkChart(p+'ch',{type:'bar',data:{labels:MONTHS,datasets:[{label:'Revenue',data:d.rev,backgroundColor:MONTHS.map((_,i)=>ISACT[i]?'#4fc3a1':'rgba(79,195,161,0.5)'),yAxisID:'y',order:2},{label:'Total Costs',data:d.cost,backgroundColor:MONTHS.map((_,i)=>ISACT[i]?'#94a3b8':'rgba(148,163,184,0.5)'),yAxisID:'y',order:2},{label:'Operating Result',data:d.opRes,type:'line',borderColor:'#f59e0b',backgroundColor:'transparent',borderWidth:2.5,pointRadius:3,pointBackgroundColor:'#f59e0b',yAxisID:'y',tension:.35,order:1}]},options:{responsive:true,interaction:{mode:'index'},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+e(ctx.parsed.y)}}},scales:{y:{ticks:{callback:v=>e(v)},grid:{color:'#f1f5f9'}}}}});
+    } else if(id==='finance-liq'){
+      wrap.innerHTML = `<div class="cc-hdr"><div><div class="cc-title">Liquidity planning</div><div class="cc-sub">Cash income, expenses &amp; closing balance</div></div>${unpin}</div><canvas id="${p}ch" height="100"></canvas><div class="legend" style="margin-top:10px"><div class="legend-item"><div class="ld" style="background:#93c5fd"></div>Income</div><div class="legend-item"><div class="ld" style="background:#6b7280"></div>Expenses</div><div class="legend-item"><div class="ld-line" style="background:#1e293b"></div>Closing balance</div></div>`;
+      mkChart(p+'ch',{type:'bar',data:{labels:LIQMON,datasets:[{label:'Income',data:B.liqIn,backgroundColor:'rgba(147,197,253,0.75)',yAxisID:'y',order:2},{label:'Expenses',data:B.liqEx,backgroundColor:'rgba(107,114,128,0.65)',yAxisID:'y',order:2},{label:'Closing Balance',data:d.lb,type:'line',borderColor:'#1e293b',backgroundColor:'transparent',borderWidth:2.5,pointRadius:3,pointBackgroundColor:'#1e293b',tension:.4,yAxisID:'y2',order:1}]},options:{responsive:true,interaction:{mode:'index'},plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'€'+v+'K'},grid:{color:'#f1f5f9'}},y2:{position:'right',ticks:{callback:v=>'€'+v+'K'},grid:{drawOnChartArea:false}}}}});
+    } else if(id==='revenue-split'){
+      wrap.innerHTML = `<div class="cc-hdr"><div><div class="cc-title">Revenue breakdown</div><div class="cc-sub">Frame-contract vs. spot &amp; promotional</div></div>${unpin}</div><canvas id="${p}ch" height="100"></canvas>`;
+      mkChart(p+'ch',{type:'bar',data:{labels:MONTHS,datasets:[{label:'Frame-contract',data:mrr,backgroundColor:'rgba(37,99,235,0.75)',stack:'a'},{label:'Spot & promo',data:svcRev.map(v=>Math.max(0,v)),backgroundColor:'rgba(79,195,161,0.65)',stack:'a'}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:v=>e(v)},grid:{color:'#f1f5f9'}}}}});
+    } else if(id==='revenue-mrr'){
+      wrap.innerHTML = `<div class="cc-hdr"><div><div class="cc-title">Revenue by account tier</div><div class="cc-sub">Specialty · Regional · National</div></div>${unpin}</div><canvas id="${p}ch" height="140"></canvas>`;
+      mkChart(p+'ch',{type:'line',data:{labels:MONTHS,datasets:[{label:'National groups',data:mrrE,borderColor:'#7c3aed',backgroundColor:'rgba(124,58,237,0.08)',fill:true,tension:.4,borderWidth:2,pointRadius:2},{label:'Regional chains',data:mrrP,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.06)',fill:true,tension:.4,borderWidth:2,pointRadius:2},{label:'Specialty shops',data:mrrS,borderColor:'#4fc3a1',backgroundColor:'rgba(79,195,161,0.06)',fill:true,tension:.4,borderWidth:2,pointRadius:2}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{y:{ticks:{callback:v=>e(v)},grid:{color:'#f1f5f9'}}}}});
+    } else if(id==='revenue-clients'){
+      wrap.innerHTML = `<div class="cc-hdr"><div><div class="cc-title">Active accounts by tier</div><div class="cc-sub">Ordering accounts per month</div></div>${unpin}</div><canvas id="${p}ch" height="140"></canvas>`;
+      mkChart(p+'ch',{type:'bar',data:{labels:MONTHS,datasets:[{label:'National groups',data:cEnt,backgroundColor:'#7c3aed',stack:'a'},{label:'Regional chains',data:cPro,backgroundColor:'#2563eb',stack:'a'},{label:'Specialty shops',data:cStart,backgroundColor:'#93c5fd',stack:'a'}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{x:{stacked:true},y:{stacked:true,grid:{color:'#f1f5f9'}}}}});
+    } else if(id==='revenue-channel'){
+      wrap.innerHTML = `<div class="cc-hdr"><div><div class="cc-title">Revenue by channel</div><div class="cc-sub">Via distributor vs direct-to-retailer</div></div>${unpin}</div><canvas id="${p}ch" height="90"></canvas>`;
+      mkChart(p+'ch',{type:'bar',data:{labels:MONTHS,datasets:[{label:'Via distributor',data:pct42,backgroundColor:'rgba(37,99,235,0.7)',stack:'a'},{label:'Direct',data:pct58,backgroundColor:'rgba(148,163,184,0.6)',stack:'a'}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:v=>e(v)},grid:{color:'#f1f5f9'}}}}});
+    } else if(id==='marketing-budget'){
+      wrap.innerHTML = `<div class="cc-hdr"><div><div class="cc-title">Monthly marketing budget</div><div class="cc-sub">vs. new clients acquired</div></div>${unpin}</div><canvas id="${p}ch" height="140"></canvas>`;
+      mkChart(p+'ch',{type:'bar',data:{labels:MONTHS,datasets:[{label:'Budget (€)',data:budget,backgroundColor:'rgba(37,99,235,0.6)',yAxisID:'y'},{label:'New Clients',data:conv,type:'line',borderColor:'#4fc3a1',backgroundColor:'transparent',borderWidth:2,pointRadius:4,pointBackgroundColor:'#4fc3a1',yAxisID:'y2',tension:.35}]},options:{responsive:true,interaction:{mode:'index'},plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{y:{ticks:{callback:v=>'€'+v.toLocaleString('nl-NL')},grid:{color:'#f1f5f9'}},y2:{position:'right',grid:{drawOnChartArea:false}}}}});
+    } else if(id==='marketing-cac'){
+      wrap.innerHTML = `<div class="cc-hdr"><div><div class="cc-title">CAC trend</div><div class="cc-sub">Customer acquisition cost</div></div>${unpin}</div><canvas id="${p}ch" height="140"></canvas>`;
+      mkChart(p+'ch',{type:'line',data:{labels:MONTHS,datasets:[{label:'Avg CAC',data:cacRaw,borderColor:'#f59e0b',backgroundColor:'transparent',borderWidth:2,pointRadius:3,tension:.35,spanGaps:true},{label:'Partner CAC',data:cacRaw.map(v=>v!=null?Math.round(v*0.7):null),borderColor:'#2563eb',backgroundColor:'transparent',borderWidth:2,pointRadius:3,tension:.35,spanGaps:true},{label:'Direct CAC',data:cacRaw.map(v=>v!=null?Math.round(v*1.4):null),borderColor:'#94a3b8',backgroundColor:'transparent',borderWidth:2,pointRadius:3,tension:.35,spanGaps:true}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{y:{ticks:{callback:v=>'€'+v},grid:{color:'#f1f5f9'}}}}});
+    } else if(id==='hr-headcount'){
+      wrap.innerHTML = `<div class="cc-hdr"><div><div class="cc-title">Headcount growth</div><div class="cc-sub">FTE by month · 2026</div></div>${unpin}</div><canvas id="${p}ch" height="140"></canvas>`;
+      mkChart(p+'ch',{type:'bar',data:{labels:MONTHS,datasets:[{label:'Warehouse',data:depts.Warehouse,backgroundColor:'#2563eb',stack:'a'},{label:'Sales',data:depts.Sales,backgroundColor:'#4fc3a1',stack:'a'},{label:'Logistics',data:depts.Logistics,backgroundColor:'#7c3aed',stack:'a'},{label:'Finance',data:depts.Finance,backgroundColor:'#f59e0b',stack:'a'},{label:'Management',data:depts.Management,backgroundColor:'#94a3b8',stack:'a'}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{x:{stacked:true},y:{stacked:true,grid:{color:'#f1f5f9'}}}}});
+    } else if(id==='hr-dept'){
+      const decDept={Warehouse:depts.Warehouse[11],Sales:depts.Sales[11],Logistics:depts.Logistics[11],Finance:depts.Finance[11],Management:depts.Management[11]};
+      wrap.innerHTML = `<div class="cc-hdr"><div><div class="cc-title">Department split</div><div class="cc-sub">Headcount by function (December)</div></div>${unpin}</div><canvas id="${p}ch" height="140"></canvas>`;
+      mkChart(p+'ch',{type:'doughnut',data:{labels:Object.keys(decDept),datasets:[{data:Object.values(decDept),backgroundColor:['#2563eb','#4fc3a1','#7c3aed','#f59e0b','#94a3b8'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,plugins:{legend:{position:'right',labels:{boxWidth:12,font:{size:12}}}}}});
+    } else if(id==='hr-salary'){
+      wrap.innerHTML = `<div class="cc-hdr"><div><div class="cc-title">Monthly salary cost vs revenue</div><div class="cc-sub">Staff cost as % of revenue</div></div>${unpin}</div><canvas id="${p}ch" height="95"></canvas>`;
+      mkChart(p+'ch',{type:'bar',data:{labels:MONTHS,datasets:[{label:'Salary Cost',data:salary,backgroundColor:'rgba(37,99,235,0.6)',yAxisID:'y'},{label:'Revenue',data:d.rev,type:'line',borderColor:'#4fc3a1',backgroundColor:'transparent',borderWidth:2,pointRadius:2,tension:.4,yAxisID:'y'}]},options:{responsive:true,interaction:{mode:'index'},plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{y:{ticks:{callback:v=>e(v)},grid:{color:'#f1f5f9'}}}}});
+    } else if(id==='logistics-inv'){
+      wrap.innerHTML = `<div class="cc-hdr"><div><div class="cc-title">Inventory &amp; shipments</div><div class="cc-sub">Stock value (€K) vs shipment count</div></div>${unpin}</div><canvas id="${p}ch" height="140"></canvas>`;
+      mkChart(p+'ch',{type:'bar',data:{labels:MONTHS,datasets:[{label:'Inventory (€K)',data:inventory,backgroundColor:MONTHS.map((_,i)=>ISACT[i]?'rgba(37,99,235,0.7)':'rgba(37,99,235,0.45)'),yAxisID:'y',order:2},{label:'Shipments',data:shipments,type:'line',borderColor:'#4fc3a1',backgroundColor:'transparent',borderWidth:2.5,pointRadius:3,pointBackgroundColor:'#4fc3a1',yAxisID:'y2',tension:.35,order:1}]},options:{responsive:true,interaction:{mode:'index'},plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{y:{ticks:{callback:v=>'€'+v+'K'},grid:{color:'#f1f5f9'}},y2:{position:'right',grid:{drawOnChartArea:false}}}}});
+    } else if(id==='logistics-po'){
+      wrap.innerHTML = `<div class="cc-hdr"><div><div class="cc-title">Incoming purchase orders</div><div class="cc-sub">PO count per month</div></div>${unpin}</div><canvas id="${p}ch" height="140"></canvas>`;
+      mkChart(p+'ch',{type:'bar',data:{labels:MONTHS,datasets:[{label:'PO count',data:poCount,backgroundColor:MONTHS.map((_,i)=>ISACT[i]?'rgba(124,58,237,0.7)':'rgba(124,58,237,0.4)')}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{grid:{color:'#f1f5f9'}}}}});
+    } else if(id==='logistics-otd'){
+      wrap.innerHTML = `<div class="cc-hdr"><div><div class="cc-title">Supplier on-time delivery</div><div class="cc-sub">% within agreed lead time</div></div>${unpin}</div><canvas id="${p}ch" height="140"></canvas>`;
+      mkChart(p+'ch',{type:'line',data:{labels:MONTHS,datasets:[{label:'OTD %',data:suppOTD,borderColor:'#4fc3a1',backgroundColor:'rgba(79,195,161,0.1)',fill:true,borderWidth:2.5,pointRadius:3,tension:.4}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%'},grid:{color:'#f1f5f9'}}}}});
+    } else if(id==='logistics-dio'){
+      wrap.innerHTML = `<div class="cc-hdr"><div><div class="cc-title">Days Inventory Outstanding</div><div class="cc-sub">Avg days stock held before sold/shipped</div></div>${unpin}</div><canvas id="${p}ch" height="140"></canvas>`;
+      mkChart(p+'ch',{type:'bar',data:{labels:MONTHS,datasets:[{label:'DIO (days)',data:dio,backgroundColor:MONTHS.map((_,i)=>ISACT[i]?'rgba(245,158,11,0.7)':'rgba(245,158,11,0.4)')}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{min:0,max:60,ticks:{callback:v=>v+'d'},grid:{color:'#f1f5f9'}}}}});
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
 // MODULE: MY DASHBOARD
 // ═══════════════════════════════════════════════════════
 function renderMyDashboard(){
-  document.getElementById('content').innerHTML = `
-<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+  const hasPinned = pinnedSections.length > 0;
+  const hasWidgets = widgets.length > 0;
+  let html = '';
+
+  if(hasPinned){
+    html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+  <div class="wdb-section-title" style="margin:0">Pinned charts</div>
+</div>
+<div class="widget-grid" id="pinned-canvas">`;
+    pinnedSections.forEach(id=>{
+      const meta = PINNED_SECTION_META[id];
+      if(!meta) return;
+      html += `<div class="cc" id="pinned-section-${id}" style="padding:14px"></div>`;
+    });
+    html += `</div>`;
+  }
+
+  html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-top:${hasPinned?'20px':'0'};margin-bottom:16px">
   <div class="wdb-section-title" style="margin:0">Your widgets</div>
-  ${widgets.length > 0 ? `<button onclick="if(confirm('Remove all widgets?')){widgets=[];saveWidgets();renderWidgets();}" style="font-size:11px;color:var(--txt3);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:4px;transition:all .15s" onmouseover="this.style.color='#dc2626'" onmouseout="this.style.color='var(--txt3)'">Clear all</button>` : ''}
+  ${hasWidgets ? `<button onclick="if(confirm('Remove all widgets?')){widgets=[];saveWidgets();renderWidgets();}" style="font-size:11px;color:var(--txt3);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:4px;transition:all .15s" onmouseover="this.style.color='#dc2626'" onmouseout="this.style.color='var(--txt3)'">Clear all</button>` : ''}
 </div>
 <div id="widget-canvas"></div>`;
+
+  document.getElementById('content').innerHTML = html;
+  if(hasPinned) renderPinnedSections();
   renderWidgets();
 }
 
