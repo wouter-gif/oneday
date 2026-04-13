@@ -420,6 +420,14 @@ function restoreChatMessages(){
 }
 
 // ── Widget state ────────────────────────────────────────
+// Migrate: discard any old React/iframe-based widgets (they used function Widget(){} syntax)
+(function migrateWidgets(){
+  try {
+    const stored = JSON.parse(localStorage.getItem('oneday_widgets') || '[]');
+    const valid = stored.filter(w => w.code && !w.code.includes('function Widget') && !w.code.includes('window.SCENARIO_DATA'));
+    if(valid.length !== stored.length) localStorage.setItem('oneday_widgets', JSON.stringify(valid));
+  } catch(e){ localStorage.removeItem('oneday_widgets'); }
+})();
 let widgets = JSON.parse(localStorage.getItem('oneday_widgets') || '[]');
 
 // ── Pinned sections state ───────────────────────────────
@@ -458,19 +466,19 @@ function addPinButtons(){
   updatePinButtons();
 }
 
-// Forbidden patterns for sandboxed widget code
+// Forbidden patterns for widget code (Chart.js function bodies)
 const WIDGET_FORBIDDEN = [
   { re: /fetch\s*\(/,       name: 'fetch()' },
   { re: /XMLHttpRequest/,   name: 'XMLHttpRequest' },
   { re: /WebSocket/,        name: 'WebSocket' },
-  { re: /eval\s*\(/,        name: 'eval()' },
-  { re: /document\.cookie/, name: 'document.cookie' },
+  { re: /\beval\s*\(/,      name: 'eval()' },
+  { re: /document\s*\./,    name: 'document access' },
+  { re: /window\s*\./,      name: 'window access' },
   { re: /import\s*\(/,      name: 'dynamic import()' },
   { re: /require\s*\(/,     name: 'require()' },
-  { re: /window\.parent/,   name: 'window.parent' },
-  { re: /window\.top/,      name: 'window.top' },
   { re: /localStorage/,     name: 'localStorage' },
   { re: /sessionStorage/,   name: 'sessionStorage' },
+  { re: /new\s+Function/,   name: 'new Function()' },
 ];
 
 function scanCode(code){
@@ -537,7 +545,7 @@ function deleteWidget(id){
   renderWidgets();
 }
 
-// Build the scenData object to inject into a widget iframe
+// Build the data object passed to every widget function
 function buildScenData(){
   const d = getScenData();
   return {
@@ -553,9 +561,8 @@ function buildScenData(){
   };
 }
 
-// Render a single widget card shell (no srcdoc — set separately via DOM property)
+// Widget card HTML — canvas-based, no iframes
 function widgetCardHTML(w){
-  const h = w.height || (w.size === 'tall' ? 340 : 220);
   return `<div class="widget-card" data-size="${w.size||'medium'}" data-id="${w.id}">
   <div class="widget-title-bar">
     <span>${w.title||'Widget'}</span>
@@ -563,18 +570,32 @@ function widgetCardHTML(w){
       <button class="widget-del-btn" onclick="deleteWidget('${w.id}')" title="Remove widget">✕</button>
     </div>
   </div>
-  <iframe id="wif-${w.id}" sandbox="allow-scripts"
-    style="width:100%;height:${h}px;border:none;display:block;transition:height .2s ease"></iframe>
+  <div class="widget-body" id="wb-${w.id}">
+    <canvas id="wc-${w.id}"></canvas>
+  </div>
 </div>`;
 }
 
-// Inject srcdoc content directly via DOM property (bypasses HTML attribute encoding issues)
-function injectWidgetSrcdocs(){
-  const scenData = buildScenData();
-  widgets.forEach(w => {
-    const iframe = document.getElementById('wif-' + w.id);
-    if(iframe) iframe.srcdoc = buildIframeHTML(w.code || '', scenData);
-  });
+// Render one widget's chart/content into its card body
+function renderSingleWidget(w){
+  const bodyEl = document.getElementById('wb-' + w.id);
+  if(!bodyEl) return;
+  try {
+    const fn = new Function('data', w.code);  // w.code returns a Chart.js config or HTML string
+    const result = fn(buildScenData());
+    if(typeof result === 'string'){
+      // HTML content (KPI card, table, etc.)
+      bodyEl.innerHTML = result;
+    } else if(result && typeof result === 'object'){
+      // Chart.js config
+      const cid = 'wc-' + w.id;
+      if(chartReg[cid]){ chartReg[cid].destroy(); delete chartReg[cid]; }
+      const canvas = document.getElementById(cid);
+      if(canvas) chartReg[cid] = new Chart(canvas, result);
+    }
+  } catch(err){
+    bodyEl.innerHTML = `<div style="padding:10px;color:#dc2626;font-size:12px;background:#fef2f2;border-radius:6px"><strong>Widget error:</strong> ${err.message}</div>`;
+  }
 }
 
 function renderWidgets(){
@@ -594,7 +615,7 @@ function renderWidgets(){
     </div>`;
   } else {
     el.innerHTML = `<div class="widget-grid">${widgets.map(widgetCardHTML).join('')}</div>`;
-    injectWidgetSrcdocs();
+    widgets.forEach(renderSingleWidget);
   }
 }
 
@@ -1722,7 +1743,7 @@ function buildWidgetSystemPrompt(){
     ? widgets.map(w=>`• id="${w.id}" title="${w.title}" size="${w.size||'medium'}"`).join('\n')
     : '(no widgets yet)';
 
-  // ── Build full data context (same as analyst prompt) ──
+  // ── Full data context ──
   const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const scenLabel = SC[scen] ? SC[scen].lbl : scen;
   const fK = v => Math.round(v/1000);
@@ -1758,7 +1779,7 @@ ${row('Inventory Value',d.inventory)}
 ${rowRaw('Supplier OTD %',d.suppOTD,'%')}
 ${rowRaw('Warehouse Usage %',d.wareUsage,'%')}`;
 
-  return `You are Begrip AI, a business intelligence assistant for Polar Bear Icecream BV. You help the user build a personal dashboard via chat, and you can also answer data and analysis questions about the business.
+  return `You are Begrip AI, a business intelligence assistant for Polar Bear Icecream BV. You build Chart.js widgets and answer data questions.
 
 ## CRITICAL RULE
 Always return a valid JSON object — never plain text, never markdown. Pure JSON only.
@@ -1769,73 +1790,57 @@ Always return a valid JSON object — never plain text, never markdown. Pure JSO
   "widget": {
     "id":     "kebab-case-id",
     "title":  "Readable title",
-    "code":   "// React JSX component — see rules below",
+    "code":   "// JS function body — see rules below",
     "action": "add" | "update" | "remove",
     "size":   "small" | "medium" | "large" | "wide"
   },
   "answer": "Text (only for type answer or both)"
 }
 
-When the user asks a data or analysis question → use type "answer".
-When the user asks for a chart or widget → use type "widget".
-When the answer includes both a chart and a text reply → use type "both".
+When the user asks a data/analysis question → type "answer".
+When the user asks for a chart/widget → type "widget".
+When response includes both → type "both".
 
 ## Widget code rules
-1. The component is always called **Widget**: function Widget() { … }
-2. JSX is available via Babel (React is global: window.React / window.ReactDOM)
-3. Always read live data from **window.SCENARIO_DATA** — never hardcode numbers
-4. Use inline styles; make it visually attractive and professional
-5. For charts: use inline <svg> — no external libraries
-6. Keep the component fully self-contained (no imports)
+The "code" field is a JavaScript function body. It receives one argument called **data** and must **return** a Chart.js v4 configuration object.
 
-## window.SCENARIO_DATA structure
-{
-  scenario: string,          // e.g. "base", "bank-loan", "hire-sales"
-  scenarioLabel: string,     // e.g. "Base", "Bank Loan"
+- Chart.js 4 is already loaded on the page — use it directly
+- data.adjusted.rev, data.months, etc. are plain JS arrays — use them directly
+- Never hardcode numeric values — always read from data
+- No emojis, icons, or decorative symbols — text and numbers only
+- No fetch(), eval(), document, window, localStorage
+
+## data object structure
+data = {
+  scenario: string,          // "base" | "new-product" | "bank-loan" | ...
+  scenarioLabel: string,     // "Base" | "New Product" | ...
   months: string[12],        // ["Jan 26", "Feb 26", ...]
   adjusted: {
-    rev:   number[12],       // monthly revenue (€) for the active scenario
+    rev:   number[12],       // monthly revenue (€)
     cost:  number[12],       // monthly costs (€)
     opRes: number[12],       // operating result (€) = rev - cost
-    lb:    number[12],       // liquidity balance (€K) end of each period
-  },
-  base: {
-    rev:    number[12],      // base-scenario revenue (€)
-    cost:   number[12],      // base-scenario costs (€)
-    liqBal: number[12],      // base liquidity balance (€K)
-  },
-  revenue: {
-    cStart: number[12],      // specialty shop accounts per month
-    cPro:   number[12],      // regional chain accounts
-    cEnt:   number[12],      // national group accounts
-    partner: number[12],     // % revenue via distributor
+    lb:    number[12],       // liquidity balance (€K)
   },
   hr: {
-    hc:     number[12],      // total headcount FTE
-    salary: number[12],      // monthly salary cost (€)
-    depts:  { Warehouse, Sales, Logistics, Finance, Management: number[12] }
+    hc:     number[12],      // headcount FTE per month
+    salary: number[12],      // salary cost (€) per month
+    depts:  { Warehouse: number[12], Sales: number[12], Logistics: number[12], Finance: number[12], Management: number[12] }
   },
   marketing: {
-    budget: number[12],      // monthly marketing budget (€)
+    budget: number[12],      // marketing budget (€)
     leads:  number[12],
-    demos:  number[12],
-    trials: number[12],
     conv:   number[12],      // conversions per month
   },
   logistics: {
-    inventory: number[12],   // inventory value (€)
-    shipments: number[12],   // outbound units
-    suppOTD:   number[12],   // supplier on-time delivery %
+    inventory: number[12],
+    shipments: number[12],
+    suppOTD:   number[12],   // on-time delivery %
     wareUsage: number[12],   // warehouse utilisation %
-    dio:       number[12],   // days inventory outstanding
-    poCount:   number[12],   // purchase orders
   },
 }
 
-## What you MUST NOT do
-- Use fetch(), XMLHttpRequest, WebSocket, eval(), document.cookie, localStorage, window.parent
-- Hardcode data values — always read from window.SCENARIO_DATA
-- Use emojis, icons, or decorative symbols anywhere in widget output — text and numbers only
+## Dashboard colour palette
+Blue: #2563eb | Teal: #4fc3a1 | Gray: #94a3b8 | Orange: #f59e0b | Red: #dc2626 | Purple: #8b5cf6
 
 ## Business data (FY 2026)
 Company: Polar Bear Icecream BV — Dutch premium ice cream, seasonal peak Q2/Q3, sells via distributors and direct accounts.
@@ -1843,14 +1848,17 @@ Active scenario: ${scenLabel}
 ${scenComparison}
 ${dataContext}
 
-## Current widgets on the dashboard
+## Current widgets
 ${widgetList}
 
-## Example response (widget)
-{"type":"widget","widget":{"id":"revenue-bar","title":"Monthly Revenue","action":"add","size":"medium","code":"function Widget(){const {adjusted,months,scenarioLabel}=window.SCENARIO_DATA;const max=Math.max(...adjusted.rev);return(<div style={{padding:'4px 0'}}><div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}}><div style={{fontSize:'13px',fontWeight:'700',color:'#1f2937'}}>Revenue per month</div><div style={{fontSize:'11px',color:'#6b7280'}}>{scenarioLabel}</div></div>{adjusted.rev.map((v,i)=><div key={i} style={{marginBottom:'6px'}}><div style={{display:'flex',justifyContent:'space-between',fontSize:'11px',color:'#6b7280',marginBottom:'2px'}}><span>{months[i]}</span><span>€{Math.round(v/1000)}K</span></div><div style={{background:'#f3f4f6',borderRadius:'3px',height:'8px'}}><div style={{width:(v/max*100)+'%',height:'100%',background:'#2563eb',borderRadius:'3px'}}/></div></div>)}</div>);}"}}
+## Example — bar chart
+{"type":"widget","widget":{"id":"revenue-monthly","title":"Monthly Revenue","action":"add","size":"medium","code":"const {adjusted,months,scenarioLabel}=data;return{type:'bar',data:{labels:months,datasets:[{label:'Revenue',data:adjusted.rev,backgroundColor:'rgba(79,195,161,0.75)',borderRadius:4,borderSkipped:false}]},options:{responsive:true,plugins:{legend:{display:false},title:{display:true,text:scenarioLabel+' scenario'}},scales:{y:{ticks:{callback:v=>'€'+Math.round(v/1000)+'K'},grid:{color:'#f1f5f9'}}}}};"}}
 
-## Example response (data question)
-{"type":"answer","answer":"Revenue in the base scenario peaks in June at €124K — typical for the ice cream season."}
+## Example — line chart
+{"type":"widget","widget":{"id":"cash-trend","title":"Cash Position","action":"add","size":"medium","code":"const {adjusted,months}=data;return{type:'line',data:{labels:months,datasets:[{label:'Cash (€K)',data:adjusted.lb,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.08)',fill:true,tension:0.4,pointRadius:3,pointBackgroundColor:'#2563eb'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>v+'K'},grid:{color:'#f1f5f9'}}}}};"}}
+
+## Example — data question
+{"type":"answer","answer":"Revenue peaks in June at €124K in the base scenario — typical for the ice cream season."}
 
 Always return valid JSON. This is a hard requirement.`;
 }
