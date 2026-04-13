@@ -385,6 +385,14 @@ canvas{max-height:280px}
 let mod = 'finance', scen = 'base';
 let starredMods = JSON.parse(localStorage.getItem('oneday_starred') || '["finance"]');
 const chartReg = {};
+
+// ── Chart.js global defaults — applied to ALL charts including widgets ──
+Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+Chart.defaults.font.size   = 11;
+Chart.defaults.color       = '#64748b';
+Chart.defaults.plugins.legend.labels.font  = { size: 11 };
+Chart.defaults.plugins.tooltip.titleFont   = { size: 11 };
+Chart.defaults.plugins.tooltip.bodyFont    = { size: 11 };
 let claudeApiKey = localStorage.getItem('oneday_api_key') || '';
 let chatHistory = [];  // [{role:'user'|'assistant', content:'...'}]
 
@@ -1675,84 +1683,130 @@ You give brief, direct answers using the data above. Use €K figures. When comp
 
 // ── Widget system prompt ────────────────────────────────
 function buildWidgetSystemPrompt(){
+  const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const scenLabel = SC[scen] ? SC[scen].lbl : scen;
+  const fK = v => Math.round(v/1000);
+  const row    = (label,arr) => label+': '+M.map((m,i)=>`${m} €${fK(arr[i])}K`).join(', ');
+  const rowRaw = (label,arr,suffix='') => label+': '+M.map((m,i)=>`${m} ${arr[i]}${suffix}`).join(', ');
+
+  const ALL=['base','new-product','bank-loan','push-receivables','hire-sales'];
+  const SD={};
+  ALL.forEach(sk=>{ SD[sk]=computeAllScenData(sk); });
+  const d = SD[scen];
+  const cmpLine=(label,fn)=>label+': '+ALL.map(sk=>`${SC[sk].lbl}=${fn(SD[sk])}`).join(' | ');
+
+  const scenComparison=`
+━━ ALL-SCENARIO COMPARISON ━━
+${cmpLine('Annual Revenue',d=>` €${fK(d.rev.reduce((a,b)=>a+b,0))}K`)}
+${cmpLine('Annual Costs',d=>` €${fK(d.cost.reduce((a,b)=>a+b,0))}K`)}
+${cmpLine('Operating Result',d=>` €${fK(d.opRes.reduce((a,b)=>a+b,0))}K`)}
+${cmpLine('Min Monthly Cash',d=>` €${Math.min(...d.lb)}K`)}
+${cmpLine('EOY Cash',d=>` €${d.lb[11]}K`)}
+${cmpLine('Dec Headcount',d=>` ${d.hc[11]} FTE`)}
+${cmpLine('Annual Salary Cost',d=>` €${fK(d.salary.reduce((a,b)=>a+b,0))}K`)}
+${cmpLine('Annual Mkt Budget',d=>` €${fK(d.mktBudget.reduce((a,b)=>a+b,0))}K`)}`;
+
+  const dataContext=`
+━━ ACTIVE SCENARIO: ${scenLabel} ━━
+── Finance ──
+${row('Revenue',d.rev)}
+${row('Costs',d.cost)}
+${row('Operating Result',d.opRes)}
+${row('Liquidity Balance',d.lb.map(v=>v*1000))}
+── Revenue ──
+${row('MRR',d.mrr)}
+${rowRaw('Total Customers',d.totalC,' accounts')}
+── Marketing ──
+${row('Budget',d.mktBudget)}
+${rowRaw('Leads',d.mktLeads)} | ${rowRaw('Conversions',d.mktConv)}
+── HR ──
+${rowRaw('Headcount',d.hc,' FTE')}
+${row('Salary Cost',d.salary)}
+── Logistics ──
+${row('Inventory Value',d.inventory)}
+${rowRaw('Supplier OTD %',d.suppOTD,'%')}
+${rowRaw('Warehouse Usage %',d.wareUsage,'%')}`;
+
   const widgetList = widgets.length
     ? widgets.map(w=>`• id="${w.id}" title="${w.title}" size="${w.size||'medium'}"`).join('\n')
-    : '(geen widgets aanwezig)';
+    : '(no widgets yet)';
 
-  // Compact data snapshot for embedding in widgets
-  const snap = {
-    monthly: B ? [
-      'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'
-    ].map((m,i)=>({
-      month:m,
-      revenue: B.rev ? B.rev[i] : 0,
-      costs:   B.cost ? B.cost[i] : 0,
-    })) : [],
-    scenarios: SC ? Object.entries(SC).map(([k,s])=>({key:k, label:s.lbl})) : [],
-  };
+  return `You are One Day AI, a business intelligence assistant for Polar Bear Icecream BV. You build Chart.js v4 widgets and answer data questions.
 
-  return `Je bent One Day AI, een dashboard-assistent voor Polar Bear Icecream BV. Je helpt de gebruiker een persoonlijk dashboard samenstellen via chat.
+Always respond with a single JSON object. No prose, no markdown — pure JSON only.
 
-## KRITIEKE REGEL
-Geef ALTIJD en UITSLUITEND een geldig JSON-object terug. Nooit plain tekst, nooit markdown — alleen pure JSON.
+## HOW WIDGET CODE WORKS — READ THIS CAREFULLY
 
-## Responschema
+The "code" field is executed as the BODY of a JavaScript function that already receives a parameter called "data".
+It is NOT a complete function definition — do NOT write "function Widget(){...}".
+It must end with a return statement returning a Chart.js config object.
+
+The runtime does this:
+  const fn = new Function('data', code);
+  const chartConfig = fn(liveData);
+  new Chart(canvas, chartConfig);
+
+CORRECT — just the function body:
+  const {adjusted, months} = data;
+  return { type: 'bar', data: { ... }, options: { ... } };
+
+WRONG — never do these:
+  function Widget() { ... }           ← NEVER declare a function
+  const data = window.SCENARIO_DATA;  ← NEVER use window — data is the parameter
+  ReactDOM.render(...)                ← NEVER use React
+
+## Response schema
 {
   "type": "widget" | "answer" | "both",
   "widget": {
     "id":     "kebab-case-id",
-    "title":  "Leesbare naam",
-    "code":   "// React JSX component — zie regels hieronder",
+    "title":  "Readable title",
+    "code":   "<function body: destructure data, return Chart.js config>",
     "action": "add" | "update" | "remove",
     "size":   "small" | "medium" | "large" | "wide"
   },
-  "answer": "Tekst (alleen bij type answer of both)"
+  "answer": "Short text (type answer or both only)"
 }
 
-## Widget code rules
-1. The component is always called **Widget**: function Widget() { … }
-2. JSX is available via Babel (React is global: window.React / window.ReactDOM)
-3. Always read live data from **window.SCENARIO_DATA** — never hardcode numbers
-4. Use inline styles; make it visually attractive and professional
-5. For simple bar charts: use inline <svg> — no external libraries
-6. Keep the component fully self-contained (no imports)
+## Typography rules — ALL charts must follow these exactly
+- Font size: 11 on all axes, legends, titles, tooltips — set font:{size:11} on every ticks/legend/title option
+- Axis tick color: #64748b
+- Grid line color: #f1f5f9
+- No decorative symbols or emojis
 
-## window.SCENARIO_DATA structure
-{
-  scenario: string,          // e.g. "base", "bank-loan", "hire-sales"
-  scenarioLabel: string,     // e.g. "Base", "Bank Loan"
-  months: string[12],        // ["Jan 26", "Feb 26", ...]
-  adjusted: {
-    rev: number[12],         // monthly revenue for active scenario (€)
-    cost: number[12],        // monthly costs
-    opRes: number[12],       // operating result
-    lb: number[12],          // liquidity balance
-  },
-  base: { rev, cost, liqBal, ca },  // base scenario values
-  revenue: { mrr, totalCustomers, ... },
-  hr: { headcount, ... },
-  marketing: { budget, leads, ... },
+## data object available in widget code
+data = {
+  scenario: string,       scenarioLabel: string,  months: string[12],
+  adjusted: { rev: number[12], cost: number[12], opRes: number[12], lb: number[12] },
+  hr:        { hc: number[12], salary: number[12], depts: { Warehouse, Sales, Logistics, Finance, Management } },
+  marketing: { budget: number[12], leads: number[12], conv: number[12] },
+  logistics: { inventory: number[12], suppOTD: number[12], wareUsage: number[12] },
 }
 
-## What you MUST NOT do
-- Modify the app framework, navigation or API integration
-- Use fetch(), XMLHttpRequest, WebSocket, eval(), document.cookie, localStorage, window.parent
-- Hardcode data values — always read from window.SCENARIO_DATA
-- Use emojis, icons, or decorative symbols anywhere in widget output — text and numbers only
+## Colour palette
+Blue: #2563eb | Teal: #4fc3a1 | Gray: #94a3b8 | Orange: #f59e0b | Red: #dc2626 | Purple: #8b5cf6
+
+## Business data (FY 2026)
+Company: Polar Bear Icecream BV — Dutch premium ice cream, seasonal peak Q2/Q3.
+Active scenario: ${scenLabel}
+${scenComparison}
+${dataContext}
 
 ## Current widgets
 ${widgetList}
 
-## Company context
-Polar Bear Icecream BV — Dutch premium ice cream, seasonal peak Q2/Q3
+## CORRECT examples
 
-## Example response (widget)
-{"type":"widget","widget":{"id":"revenue-bar","title":"Monthly Revenue","action":"add","size":"medium","code":"function Widget(){const {adjusted,months,scenarioLabel}=window.SCENARIO_DATA;const max=Math.max(...adjusted.rev);return(<div style={{padding:'4px 0'}}><div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}}><div style={{fontSize:'13px',fontWeight:'700',color:'#1f2937'}}>Revenue per month</div><div style={{fontSize:'11px',color:'#6b7280'}}>{scenarioLabel}</div></div>{adjusted.rev.map((v,i)=><div key={i} style={{marginBottom:'6px'}}><div style={{display:'flex',justifyContent:'space-between',fontSize:'11px',color:'#6b7280',marginBottom:'2px'}}><span>{months[i]}</span><span>€{Math.round(v/1000)}K</span></div><div style={{background:'#f3f4f6',borderRadius:'3px',height:'8px'}}><div style={{width:(v/max*100)+'%',height:'100%',background:'#2563eb',borderRadius:'3px'}}/></div></div>)}</div>);}"}}
+Bar chart (note font:{size:11} on every tick/title):
+{"type":"widget","widget":{"id":"revenue-monthly","title":"Monthly Revenue","action":"add","size":"medium","code":"const {adjusted,months,scenarioLabel}=data;return{type:'bar',data:{labels:months,datasets:[{label:'Revenue',data:adjusted.rev,backgroundColor:'rgba(79,195,161,0.75)',borderRadius:4,borderSkipped:false}]},options:{responsive:true,plugins:{legend:{display:false},title:{display:true,text:scenarioLabel+' scenario',font:{size:11}}},scales:{y:{ticks:{font:{size:11},color:'#64748b',callback:v=>'€'+Math.round(v/1000)+'K'},grid:{color:'#f1f5f9'}},x:{ticks:{font:{size:11},color:'#64748b'}}}}};"}}
 
-## Example response (data question)
-{"type":"answer","answer":"Revenue in the base scenario peaks in June at €124K — typical for the ice cream season."}
+Line chart:
+{"type":"widget","widget":{"id":"cash-trend","title":"Cash Position","action":"add","size":"medium","code":"const {adjusted,months}=data;return{type:'line',data:{labels:months,datasets:[{label:'Cash (€K)',data:adjusted.lb,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.08)',fill:true,tension:0.4,pointRadius:3}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{ticks:{font:{size:11},color:'#64748b',callback:v=>v+'K'},grid:{color:'#f1f5f9'}},x:{ticks:{font:{size:11},color:'#64748b'}}}}};"}}
 
-Reageer ALTIJD met geldig JSON. Dit is een harde vereiste.`;
+Data question:
+{"type":"answer","answer":"Revenue peaks in June at €124K in the base scenario."}
+
+Always return valid JSON. This is a hard requirement.`;
 }
 
 // Parse JSON from Claude response (handles wrapped/plain JSON)
