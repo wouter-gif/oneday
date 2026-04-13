@@ -537,24 +537,26 @@ function deleteWidget(id){
   renderWidgets();
 }
 
-// Build the scenData object to inject into a widget iframe
-function buildScenData(){
+// Render a single widget card (returns HTML string)
+function widgetCardHTML(w){
+  const iframeId = 'wif-'+w.id;
   const d = getScenData();
-  return {
+  const scenData = {
     scenario: scen,
     scenarioLabel: SC[scen].lbl,
     months: MONTHS,
-    adjusted: { rev: d.rev, cost: d.cost, opRes: d.opRes, lb: d.lb },
-    base: { rev: B.rev, cost: B.cost, liqBal: B.liqBal },
+    adjusted: { rev: d.rev, cost: d.cost, opRes: d.opRes, rbt: d.rbt, rat: d.rat, lb: d.lb },
+    base: { rev: B.rev, cost: B.cost, liqBal: B.liqBal, ca: B.ca },
+    scenarioConfig: SC[scen],
+    allScenarios: Object.fromEntries(Object.entries(SC).map(([k,s])=>[k,{lbl:s.lbl,rAdj:s.rAdj,cAdj:s.cAdj,lbAdj:s.lbAdj}])),
     revenue: REV_BASE,
     hr: HR_BASE,
     marketing: MKT_BASE,
     logistics: LOG_BASE,
+    projects: PRJ_BASE,
   };
-}
-
-// Render a single widget card shell (no srcdoc — set separately via DOM property)
-function widgetCardHTML(w){
+  const html = buildIframeHTML(w.code || '', scenData);
+  const srcdoc = html.replace(/"/g, '&quot;');
   const h = w.height || (w.size === 'tall' ? 340 : 220);
   return `<div class="widget-card" data-size="${w.size||'medium'}" data-id="${w.id}">
   <div class="widget-title-bar">
@@ -563,18 +565,9 @@ function widgetCardHTML(w){
       <button class="widget-del-btn" onclick="deleteWidget('${w.id}')" title="Remove widget">✕</button>
     </div>
   </div>
-  <iframe id="wif-${w.id}" sandbox="allow-scripts"
+  <iframe id="${iframeId}" srcdoc="${srcdoc}" sandbox="allow-scripts"
     style="width:100%;height:${h}px;border:none;display:block;transition:height .2s ease"></iframe>
 </div>`;
-}
-
-// Inject srcdoc content directly via DOM property (bypasses HTML attribute encoding issues)
-function injectWidgetSrcdocs(){
-  const scenData = buildScenData();
-  widgets.forEach(w => {
-    const iframe = document.getElementById('wif-' + w.id);
-    if(iframe) iframe.srcdoc = buildIframeHTML(w.code || '', scenData);
-  });
 }
 
 function renderWidgets(){
@@ -594,7 +587,6 @@ function renderWidgets(){
     </div>`;
   } else {
     el.innerHTML = `<div class="widget-grid">${widgets.map(widgetCardHTML).join('')}</div>`;
-    injectWidgetSrcdocs();
   }
 }
 
@@ -1794,42 +1786,15 @@ When the answer includes both a chart and a text reply → use type "both".
   scenarioLabel: string,     // e.g. "Base", "Bank Loan"
   months: string[12],        // ["Jan 26", "Feb 26", ...]
   adjusted: {
-    rev:   number[12],       // monthly revenue (€) for the active scenario
-    cost:  number[12],       // monthly costs (€)
-    opRes: number[12],       // operating result (€) = rev - cost
-    lb:    number[12],       // liquidity balance (€K) end of each period
+    rev: number[12],         // monthly revenue for active scenario (€)
+    cost: number[12],        // monthly costs
+    opRes: number[12],       // operating result
+    lb: number[12],          // liquidity balance
   },
-  base: {
-    rev:    number[12],      // base-scenario revenue (€)
-    cost:   number[12],      // base-scenario costs (€)
-    liqBal: number[12],      // base liquidity balance (€K)
-  },
-  revenue: {
-    cStart: number[12],      // specialty shop accounts per month
-    cPro:   number[12],      // regional chain accounts
-    cEnt:   number[12],      // national group accounts
-    partner: number[12],     // % revenue via distributor
-  },
-  hr: {
-    hc:     number[12],      // total headcount FTE
-    salary: number[12],      // monthly salary cost (€)
-    depts:  { Warehouse, Sales, Logistics, Finance, Management: number[12] }
-  },
-  marketing: {
-    budget: number[12],      // monthly marketing budget (€)
-    leads:  number[12],
-    demos:  number[12],
-    trials: number[12],
-    conv:   number[12],      // conversions per month
-  },
-  logistics: {
-    inventory: number[12],   // inventory value (€)
-    shipments: number[12],   // outbound units
-    suppOTD:   number[12],   // supplier on-time delivery %
-    wareUsage: number[12],   // warehouse utilisation %
-    dio:       number[12],   // days inventory outstanding
-    poCount:   number[12],   // purchase orders
-  },
+  base: { rev, cost, liqBal, ca },
+  revenue: { mrr, totalCustomers },
+  hr: { headcount },
+  marketing: { budget, leads },
 }
 
 ## What you MUST NOT do
