@@ -286,14 +286,14 @@ canvas{max-height:280px}
       </svg>
       <div>
         <div class="sb-title">Polar Bear Icecream</div>
-        <div class="sb-sub">Powered by Begrip</div>
+        <div class="sb-sub">Powered by One Day</div>
       </div>
     </div>
   </div>
   <nav class="sb-nav" id="sb-nav"></nav>
   <div class="sb-footer">
     <strong>Polar Bear Icecream BV</strong><br>
-    Powered by Begrip · FY 2026
+    Powered by One Day · FY 2026
   </div>
 </aside>
 
@@ -323,7 +323,7 @@ canvas{max-height:280px}
     <div class="chat-hdr-info">
       <div class="chat-av">✦</div>
       <div>
-        <div class="chat-hdr-name">Begrip AI</div>
+        <div class="chat-hdr-name">One Day AI</div>
         <div class="chat-hdr-status">● Analysing your data</div>
       </div>
     </div>
@@ -343,7 +343,7 @@ canvas{max-height:280px}
     </div>
     <div class="chat-msgs" id="chat-msgs"></div>
     <div class="chat-input-row" id="chat-input-row">
-      <textarea class="chat-inp" id="chat-inp" placeholder="Ask Begrip AI…" autocomplete="off" rows="3"></textarea>
+      <textarea class="chat-inp" id="chat-inp" placeholder="Ask One Day AI…" autocomplete="off" rows="3"></textarea>
       <div class="chat-input-actions">
         <button class="chat-send-btn" id="chat-send-btn">
           Send
@@ -374,7 +374,7 @@ canvas{max-height:280px}
 </div>
 
 <!-- CHAT BUBBLE (minimised state) -->
-<button class="float-bubble hidden" id="float-bubble" title="Open Begrip AI">
+<button class="float-bubble hidden" id="float-bubble" title="Open One Day AI">
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
 </button>
 
@@ -387,33 +387,6 @@ let starredMods = JSON.parse(localStorage.getItem('oneday_starred') || '["financ
 const chartReg = {};
 let claudeApiKey = localStorage.getItem('oneday_api_key') || '';
 let chatHistory = [];  // [{role:'user'|'assistant', content:'...'}]
-let chatHistories = JSON.parse(localStorage.getItem('begrip_chat_histories') || '{}');
-function saveChatHistory(){
-  chatHistories[mod] = chatHistory.slice(-60);
-  localStorage.setItem('begrip_chat_histories', JSON.stringify(chatHistories));
-}
-function restoreChatMessages(){
-  if(!chatHistory.length) return false;
-  const c = document.getElementById('chat-msgs');
-  let html = '';
-  chatHistory.forEach(msg=>{
-    if(msg.role==='user'){
-      html+=`<div class="cmsg user"><div class="cmsg-av">U</div><div class="cmsg-text">${msg.content.replace(/</g,'&lt;')}</div></div>`;
-    } else {
-      let display = msg.content;
-      if(mod==='my-dashboard'){
-        const j=parseClaudeJSON(msg.content);
-        if(j && j.answer) display=j.answer;
-        else if(j && j.widget) display=`Widget "${j.widget.title||j.widget.id}" ${j.widget.action==='remove'?'removed':j.widget.action==='update'?'updated':'added'}.`;
-      }
-      const fmt=display.replace(/</g,'&lt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
-      html+=`<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text">${fmt}</div></div>`;
-    }
-  });
-  c.innerHTML=html;
-  c.scrollTop=c.scrollHeight;
-  return true;
-}
 
 // ── Widget state ────────────────────────────────────────
 let widgets = JSON.parse(localStorage.getItem('oneday_widgets') || '[]');
@@ -573,7 +546,7 @@ function renderWidgets(){
     el.innerHTML = `<div class="widget-empty">
       <div class="widget-empty-icon">✦</div>
       <div class="widget-empty-title">Your dashboard is empty</div>
-      <div class="widget-empty-body">Type in the chat what you'd like to see — a revenue chart, KPI card, team breakdown — and Begrip AI will build it for you.</div>
+      <div class="widget-empty-body">Type in the chat what you'd like to see — a revenue chart, KPI card, team breakdown — and One Day AI will build it for you.</div>
       <div class="widget-hints-row">
         <span class="widget-hint-chip" onclick="setWidgetHint(this)">Create a revenue chart</span>
         <span class="widget-hint-chip" onclick="setWidgetHint(this)">Add a KPI overview</span>
@@ -1415,7 +1388,7 @@ function renderCompare(){
   <div class="advisor-card-hdr">
     <div class="advisor-av-lg">✦</div>
     <div>
-      <div class="advisor-title">Begrip AI · Scenario Comparison</div>
+      <div class="advisor-title">One Day AI · Scenario Comparison</div>
       <div class="advisor-sub">FY 2026 forecast · Polar Bear Icecream · All scenarios side by side</div>
     </div>
   </div>
@@ -1465,41 +1438,37 @@ function renderCompare(){
 
 function renderChat(){
   document.getElementById('chat-ctx-mod').textContent=MODULE_META[mod]?MODULE_META[mod].title:mod;
-  document.getElementById('chat-ctx-scen').textContent=(mod==='my-dashboard') ? 'Dashboard' : (SC[scen]?SC[scen].lbl:scen);
+  document.getElementById('chat-ctx-scen').textContent=(mod==='my-dashboard') ? 'Widget mode' : (SC[scen]?SC[scen].lbl:scen);
 
-  // Load persisted history for this module
-  chatHistory = chatHistories[mod] || [];
+  chatHistory=[];
 
   const isWidgetMode = (mod === 'my-dashboard');
 
-  // If there's saved history, restore it; otherwise show welcome screen
-  if(!restoreChatMessages()){
-    if(isWidgetMode){
-      document.getElementById('chat-msgs').innerHTML=`
-        <div class="chat-welcome">
-          <div class="chat-welcome-av">✦</div>
-          <div class="chat-welcome-title">Hi, I'm Begrip AI</div>
-          <div class="chat-welcome-body">Ask me anything about your data, or describe a widget and I'll build it for your dashboard.</div>
-          <div class="chat-hints">
-            <div class="chat-hint">Create a bar chart of monthly revenue</div>
-            <div class="chat-hint">Add a KPI card with MRR, revenue and margin</div>
-            <div class="chat-hint">Which scenario gives the best cash position?</div>
-            <div class="chat-hint">What is our best month in the base case?</div>
-          </div>
-        </div>`;
-    } else {
-      document.getElementById('chat-msgs').innerHTML=`
-        <div class="chat-welcome">
-          <div class="chat-welcome-av">✦</div>
-          <div class="chat-welcome-title">Hi, I'm Begrip AI</div>
-          <div class="chat-welcome-body">I have full access to all your Polar Bear Icecream data — every module, all five scenarios. Ask me anything.</div>
-          <div class="chat-hints">
-            <div class="chat-hint">Which scenario gives the best cash position?</div>
-            <div class="chat-hint">What's our biggest risk in Q1?</div>
-            <div class="chat-hint">Compare headcount costs across scenarios</div>
-          </div>
-        </div>`;
-    }
+  if(isWidgetMode){
+    document.getElementById('chat-msgs').innerHTML=`
+      <div class="chat-welcome">
+        <div class="chat-welcome-av">✦</div>
+        <div class="chat-welcome-title">Dashboard builder</div>
+        <div class="chat-welcome-body">Tell me which widget you want — a chart, KPI card, or table. I'll generate it for you right away.</div>
+        <div class="chat-hints">
+          <div class="chat-hint">Create a bar chart of monthly revenue</div>
+          <div class="chat-hint">Add a KPI card with MRR, revenue and margin</div>
+          <div class="chat-hint">Show team breakdown as a pie chart</div>
+          <div class="chat-hint">What is our best month in the base case?</div>
+        </div>
+      </div>`;
+  } else {
+    document.getElementById('chat-msgs').innerHTML=`
+      <div class="chat-welcome">
+        <div class="chat-welcome-av">✦</div>
+        <div class="chat-welcome-title">Hi, I'm One Day AI</div>
+        <div class="chat-welcome-body">I have full access to all your Polar Bear Icecream data — every module, all five scenarios. Ask me anything.</div>
+        <div class="chat-hints">
+          <div class="chat-hint">Which scenario gives the best cash position?</div>
+          <div class="chat-hint">What's our biggest risk in Q1?</div>
+          <div class="chat-hint">Compare headcount costs across scenarios</div>
+        </div>
+      </div>`;
   }
 
   // Make hints clickable
@@ -1517,7 +1486,7 @@ function renderChat(){
   // Update placeholder
   const inp = document.getElementById('chat-inp');
   if(inp && !inp.disabled){
-    inp.placeholder = isWidgetMode ? 'Describe a widget or ask a data question…' : 'Ask Begrip AI…';
+    inp.placeholder = isWidgetMode ? 'Beschrijf een widget of stel een datavraag…' : 'Ask One Day AI…';
   }
 
   updateChatKeyUI();
@@ -1656,7 +1625,7 @@ ${cmpLine('Avg Project Health',d=>` ${Math.round(Object.values(d.health).reduce(
     {name:'Sustainability Plan',start:'Aug',end:'Nov',status:'Planned'},
   ];
 
-  return `You are Begrip AI, a sharp and concise financial analyst embedded in the Polar Bear Icecream BV business dashboard (FY 2026). You have full access to all monthly data across every module and tab, for ALL scenarios.
+  return `You are One Day AI, a sharp and concise financial analyst embedded in the Polar Bear Icecream BV business dashboard (FY 2026). You have full access to all monthly data across every module and tab, for ALL scenarios.
 
 Company: Polar Bear Icecream BV — Dutch premium ice cream brand, seasonal business (Q2/Q3 peak), sells via distributors and direct accounts.
 Current scenario: ${scenLabel} | Active module: ${modLabel}
@@ -1708,72 +1677,44 @@ You give brief, direct answers using the data above. Use €K figures. When comp
 function buildWidgetSystemPrompt(){
   const widgetList = widgets.length
     ? widgets.map(w=>`• id="${w.id}" title="${w.title}" size="${w.size||'medium'}"`).join('\n')
-    : '(no widgets yet)';
+    : '(geen widgets aanwezig)';
 
-  // ── Build full data context (same as analyst prompt) ──
-  const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const scenLabel = SC[scen] ? SC[scen].lbl : scen;
-  const fK = v => Math.round(v/1000);
-  const row    = (label,arr) => label+': '+M.map((m,i)=>`${m} €${fK(arr[i])}K`).join(', ');
-  const rowRaw = (label,arr,suffix='') => label+': '+M.map((m,i)=>`${m} ${arr[i]}${suffix}`).join(', ');
-  const ALL=['base','new-product','bank-loan','push-receivables','hire-sales'];
-  const SD={};
-  ALL.forEach(sk=>{ SD[sk]=computeAllScenData(sk); });
-  const d = SD[scen];
-  const cmpLine=(label,fn)=>label+': '+ALL.map(sk=>`${SC[sk].lbl}=${fn(SD[sk])}`).join(' | ');
-  const scenComparison=`
-── ALL-SCENARIO COMPARISON ──
-${cmpLine('Annual Revenue',d=>` €${fK(d.rev.reduce((a,b)=>a+b,0))}K`)}
-${cmpLine('Annual Costs',d=>` €${fK(d.cost.reduce((a,b)=>a+b,0))}K`)}
-${cmpLine('Operating Result',d=>` €${fK(d.opRes.reduce((a,b)=>a+b,0))}K`)}
-${cmpLine('Min Monthly Cash',d=>` €${Math.min(...d.lb)}K`)}
-${cmpLine('EOY Cash',d=>` €${d.lb[11]}K`)}
-${cmpLine('Dec Headcount',d=>` ${d.hc[11]} FTE`)}`;
+  // Compact data snapshot for embedding in widgets
+  const snap = {
+    monthly: B ? [
+      'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'
+    ].map((m,i)=>({
+      month:m,
+      revenue: B.rev ? B.rev[i] : 0,
+      costs:   B.cost ? B.cost[i] : 0,
+    })) : [],
+    scenarios: SC ? Object.entries(SC).map(([k,s])=>({key:k, label:s.lbl})) : [],
+  };
 
-  const dataContext=`
-── ACTIVE SCENARIO: ${scenLabel} ──
-${row('Revenue',d.rev)}
-${row('Costs',d.cost)}
-${row('Operating Result',d.opRes)}
-${row('Liquidity Balance',d.lb.map(v=>v*1000))}
-${row('MRR',d.mrr)}
-${rowRaw('Total Customers',d.totalC,' accounts')}
-${rowRaw('Headcount',d.hc,' FTE')}
-${row('Salary Cost',d.salary)}
-${row('Marketing Budget',d.mktBudget)}
-${rowRaw('Leads',d.mktLeads)} | ${rowRaw('Conversions',d.mktConv)}
-${row('Inventory Value',d.inventory)}
-${rowRaw('Supplier OTD %',d.suppOTD,'%')}
-${rowRaw('Warehouse Usage %',d.wareUsage,'%')}`;
+  return `Je bent One Day AI, een dashboard-assistent voor Polar Bear Icecream BV. Je helpt de gebruiker een persoonlijk dashboard samenstellen via chat.
 
-  return `You are Begrip AI, a business intelligence assistant for Polar Bear Icecream BV. You help the user build a personal dashboard via chat, and you can also answer data and analysis questions about the business.
+## KRITIEKE REGEL
+Geef ALTIJD en UITSLUITEND een geldig JSON-object terug. Nooit plain tekst, nooit markdown — alleen pure JSON.
 
-## CRITICAL RULE
-Always return a valid JSON object — never plain text, never markdown. Pure JSON only.
-
-## Response schema
+## Responschema
 {
   "type": "widget" | "answer" | "both",
   "widget": {
     "id":     "kebab-case-id",
-    "title":  "Readable title",
-    "code":   "// React JSX component — see rules below",
+    "title":  "Leesbare naam",
+    "code":   "// React JSX component — zie regels hieronder",
     "action": "add" | "update" | "remove",
     "size":   "small" | "medium" | "large" | "wide"
   },
-  "answer": "Text (only for type answer or both)"
+  "answer": "Tekst (alleen bij type answer of both)"
 }
-
-When the user asks a data or analysis question → use type "answer".
-When the user asks for a chart or widget → use type "widget".
-When the answer includes both a chart and a text reply → use type "both".
 
 ## Widget code rules
 1. The component is always called **Widget**: function Widget() { … }
 2. JSX is available via Babel (React is global: window.React / window.ReactDOM)
 3. Always read live data from **window.SCENARIO_DATA** — never hardcode numbers
 4. Use inline styles; make it visually attractive and professional
-5. For charts: use inline <svg> — no external libraries
+5. For simple bar charts: use inline <svg> — no external libraries
 6. Keep the component fully self-contained (no imports)
 
 ## window.SCENARIO_DATA structure
@@ -1787,25 +1728,23 @@ When the answer includes both a chart and a text reply → use type "both".
     opRes: number[12],       // operating result
     lb: number[12],          // liquidity balance
   },
-  base: { rev, cost, liqBal, ca },
-  revenue: { mrr, totalCustomers },
-  hr: { headcount },
-  marketing: { budget, leads },
+  base: { rev, cost, liqBal, ca },  // base scenario values
+  revenue: { mrr, totalCustomers, ... },
+  hr: { headcount, ... },
+  marketing: { budget, leads, ... },
 }
 
 ## What you MUST NOT do
+- Modify the app framework, navigation or API integration
 - Use fetch(), XMLHttpRequest, WebSocket, eval(), document.cookie, localStorage, window.parent
 - Hardcode data values — always read from window.SCENARIO_DATA
 - Use emojis, icons, or decorative symbols anywhere in widget output — text and numbers only
 
-## Business data (FY 2026)
-Company: Polar Bear Icecream BV — Dutch premium ice cream, seasonal peak Q2/Q3, sells via distributors and direct accounts.
-Active scenario: ${scenLabel}
-${scenComparison}
-${dataContext}
-
-## Current widgets on the dashboard
+## Current widgets
 ${widgetList}
+
+## Company context
+Polar Bear Icecream BV — Dutch premium ice cream, seasonal peak Q2/Q3
 
 ## Example response (widget)
 {"type":"widget","widget":{"id":"revenue-bar","title":"Monthly Revenue","action":"add","size":"medium","code":"function Widget(){const {adjusted,months,scenarioLabel}=window.SCENARIO_DATA;const max=Math.max(...adjusted.rev);return(<div style={{padding:'4px 0'}}><div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}}><div style={{fontSize:'13px',fontWeight:'700',color:'#1f2937'}}>Revenue per month</div><div style={{fontSize:'11px',color:'#6b7280'}}>{scenarioLabel}</div></div>{adjusted.rev.map((v,i)=><div key={i} style={{marginBottom:'6px'}}><div style={{display:'flex',justifyContent:'space-between',fontSize:'11px',color:'#6b7280',marginBottom:'2px'}}><span>{months[i]}</span><span>€{Math.round(v/1000)}K</span></div><div style={{background:'#f3f4f6',borderRadius:'3px',height:'8px'}}><div style={{width:(v/max*100)+'%',height:'100%',background:'#2563eb',borderRadius:'3px'}}/></div></div>)}</div>);}"}}
@@ -1813,7 +1752,7 @@ ${widgetList}
 ## Example response (data question)
 {"type":"answer","answer":"Revenue in the base scenario peaks in June at €124K — typical for the ice cream season."}
 
-Always return valid JSON. This is a hard requirement.`;
+Reageer ALTIJD met geldig JSON. Dit is een harde vereiste.`;
 }
 
 // Parse JSON from Claude response (handles wrapped/plain JSON)
@@ -1912,7 +1851,6 @@ async function sendChat(){
         // Fallback: treat whole response as plain answer
         const fmtReply = rawReply.replace(/</g,'&lt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
         if(el)el.outerHTML=`<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text">${fmtReply}</div></div>`;
-        saveChatHistory();
       } else {
         let chatBubbleHTML = '';
         let badgeHTML = '';
@@ -1929,15 +1867,15 @@ async function sendChat(){
           if(w.action === 'remove'){
             applyWidgetAction(w);
             renderWidgets();
-            badgeHTML = `<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text"><span class="widget-badge ok">✓ Widget '${w.id}' removed</span></div></div>`;
+            badgeHTML = `<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text"><span class="widget-badge ok">✓ Widget '${w.id}' verwijderd</span></div></div>`;
           } else {
             const scan = scanCode(w.code||'');
             if(!scan.safe){
-              badgeHTML = `<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text"><span class="widget-badge err">Blocked: ${scan.violations.join(', ')}</span></div></div>`;
+              badgeHTML = `<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text"><span class="widget-badge err">⚠ Geblokkeerd: ${scan.violations.join(', ')}</span></div></div>`;
             } else {
               applyWidgetAction(w);
               renderWidgets();
-              const verb = w.action==='update' ? 'updated' : 'added';
+              const verb = w.action==='update' ? 'bijgewerkt' : 'toegevoegd';
               badgeHTML = `<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text"><span class="widget-badge ok">✓ Widget '${w.title||w.id}' ${verb}</span></div></div>`;
             }
           }
@@ -1950,7 +1888,6 @@ async function sendChat(){
             : `<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text">${rawReply.replace(/</g,'&lt;')}</div></div>`;
           el.outerHTML = combined;
         }
-        saveChatHistory();
       }
 
     } else {
@@ -1958,7 +1895,6 @@ async function sendChat(){
       const el2 = document.getElementById(tid);
       const fmtReply = rawReply.replace(/</g,'&lt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
       if(el2) el2.outerHTML=`<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text">${fmtReply}</div></div>`;
-      saveChatHistory();
     }
 
   } catch(e){
