@@ -419,19 +419,20 @@ function restoreChatMessages(){
   return true;
 }
 
-// ── Widget system version — bump this string to force-clear old widgets + chat history ──
-const WIDGET_VERSION = 'chartjs-v2';
+// ── Widget state ────────────────────────────────────────
+// Migrate: discard old React/iframe widgets AND old React-contaminated chat history
 (function migrateWidgets(){
-  if(localStorage.getItem('begrip_widget_ver') !== WIDGET_VERSION){
-    // New widget engine: wipe all old React-based widgets and My Dashboard chat history
-    localStorage.removeItem('oneday_widgets');
-    try{
-      const h = JSON.parse(localStorage.getItem('begrip_chat_histories')||'{}');
-      delete h['my-dashboard'];
-      localStorage.setItem('begrip_chat_histories', JSON.stringify(h));
-    }catch(e){}
-    localStorage.setItem('begrip_widget_ver', WIDGET_VERSION);
-  }
+  try {
+    const stored = JSON.parse(localStorage.getItem('oneday_widgets') || '[]');
+    const valid = stored.filter(w => w.code && !w.code.includes('function Widget') && !w.code.includes('window.SCENARIO_DATA'));
+    if(valid.length !== stored.length) localStorage.setItem('oneday_widgets', JSON.stringify(valid));
+  } catch(e){ localStorage.removeItem('oneday_widgets'); }
+  try {
+    const histories = JSON.parse(localStorage.getItem('begrip_chat_histories') || '{}');
+    const md = histories['my-dashboard'] || [];
+    const stale = md.some(m => m.content && (m.content.includes('window.SCENARIO_DATA') || m.content.includes('function Widget') || m.content.includes('text/babel')));
+    if(stale){ delete histories['my-dashboard']; localStorage.setItem('begrip_chat_histories', JSON.stringify(histories)); }
+  } catch(e){}
 })();
 let widgets = JSON.parse(localStorage.getItem('oneday_widgets') || '[]');
 
@@ -581,11 +582,6 @@ function widgetCardHTML(w){
 function renderSingleWidget(w){
   const bodyEl = document.getElementById('wb-' + w.id);
   if(!bodyEl) return;
-  // Guard: reject React/old-style code before attempting execution
-  if(!w.code || /function\s+Widget\s*\(|window\.SCENARIO_DATA|ReactDOM|text\/babel/.test(w.code)){
-    bodyEl.innerHTML = `<div style="padding:10px;color:#92400e;font-size:12px;background:#fffbeb;border-radius:6px">Widget uses old format — please delete and recreate it.</div>`;
-    return;
-  }
   try {
     const fn = new Function('data', w.code);  // w.code returns a Chart.js config or HTML string
     const result = fn(buildScenData());
