@@ -1896,11 +1896,14 @@ function parseClaudeJSON(text){
 async function callClaudeAPI(messages){
   const isWidget = (mod === 'my-dashboard');
 
-  // Widget mode: use assistant prefill '{"' to force the model to begin with JSON.
-  // This prevents the model from generating React/prose — it must complete the JSON object.
-  const apiMessages = isWidget
-    ? [...messages, {role:'assistant', content:'{"'}]
-    : messages;
+  // Widget mode: inject a seed exchange before the real conversation.
+  // This shows the model a correct prior example of the exact output format,
+  // preventing it from defaulting to React/function Widget() patterns.
+  const WIDGET_SEED = [
+    { role: 'user',      content: 'Show me monthly revenue as a bar chart.' },
+    { role: 'assistant', content: '{"type":"widget","widget":{"id":"revenue-monthly","title":"Monthly Revenue","action":"add","size":"medium","code":"const {adjusted,months,scenarioLabel}=data;return{type:\'bar\',data:{labels:months,datasets:[{label:\'Revenue\',data:adjusted.rev,backgroundColor:\'rgba(79,195,161,0.75)\',borderRadius:4,borderSkipped:false}]},options:{responsive:true,plugins:{legend:{display:false},title:{display:true,text:scenarioLabel+\' scenario\'}},scales:{y:{ticks:{callback:v=>\'€\'+Math.round(v/1000)+\'K\'},grid:{color:\'#f1f5f9\'}}}}};"}}' },
+  ];
+  const apiMessages = isWidget ? [...WIDGET_SEED, ...messages] : messages;
 
   const resp=await fetch('/api/messages',{
     method:'POST',
@@ -1920,9 +1923,7 @@ async function callClaudeAPI(messages){
     throw new Error(err.error?.message||`HTTP ${resp.status}`);
   }
   const data=await resp.json();
-  const text = data.content[0].text;
-  // Re-prepend the prefill prefix so parseClaudeJSON gets a complete object
-  return isWidget ? '{"' + text : text;
+  return data.content[0].text;
 }
 
 function updateChatKeyUI(){
