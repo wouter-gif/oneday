@@ -1884,7 +1884,7 @@ async function sendChat(){
         if(el) el.outerHTML = `<div class="cmsg ai typing" id="${tid}-analyst"><div class="cmsg-av">✦</div><div class="cmsg-text">Consulting analyst…</div></div>`;
         const analystEl = document.getElementById(tid+'-analyst');
         try {
-          const analystReply = await callAnalystFromDashboard(chatHistory.concat({role:'user',content:txt}));
+          const analystReply = await callAnalystFromDashboard(chatHistory);
           chatHistory.push({role:'assistant', content: analystReply});
           const fmtAns = analystReply.replace(/</g,'&lt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
           if(analystEl) analystEl.outerHTML = `<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text">${fmtAns}</div></div>`;
