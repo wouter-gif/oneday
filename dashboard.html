@@ -420,19 +420,13 @@ function restoreChatMessages(){
 }
 
 // ── Widget state ────────────────────────────────────────
-// Migrate: discard old React/iframe widgets AND old React-contaminated chat history
+// Migrate: discard any old React/iframe-based widgets (they used function Widget(){} syntax)
 (function migrateWidgets(){
   try {
     const stored = JSON.parse(localStorage.getItem('oneday_widgets') || '[]');
     const valid = stored.filter(w => w.code && !w.code.includes('function Widget') && !w.code.includes('window.SCENARIO_DATA'));
     if(valid.length !== stored.length) localStorage.setItem('oneday_widgets', JSON.stringify(valid));
   } catch(e){ localStorage.removeItem('oneday_widgets'); }
-  try {
-    const histories = JSON.parse(localStorage.getItem('begrip_chat_histories') || '{}');
-    const md = histories['my-dashboard'] || [];
-    const stale = md.some(m => m.content && (m.content.includes('window.SCENARIO_DATA') || m.content.includes('function Widget') || m.content.includes('text/babel')));
-    if(stale){ delete histories['my-dashboard']; localStorage.setItem('begrip_chat_histories', JSON.stringify(histories)); }
-  } catch(e){}
 })();
 let widgets = JSON.parse(localStorage.getItem('oneday_widgets') || '[]');
 
@@ -596,8 +590,7 @@ function renderSingleWidget(w){
       if(canvas) chartReg[cid] = new Chart(canvas, result);
     }
   } catch(err){
-    const preview = (w.code||'').slice(0,200).replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    bodyEl.innerHTML = `<div style="padding:10px;color:#dc2626;font-size:12px;background:#fef2f2;border-radius:6px;word-break:break-all"><strong>Widget error:</strong> ${err.message}<br><span style="opacity:.55;font-family:monospace;font-size:10px">${preview}…</span></div>`;
+    bodyEl.innerHTML = `<div style="padding:10px;color:#dc2626;font-size:12px;background:#fef2f2;border-radius:6px"><strong>Widget error:</strong> ${err.message}</div>`;
   }
 }
 
@@ -1784,10 +1777,8 @@ ${rowRaw('Warehouse Usage %',d.wareUsage,'%')}`;
 
   return `You are Begrip AI, a business intelligence assistant for Polar Bear Icecream BV. You build Chart.js widgets and answer data questions.
 
-## CRITICAL RULES
-1. Always return a valid JSON object — never plain text, never markdown. Pure JSON only.
-2. Widget code uses Chart.js ONLY. Do NOT use React, JSX, window.SCENARIO_DATA, or any browser globals.
-3. The "code" field is a plain JS function body that receives (data) and must RETURN a Chart.js config object.
+## CRITICAL RULE
+Always return a valid JSON object — never plain text, never markdown. Pure JSON only.
 
 ## Response schema
 {
