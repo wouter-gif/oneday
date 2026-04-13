@@ -1895,13 +1895,6 @@ function parseClaudeJSON(text){
 
 async function callClaudeAPI(messages){
   const isWidget = (mod === 'my-dashboard');
-
-  // Widget mode: use assistant prefill '{"' to force the model to begin with JSON.
-  // This prevents the model from generating React/prose — it must complete the JSON object.
-  const apiMessages = isWidget
-    ? [...messages, {role:'assistant', content:'{"'}]
-    : messages;
-
   const resp=await fetch('/api/messages',{
     method:'POST',
     headers:{
@@ -1912,7 +1905,7 @@ async function callClaudeAPI(messages){
       model:'claude-sonnet-4-6',
       max_tokens: isWidget ? 4096 : 512,
       system: isWidget ? buildWidgetSystemPrompt() : buildSystemPrompt(),
-      messages: apiMessages
+      messages:messages
     })
   });
   if(!resp.ok){
@@ -1920,9 +1913,7 @@ async function callClaudeAPI(messages){
     throw new Error(err.error?.message||`HTTP ${resp.status}`);
   }
   const data=await resp.json();
-  const text = data.content[0].text;
-  // Re-prepend the prefill prefix so parseClaudeJSON gets a complete object
-  return isWidget ? '{"' + text : text;
+  return data.content[0].text;
 }
 
 function updateChatKeyUI(){
