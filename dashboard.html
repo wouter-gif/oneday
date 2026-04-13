@@ -31,6 +31,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .nav-item-primary:hover{background:rgba(255,255,255,.07);color:#fff}
 .nav-item-primary.active{background:rgba(37,99,235,.2);color:#93c5fd;border-left-color:#3b82f6}
 .nav-divider{height:1px;background:rgba(255,255,255,.08);margin:10px 16px}.sb-footer{padding:14px 16px;border-top:1px solid rgba(255,255,255,.08);font-size:11px;color:rgba(255,255,255,.3)}
+.nav-star{margin-left:auto;flex-shrink:0;opacity:0;font-size:13px;color:rgba(255,255,255,.35);transition:opacity .15s,color .15s;padding:2px 5px;line-height:1;border-radius:3px}
+.nav-item:hover .nav-star{opacity:1}
+.nav-star.starred{opacity:1;color:#f59e0b}
+.nav-star:hover{color:#fbbf24!important;background:rgba(251,191,36,.12)}
 .sb-footer strong{color:rgba(255,255,255,.5)}
 
 /* MAIN */
@@ -46,10 +50,6 @@ body.chat-open .main{margin-right:var(--cw)}
 .sc-btn{padding:5px 13px;border-radius:20px;border:1.5px solid var(--bdr);background:transparent;font-size:12px;font-weight:500;color:var(--txt2);cursor:pointer;transition:all .15s;white-space:nowrap}
 .sc-btn:hover{border-color:var(--blue);color:var(--blue)}
 .sc-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
-.sc-spacer{flex:1}
-.sc-compare-btn{padding:5px 13px;border-radius:20px;border:1.5px solid var(--bdr);background:transparent;font-size:12px;font-weight:500;color:var(--txt2);cursor:pointer;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:6px}
-.sc-compare-btn:hover{border-color:#6366f1;color:#6366f1}
-.sc-compare-btn.active{background:#6366f1;border-color:#6366f1;color:#fff}
 
 .content{flex:1;overflow-y:auto;padding:20px 24px}
 
@@ -313,11 +313,6 @@ canvas{max-height:280px}
     <button class="sc-btn" data-scenario="bank-loan">Bank Loan</button>
     <button class="sc-btn" data-scenario="push-receivables">Push Receivables</button>
     <button class="sc-btn" data-scenario="hire-sales">Hire More Sales</button>
-    <div class="sc-spacer"></div>
-    <button class="sc-compare-btn" id="sc-compare-btn">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="18"/><rect x="14" y="3" width="7" height="12"/></svg>
-      Compare Scenarios
-    </button>
   </div>
   <div class="content" id="content"></div>
 </div>
@@ -388,6 +383,7 @@ canvas{max-height:280px}
 // STATE
 // ═══════════════════════════════════════════════════════
 let mod = 'finance', scen = 'base';
+let starredMods = JSON.parse(localStorage.getItem('oneday_starred') || '["finance"]');
 const chartReg = {};
 let claudeApiKey = localStorage.getItem('oneday_api_key') || '';
 let chatHistory = [];  // [{role:'user'|'assistant', content:'...'}]
@@ -2154,11 +2150,8 @@ function render(){
   const meta=MODULE_META[mod];
   document.getElementById('tb-title').textContent=meta.title;
   document.getElementById('tb-sub').textContent=meta.sub;
-  // Hide scenario bar on my-dashboard; show on all other views (including compare)
-  document.querySelector('.scenario-bar').style.display=(mod==='my-dashboard')?'none':'';
-  // Update compare button active state
-  const cmpBtn = document.getElementById('sc-compare-btn');
-  if(cmpBtn) cmpBtn.classList.toggle('active', mod==='compare');
+  // Hide scenario bar on compare and my-dashboard views
+  document.querySelector('.scenario-bar').style.display=(mod==='compare')?'none':'';
   if(mod==='finance')renderFinance();
   else if(mod==='revenue')renderRevenue();
   else if(mod==='marketing')renderMarketing();
@@ -2174,15 +2167,18 @@ function render(){
 // NAV
 // ═══════════════════════════════════════════════════════
 const MODULES = [
-  {key:'my-dashboard', label:'My Dashboard'},
-  {key:'finance',      label:'Finance'},
-  {key:'revenue',      label:'Revenue'},
-  {key:'marketing',    label:'Marketing'},
-  {key:'hr',           label:'HR'},
-  {key:'logistics',    label:'Logistics'},
-  {key:'projects',     label:'Projects'},
+  {key:'my-dashboard',  label:'My Dashboard',       icon:'dashboard'},
+  {key:'finance',       label:'Finance',           icon:null},
+  {key:'revenue',       label:'Revenue',            icon:null},
+  {key:'marketing',     label:'Marketing',          icon:null},
+  {key:'hr',            label:'HR',                 icon:null},
+  {key:'logistics',     label:'Logistics',          icon:null},
+  {key:'projects',      label:'Projects',           icon:null},
+  {key:'compare',       label:'Compare Scenarios',  icon:'compare'},
 ];
 const NAV_ICONS = {
+  briefcase:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;opacity:.8;margin-right:8px"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>`,
+  compare:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;opacity:.7;margin-right:8px"><rect x="3" y="3" width="7" height="18"/><rect x="14" y="3" width="7" height="12"/></svg>`,
   dashboard:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;opacity:.7;margin-right:8px"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>`,
 };
 
@@ -2190,26 +2186,55 @@ function renderNav(){
   const nav = document.getElementById('sb-nav');
   let html = '';
 
-  // ── My Dashboard (top, primary) ──
-  const dashActive = mod==='my-dashboard' ? ' active' : '';
-  html += `<div class="nav-item nav-item-primary${dashActive}" data-module="my-dashboard">${NAV_ICONS.dashboard}My Dashboard</div>`;
-  html += '<div class="nav-divider"></div>';
+  // ── Starred section ──
+  if(starredMods.length > 0){
+    html += '<div class="nav-group-label">Starred</div>';
+    starredMods.forEach(key=>{
+      const m = MODULES.find(x=>x.key===key);
+      if(!m) return;
+      const active = mod===key ? ' active' : '';
+      const primary = key==='finance' ? ' nav-item-primary' : '';
+      const icon = m.icon ? (NAV_ICONS[m.icon]||'') : '';
+      html += `<div class="nav-item${primary}${active}" data-module="${key}">${icon}${m.label}<span class="nav-star starred" data-star="${key}" title="Unstar">★</span></div>`;
+    });
+    html += '<div class="nav-divider"></div>';
+  }
 
-  // ── Modules section ──
-  html += '<div class="nav-group-label">Modules</div>';
-  const moduleItems = MODULES.filter(m => m.key !== 'my-dashboard');
-  moduleItems.forEach(m => {
-    const active = mod===m.key ? ' active' : '';
-    html += `<div class="nav-item${active}" data-module="${m.key}">${m.label}</div>`;
-  });
+  // ── All (unstarred) section ──
+  const unstarred = MODULES.filter(m=>!starredMods.includes(m.key));
+  if(unstarred.length > 0){
+    html += '<div class="nav-group-label">All</div>';
+    unstarred.forEach(m=>{
+      const active = mod===m.key ? ' active' : '';
+      const icon = m.icon ? (NAV_ICONS[m.icon]||'') : '';
+      html += `<div class="nav-item${active}" data-module="${m.key}">${icon}${m.label}<span class="nav-star" data-star="${m.key}" title="Star">☆</span></div>`;
+    });
+  }
 
   nav.innerHTML = html;
 
-  nav.querySelectorAll('.nav-item').forEach(el => {
-    el.addEventListener('click', () => {
+  // Module click (ignore clicks on the star itself)
+  nav.querySelectorAll('.nav-item').forEach(el=>{
+    el.addEventListener('click', e=>{
+      if(e.target.closest('.nav-star')) return;
       mod = el.dataset.module;
       renderNav();
       render();
+    });
+  });
+
+  // Star toggle
+  nav.querySelectorAll('.nav-star').forEach(el=>{
+    el.addEventListener('click', e=>{
+      e.stopPropagation();
+      const key = el.dataset.star;
+      if(starredMods.includes(key)){
+        starredMods = starredMods.filter(k=>k!==key);
+      } else {
+        starredMods = [...starredMods, key];
+      }
+      localStorage.setItem('oneday_starred', JSON.stringify(starredMods));
+      renderNav();
     });
   });
 }
@@ -2218,12 +2243,6 @@ function renderNav(){
 // EVENTS
 // ═══════════════════════════════════════════════════════
 renderNav();
-
-document.getElementById('sc-compare-btn').addEventListener('click', ()=>{
-  mod = (mod === 'compare') ? 'finance' : 'compare';
-  renderNav();
-  render();
-});
 
 document.querySelectorAll('.sc-btn').forEach(el=>{
   el.addEventListener('click',()=>{
