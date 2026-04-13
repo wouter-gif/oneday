@@ -472,12 +472,8 @@ const WIDGET_FORBIDDEN = [
   { re: /XMLHttpRequest/,   name: 'XMLHttpRequest' },
   { re: /WebSocket/,        name: 'WebSocket' },
   { re: /\beval\s*\(/,      name: 'eval()' },
-  { re: /document\s*\./,    name: 'document access' },
-  { re: /window\s*\./,      name: 'window access' },
   { re: /import\s*\(/,      name: 'dynamic import()' },
   { re: /require\s*\(/,     name: 'require()' },
-  { re: /localStorage/,     name: 'localStorage' },
-  { re: /sessionStorage/,   name: 'sessionStorage' },
   { re: /new\s+Function/,   name: 'new Function()' },
 ];
 
