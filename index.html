@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Begrip.ai – Weet morgen waar je volgende maand staat</title>
-  <meta name="description" content="Begrip.ai koppelt AI aan jouw boekhoudsoftware. Binnen één dag zie je niet alleen hoe het gaat, maar ook hoe het éraan komt." />
+  <title>Begrip.ai – Prognoses die managers vertrouwen</title>
+  <meta name="description" content="Begrip.ai verbindt uw bedrijfsdrivers aan financiële scenario's. Driver-based forecasting dat managers herkennen — en vertrouwen." />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -21,1211 +21,1154 @@
       --bg-soft: #f8fafc;
       --border: #e2e8f0;
       --radius: 14px;
-      --shadow: 0 4px 24px rgba(37, 99, 235, 0.08);
-      --shadow-lg: 0 12px 48px rgba(37, 99, 235, 0.14);
+      --shadow: 0 4px 24px rgba(37,99,235,0.08);
+      --shadow-lg: 0 12px 48px rgba(37,99,235,0.14);
     }
 
     html { scroll-behavior: smooth; }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      color: var(--text);
-      background: var(--bg);
-      line-height: 1.65;
-      font-size: 16px;
-    }
+    body { font-family: 'Inter', sans-serif; color: var(--text); background: var(--bg); line-height: 1.65; font-size: 16px; }
 
     /* ─── NAV ─── */
     nav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(255,255,255,0.93);
-      backdrop-filter: blur(12px);
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.93); backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
-      padding: 0 6%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 66px;
+      padding: 0 6%; display: flex; align-items: center; justify-content: space-between; height: 66px;
     }
-    .logo {
-      font-size: 1.35rem;
-      font-weight: 800;
-      color: var(--primary);
-      letter-spacing: -0.5px;
-    }
+    .logo { font-size: 1.35rem; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; text-decoration: none; }
     .logo span { color: var(--accent); }
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 28px;
-    }
-    .nav-links a {
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: color 0.15s;
-    }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a { font-size: 0.9rem; font-weight: 500; color: var(--text-muted); text-decoration: none; transition: color 0.15s; }
     .nav-links a:hover { color: var(--primary); }
-    nav a.nav-cta {
-      background: var(--primary);
-      color: #fff;
-      padding: 10px 22px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
+    nav a.nav-cta { background: var(--primary); color: #fff; padding: 10px 22px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: background 0.2s; }
     nav a.nav-cta:hover { background: var(--primary-dark); }
     @media (max-width: 640px) { .nav-links { display: none; } }
 
-    /* ─── HERO ─── */
-    .hero {
-      background: linear-gradient(135deg, #eff6ff 0%, #ecfdf5 100%);
-      padding: 88px 6% 80px;
-      text-align: center;
+    /* ─── JOURNEY BADGE ─── */
+    .journey-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--primary); color: #fff;
+      font-size: 0.78rem; font-weight: 700; padding: 5px 16px 5px 7px;
+      border-radius: 999px; margin-bottom: 20px; letter-spacing: 0.2px;
     }
-    .hero .eyebrow {
-      display: inline-block;
-      background: var(--primary-light);
-      color: var(--primary);
-      font-size: 0.82rem;
-      font-weight: 700;
-      padding: 5px 16px;
-      border-radius: 999px;
-      margin-bottom: 22px;
-      border: 1px solid #bfdbfe;
-      letter-spacing: 0.3px;
+    .journey-badge-num {
+      background: rgba(255,255,255,0.22); width: 22px; height: 22px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800;
     }
-    .hero h1 {
-      font-size: clamp(2rem, 5vw, 3.1rem);
-      font-weight: 800;
-      line-height: 1.17;
-      letter-spacing: -1px;
-      max-width: 720px;
-      margin: 0 auto 22px;
-    }
-    .hero h1 em {
-      font-style: normal;
-      color: var(--primary);
-    }
-    .hero p {
-      font-size: 1.15rem;
+    .journey-connector {
+      text-align: center; padding: 22px 0; background: var(--bg-soft);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
       color: var(--text-muted);
-      max-width: 540px;
-      margin: 0 auto 38px;
     }
-    .hero-btns {
-      display: flex;
-      justify-content: center;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-    .btn-primary {
-      background: var(--primary);
-      color: #fff;
-      padding: 14px 32px;
-      border-radius: 10px;
-      font-weight: 700;
-      font-size: 1rem;
-      text-decoration: none;
-      transition: background 0.2s, transform 0.15s;
-      display: inline-block;
-    }
-    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
-    .btn-secondary {
-      background: #fff;
-      color: var(--primary);
-      padding: 14px 32px;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 1rem;
-      text-decoration: none;
-      border: 2px solid var(--primary);
-      transition: background 0.2s;
-      display: inline-block;
-    }
-    .btn-secondary:hover { background: var(--primary-light); }
+    .journey-connector-inner { display: inline-flex; flex-direction: column; align-items: center; gap: 5px; }
+    .journey-connector-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; }
 
-    /* ─── MOCK DASHBOARD ─── */
-    .hero-visual {
-      margin-top: 56px;
-      display: flex;
-      justify-content: center;
+    /* ─── DEMO SECTION ─── */
+    .demo-section {
+      background: linear-gradient(135deg, #eff6ff 0%, #ecfdf5 100%);
+      padding: 56px 6% 72px; text-align: center;
     }
+    .demo-section h1 { font-size: clamp(1.9rem, 4.5vw, 2.9rem); font-weight: 800; line-height: 1.18; letter-spacing: -1px; max-width: 700px; margin: 0 auto 18px; }
+    .demo-section h1 em { font-style: normal; color: var(--primary); }
+    .demo-section p.demo-intro { font-size: 1.05rem; color: var(--text-muted); max-width: 520px; margin: 0 auto 40px; }
+
+    /* ─── MOCK BROWSER ─── */
+    .demo-wrap { position: relative; }
     .dashboard-mock {
-      background: #fff;
-      border-radius: 18px;
-      box-shadow: var(--shadow-lg);
-      width: 100%;
-      max-width: 920px;
-      text-align: left;
-      overflow: hidden;
+      background: #fff; border-radius: 18px; box-shadow: var(--shadow-lg);
+      width: 100%; max-width: 960px; text-align: left; overflow: hidden; margin: 0 auto;
     }
     .mock-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border);
-      background: var(--text);
+      display: flex; align-items: center; gap: 8px;
+      padding: 13px 18px; border-bottom: 1px solid var(--border); background: var(--text);
     }
     .mock-dot { width: 11px; height: 11px; border-radius: 50%; }
     .mock-dot.red   { background: #fc6c57; }
     .mock-dot.yellow{ background: #fdbb2e; }
     .mock-dot.green { background: #27c840; }
-    .mock-title { font-size: 0.78rem; color: #94a3b8; font-weight: 500; margin-left: 6px; }
+    .mock-title { font-size: 0.76rem; color: #94a3b8; font-weight: 500; margin-left: 6px; }
     .mock-live { margin-left: auto; display: flex; align-items: center; gap: 5px; }
     .mock-live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px rgba(16,185,129,0.25); }
     .mock-live-label { font-size: 0.7rem; color: #6ee7b7; font-weight: 600; }
 
-    /* Hero split body */
-    .hero-split-body {
-      display: grid;
-      grid-template-columns: 1fr 300px;
-    }
-    .hero-dash-left { padding: 20px 20px 20px 20px; border-right: 1px solid var(--border); }
-    .hero-chat-right {
-      display: flex;
-      flex-direction: column;
-      height: 380px;
-    }
-    .hero-chat-header {
-      background: var(--primary);
-      color: #fff;
-      padding: 11px 14px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .hero-chat-avatar {
-      width: 28px; height: 28px; border-radius: 50%;
-      background: rgba(255,255,255,0.2);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.72rem; font-weight: 700;
-    }
+    /* Demo progress bar */
+    .demo-progress-bar { height: 3px; background: var(--border); }
+    .demo-progress-fill { height: 100%; background: var(--accent); transition: width 0.7s ease; width: 0%; }
+
+    /* ─── SPLIT BODY ─── */
+    .hero-split-body { display: grid; grid-template-columns: 1fr 310px; }
+    .hero-dash-left { padding: 18px; border-right: 1px solid var(--border); }
+    .hero-chat-right { display: flex; flex-direction: column; height: 490px; }
+    .hero-chat-header { background: var(--primary); color: #fff; padding: 11px 14px; display: flex; align-items: center; gap: 8px; }
+    .hero-chat-avatar { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; }
     .hero-chat-header-text { font-size: 0.82rem; font-weight: 700; }
     .hero-chat-header-sub  { font-size: 0.68rem; color: #bfdbfe; }
     .hero-chat-header .h-online { width: 6px; height: 6px; border-radius: 50%; background: #6ee7b7; margin-left: auto; }
-    .hero-chat-msgs {
-      flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px;
-    }
-    .hero-chat-sugg {
-      padding: 7px 10px 4px; display: flex; flex-wrap: wrap; gap: 6px;
-      border-top: 1px solid var(--border);
-    }
+    .hero-chat-msgs { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+    .hero-chat-sugg { padding: 7px 10px 4px; display: flex; flex-wrap: wrap; gap: 6px; border-top: 1px solid var(--border); min-height: 42px; }
     .hero-sugg-btn {
       background: var(--primary-light); color: var(--primary);
       border: 1px solid #bfdbfe; border-radius: 999px;
       padding: 5px 11px; font-size: 0.72rem; font-weight: 600;
-      cursor: pointer; font-family: inherit;
-      transition: background 0.15s, transform 0.1s; white-space: nowrap;
+      cursor: pointer; font-family: inherit; transition: background 0.15s, transform 0.1s; white-space: nowrap;
     }
-    .hero-sugg-btn:hover { background: #dbeafe; transform: translateY(-1px); }
-    .hero-chat-input-row {
-      display: flex; gap: 6px; padding: 8px 10px 10px;
-      border-top: 1px solid var(--border);
-    }
-    .hero-chat-input {
-      flex: 1; border: 1.5px solid var(--border); border-radius: 7px;
-      padding: 7px 11px; font-size: 0.8rem; font-family: inherit;
-      color: var(--text); background: var(--bg-soft); outline: none;
-    }
+    .hero-sugg-btn:hover:not(:disabled) { background: #dbeafe; transform: translateY(-1px); }
+    .hero-sugg-btn:disabled { opacity: 0.45; cursor: default; }
+    .hero-sugg-btn.primary-btn { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .hero-sugg-btn.primary-btn:hover:not(:disabled) { background: var(--primary-dark); }
+    .hero-chat-input-row { display: flex; gap: 6px; padding: 8px 10px 10px; border-top: 1px solid var(--border); }
+    .hero-chat-input { flex: 1; border: 1.5px solid var(--border); border-radius: 7px; padding: 7px 11px; font-size: 0.8rem; font-family: inherit; color: var(--text); background: var(--bg-soft); outline: none; }
     .hero-chat-input:focus { border-color: var(--primary); background: #fff; }
-    .hero-chat-send {
-      background: var(--primary); color: #fff; border: none;
-      border-radius: 7px; padding: 7px 13px; font-size: 0.8rem;
-      font-weight: 700; cursor: pointer; font-family: inherit;
-      transition: background 0.15s;
-    }
+    .hero-chat-send { background: var(--primary); color: #fff; border: none; border-radius: 7px; padding: 7px 13px; font-size: 0.8rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: background 0.15s; }
     .hero-chat-send:hover { background: var(--primary-dark); }
 
-    .kpi-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-    .kpi {
-      background: var(--bg-soft);
-      border-radius: 10px;
-      padding: 11px 13px;
-    }
-    .kpi-label { font-size: 0.68rem; color: var(--text-muted); font-weight: 500; margin-bottom: 3px; }
-    .kpi-value { font-size: 1.1rem; font-weight: 700; color: var(--text); }
-    .kpi-delta { font-size: 0.67rem; font-weight: 600; margin-top: 2px; }
-    .kpi-delta.up   { color: var(--accent); }
-    .kpi-delta.warn { color: #f59e0b; }
+    /* ─── CHAT MESSAGES ─── */
+    .msg { display: flex; gap: 8px; align-items: flex-end; }
+    .msg.user { flex-direction: row-reverse; }
+    .msg-bubble { max-width: 80%; padding: 9px 13px; border-radius: 13px; font-size: 0.83rem; line-height: 1.5; }
+    .msg.ai   .msg-bubble { background: var(--bg-soft); color: var(--text); border-bottom-left-radius: 4px; }
+    .msg.user .msg-bubble { background: var(--primary); color: #fff; border-bottom-right-radius: 4px; }
+    .msg-avatar { width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; }
+    .msg.user .msg-avatar { background: #dbeafe; }
 
+    /* Typing indicator */
+    .typing-dots { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
+    .typing-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); animation: dot-bounce 1.2s infinite; }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dot-bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
+
+    /* ─── KPIs ─── */
+    .kpi-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 12px; }
+    .kpi { background: var(--bg-soft); border-radius: 10px; padding: 11px 13px; transition: background 0.4s; }
+    .kpi.kpi-good { background: #f0fdf4; }
+    .kpi-label { font-size: 0.67rem; color: var(--text-muted); font-weight: 500; margin-bottom: 3px; }
+    .kpi-value { font-size: 1.08rem; font-weight: 700; color: var(--text); transition: color 0.4s; }
+    .kpi-value.bad { color: #ef4444; }
+    .kpi-value.neutral { color: #f59e0b; }
+    .kpi-value.good { color: var(--accent); }
+    .kpi-delta { font-size: 0.66rem; font-weight: 600; margin-top: 2px; color: var(--text-muted); transition: color 0.4s; }
+    .kpi-delta.bad { color: #ef4444; }
+    .kpi-delta.neutral { color: #f59e0b; }
+    .kpi-delta.good { color: var(--accent); }
+
+    /* ─── CHARTS ─── */
     .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .chart-box {
-      background: var(--bg-soft);
-      border-radius: 10px;
-      padding: 12px 14px;
-    }
-    .chart-box-label { font-size: 0.68rem; color: var(--text-muted); font-weight: 500; margin-bottom: 8px; }
-    .bar-chart { display: flex; align-items: flex-end; gap: 4px; height: 50px; }
-    .bar {
-      flex: 1;
-      border-radius: 3px 3px 0 0;
-      background: var(--primary);
-      opacity: 0.55;
-    }
-    .bar.highlight { opacity: 1; }
-    .bar.forecast  { background: var(--accent); opacity: 0.55; }
+    .chart-box { background: var(--bg-soft); border-radius: 10px; padding: 12px 14px; }
+    .chart-box-label { font-size: 0.67rem; color: var(--text-muted); font-weight: 500; margin-bottom: 8px; }
+    .bar-chart { display: flex; align-items: flex-end; gap: 3px; height: 52px; }
+    .bar { flex: 1; border-radius: 3px 3px 0 0; background: var(--primary); opacity: 0.55; transition: height 0.5s ease, background 0.4s; }
+    .bar.hi { opacity: 1; }
+    .bar.neg { background: #ef4444; opacity: 0.75; }
+    .bar.warn-bar { background: #f59e0b; opacity: 0.75; }
+    .bar.s1 { background: #f59e0b; opacity: 0.75; }
+    .bar.s2 { background: var(--accent); opacity: 0.75; }
+    .bar.opt { background: var(--accent); opacity: 0.85; }
+    .chart-legend { display: flex; gap: 10px; margin-top: 7px; flex-wrap: wrap; }
+    .legend-dot { display: inline-flex; align-items: center; gap: 4px; font-size: 0.62rem; color: var(--text-muted); }
+    .legend-dot span { display: inline-block; width: 8px; height: 8px; border-radius: 2px; }
 
-    .ai-insight {
-      background: var(--accent-light);
-      border-left: 3px solid var(--accent);
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 0.78rem;
-      color: #065f46;
-      line-height: 1.5;
-    }
-    .ai-insight strong { display: block; margin-bottom: 2px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.4px; color: var(--accent); }
+    /* AI insight box */
+    .ai-insight { background: var(--accent-light); border-left: 3px solid var(--accent); border-radius: 8px; padding: 10px 12px; font-size: 0.78rem; color: #065f46; line-height: 1.5; transition: background 0.4s, border-color 0.4s, color 0.4s; }
+    .ai-insight strong { display: block; margin-bottom: 2px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.4px; color: var(--accent); }
+    .ai-insight.warn { background: #fff7ed; border-left-color: #f59e0b; color: #92400e; }
+    .ai-insight.warn strong { color: #f59e0b; }
+    .ai-insight.ok { background: var(--accent-light); border-left-color: var(--accent); color: #065f46; }
+    .ai-insight.ok strong { color: var(--accent); }
 
-    @media (max-width: 720px) {
-      .hero-split-body { grid-template-columns: 1fr; }
-      .hero-chat-right { height: 340px; border-top: 1px solid var(--border); }
-      .hero-dash-left { border-right: none; }
-    }
+    /* Scenario table */
+    .scenario-table-wrap { margin-top: 12px; overflow-x: auto; }
+    table.stbl { width: 100%; border-collapse: collapse; font-size: 0.74rem; }
+    table.stbl th { text-align: left; padding: 5px 8px; font-size: 0.63rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); border-bottom: 2px solid var(--border); }
+    table.stbl td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
+    table.stbl tr.row-current td:first-child { color: var(--text-muted); }
+    table.stbl tr.row-opt { background: #f0fdf4; font-weight: 700; }
+    .v-bad { color: #ef4444; font-weight: 600; }
+    .v-neutral { color: #f59e0b; font-weight: 600; }
+    .v-good { color: var(--accent); font-weight: 600; }
 
-    /* ─── SECTIONS ─── */
-    section { padding: 88px 6%; }
-    .section-label {
-      text-align: center;
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 1.2px;
-      text-transform: uppercase;
-      color: var(--primary);
-      margin-bottom: 12px;
+    /* Demo complete overlay */
+    .demo-complete-overlay {
+      display: none; position: absolute; inset: 0;
+      background: rgba(15,23,42,0.92);
+      border-radius: 18px;
+      flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 48px 40px; color: #fff; z-index: 20;
     }
-    h2 {
-      text-align: center;
-      font-size: clamp(1.55rem, 3.5vw, 2.2rem);
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      margin-bottom: 14px;
+    .demo-complete-overlay.show { display: flex; }
+    .demo-complete-check {
+      width: 64px; height: 64px; background: var(--accent); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem; margin: 0 auto 20px;
     }
-    .section-sub {
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 1.05rem;
-      max-width: 560px;
-      margin: 0 auto 52px;
-    }
+    .demo-complete-overlay h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 12px; }
+    .demo-complete-overlay p { color: #94a3b8; max-width: 440px; margin: 0 auto 28px; font-size: 0.97rem; }
+    .btn-white { background: #fff; color: var(--primary); padding: 13px 28px; border-radius: 10px; font-weight: 700; font-size: 0.95rem; text-decoration: none; display: inline-block; transition: background 0.2s; }
+    .btn-white:hover { background: #f1f5f9; }
 
-    /* ─── HERKENBAAR ─── */
-    .problem { background: var(--bg-soft); }
-    .pain-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 20px;
-    }
-    .pain-card {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 28px 26px;
-    }
-    .pain-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
-    .pain-card p  { font-size: 0.9rem; color: var(--text-muted); }
+    /* ─── STEP SECTIONS ─── */
+    section { padding: 80px 6%; }
+    .section-bg-soft { background: var(--bg-soft); }
+    .section-label { text-align: center; font-size: 0.78rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--primary); margin-bottom: 12px; }
+    h2 { text-align: center; font-size: clamp(1.5rem, 3.5vw, 2.15rem); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 14px; }
+    .section-sub { text-align: center; color: var(--text-muted); font-size: 1.02rem; max-width: 560px; margin: 0 auto 44px; }
 
-    /* ─── USPs ─── */
-    .usps-wrapper {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-      gap: 24px;
-    }
-    .usp-card {
-      background: var(--bg-soft);
-      border-radius: var(--radius);
-      padding: 32px 28px;
-      border: 1px solid var(--border);
-      transition: box-shadow 0.2s, transform 0.2s;
-      position: relative;
-      overflow: hidden;
-    }
-    .usp-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
-    .usp-card.featured {
-      background: var(--primary);
-      color: #fff;
-      border-color: var(--primary);
-    }
-    .usp-card.featured p { color: #bfdbfe; }
-    .usp-tag {
-      display: inline-block;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      background: var(--primary-light);
-      color: var(--primary);
-      padding: 3px 10px;
-      border-radius: 999px;
-      margin-bottom: 16px;
-    }
-    .usp-card.featured .usp-tag { background: rgba(255,255,255,0.18); color: #fff; }
-    .usp-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; }
-    .usp-card p  { font-size: 0.92rem; color: var(--text-muted); line-height: 1.6; }
+    /* Zelfscan features */
+    .scan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; margin-bottom: 40px; text-align: left; }
+    .scan-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 20px 18px; display: flex; gap: 12px; align-items: flex-start; }
+    .scan-icon { width: 34px; height: 34px; background: var(--primary-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.05rem; flex-shrink: 0; }
+    .scan-card h4 { font-size: 0.88rem; font-weight: 700; margin-bottom: 4px; }
+    .scan-card p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; }
 
-    /* ─── HOE HET WERKT ─── */
-    .how { background: var(--bg-soft); }
-    .steps-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 32px;
+    /* Form */
+    .form-box { background: #fff; border-radius: 20px; box-shadow: var(--shadow-lg); padding: 44px 40px; max-width: 560px; margin: 0 auto; text-align: left; }
+    .form-box h3 { font-size: 1.15rem; font-weight: 800; margin-bottom: 6px; }
+    .form-box p { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 24px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.83rem; font-weight: 600; margin-bottom: 5px; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 11px 14px; border: 1.5px solid var(--border);
+      border-radius: 9px; font-size: 0.93rem; font-family: inherit;
+      color: var(--text); background: var(--bg-soft); outline: none; transition: border-color 0.2s;
     }
-    .step { text-align: center; }
-    .step-number {
-      width: 48px;
-      height: 48px;
-      background: var(--primary);
-      color: #fff;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.15rem;
-      font-weight: 800;
-      margin: 0 auto 16px;
-    }
-    .step h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
-    .step p   { font-size: 0.88rem; color: var(--text-muted); }
-
-    /* ─── SOCIAL PROOF ─── */
-    .social-proof { background: var(--primary); color: #fff; }
-    .social-proof h2 { color: #fff; }
-    .social-proof .section-sub { color: #bfdbfe; }
-    .quotes-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 20px;
-    }
-    .quote-card {
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.18);
-      border-radius: var(--radius);
-      padding: 28px 26px;
-    }
-    .quote-text {
-      font-size: 0.95rem;
-      font-style: italic;
-      line-height: 1.65;
-      margin-bottom: 18px;
-      color: #e0f2fe;
-    }
-    .quote-author { font-size: 0.85rem; font-weight: 700; color: #fff; }
-    .quote-role   { font-size: 0.78rem; color: #93c5fd; }
-
-    /* ─── CTA FORMULIER ─── */
-    .cta-section {
-      background: linear-gradient(135deg, #ecfdf5 0%, #eff6ff 100%);
-      text-align: center;
-    }
-    .cta-box {
-      background: #fff;
-      border-radius: 20px;
-      box-shadow: var(--shadow-lg);
-      padding: 56px 44px;
-      max-width: 600px;
-      margin: 0 auto;
-      text-align: left;
-    }
-    .cta-box h2 { text-align: left; font-size: clamp(1.45rem, 3vw, 1.9rem); margin-bottom: 10px; }
-    .cta-box > p { color: var(--text-muted); margin-bottom: 36px; font-size: 0.97rem; }
-
-    .form-group { margin-bottom: 16px; }
-    .form-group label {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 6px;
-      color: var(--text);
-    }
-    .form-group input,
-    .form-group select {
-      width: 100%;
-      padding: 12px 16px;
-      border: 1.5px solid var(--border);
-      border-radius: 9px;
-      font-size: 0.95rem;
-      font-family: inherit;
-      color: var(--text);
-      background: var(--bg-soft);
-      transition: border-color 0.2s;
-      outline: none;
-      appearance: none;
-    }
-    .form-group input:focus,
-    .form-group select:focus { border-color: var(--primary); background: #fff; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .submit-btn {
-      width: 100%;
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      padding: 15px;
-      border-radius: 10px;
-      font-size: 1rem;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: inherit;
-      transition: background 0.2s, transform 0.15s;
-      margin-top: 6px;
-    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); background: #fff; }
+    .form-group textarea { resize: vertical; min-height: 90px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .submit-btn { width: 100%; background: var(--primary); color: #fff; border: none; padding: 14px; border-radius: 10px; font-size: 0.97rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: background 0.2s, transform 0.15s; margin-top: 6px; }
     .submit-btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
-    .form-privacy {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      margin-top: 12px;
-      text-align: center;
-    }
-    .success-msg {
-      display: none;
-      background: var(--accent-light);
-      border: 1px solid #6ee7b7;
-      border-radius: 10px;
-      padding: 22px;
-      color: #065f46;
-      font-weight: 600;
-      text-align: center;
-      margin-top: 16px;
-      font-size: 0.97rem;
-      line-height: 1.6;
-    }
+    .form-note { font-size: 0.76rem; color: var(--text-muted); text-align: center; margin-top: 12px; }
+    .success-msg { display: none; background: var(--accent-light); border: 1px solid #6ee7b7; border-radius: 10px; padding: 20px; color: #065f46; font-weight: 600; text-align: center; margin-top: 14px; font-size: 0.95rem; line-height: 1.6; }
 
-    /* ─── FOOTER ─── */
-    footer {
-      background: var(--text);
-      color: #94a3b8;
-      text-align: center;
-      padding: 36px 6%;
-      font-size: 0.88rem;
-    }
+    /* Upload area */
+    .upload-area { border: 2px dashed var(--border); border-radius: 12px; padding: 32px 20px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; background: var(--bg-soft); margin-bottom: 14px; }
+    .upload-area:hover { border-color: var(--primary); background: var(--primary-light); }
+    .upload-area input { display: none; }
+    .upload-icon { font-size: 1.8rem; margin-bottom: 8px; }
+    .upload-area p { font-size: 0.85rem; color: var(--text-muted); }
+    .upload-area .upload-label { font-size: 0.88rem; font-weight: 600; color: var(--primary); margin-bottom: 4px; }
+
+    /* Value field */
+    .value-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* Workshop steps */
+    .workshop-steps { display: flex; gap: 28px; justify-content: center; flex-wrap: wrap; margin-bottom: 44px; }
+    .ws-step { display: flex; align-items: flex-start; gap: 12px; max-width: 230px; text-align: left; }
+    .ws-num { width: 30px; height: 30px; background: var(--accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.82rem; font-weight: 800; flex-shrink: 0; margin-top: 2px; }
+    .ws-step strong { display: block; font-size: 0.9rem; margin-bottom: 4px; }
+    .ws-step p { font-size: 0.82rem; color: var(--text-muted); }
+
+    /* CTA section */
+    .cta-section { background: linear-gradient(135deg, #ecfdf5 0%, #eff6ff 100%); text-align: center; }
+    .cta-box { background: #fff; border-radius: 20px; box-shadow: var(--shadow-lg); padding: 52px 44px; max-width: 720px; margin: 0 auto; text-align: left; }
+    .cta-box h2 { text-align: left; font-size: clamp(1.4rem, 3vw, 1.85rem); margin-bottom: 10px; }
+    .cta-box > p { color: var(--text-muted); margin-bottom: 32px; font-size: 0.97rem; }
+
+    /* Footer */
+    footer { background: var(--text); color: #94a3b8; text-align: center; padding: 36px 6%; font-size: 0.88rem; }
     footer .footer-logo { font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom: 8px; }
     footer .footer-logo span { color: var(--accent); }
     footer a { color: #93c5fd; text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
 
-    /* ─── CHAT DEMO ─── */
-    .chat-demo-section { background: var(--bg-soft); }
-    .chat-demo-wrapper {
-      display: grid;
-      grid-template-columns: 1fr 400px;
-      gap: 28px;
-      align-items: start;
-      max-width: 1040px;
-      margin: 0 auto;
-    }
-    .chat-left {
+    /* ─── RECAP BLOK ─── */
+    .recap-wrap {
       background: #fff;
-      border-radius: var(--radius);
       border: 1px solid var(--border);
-      overflow: hidden;
+      border-radius: 20px;
+      padding: 36px 40px 28px;
+      max-width: 960px;
+      margin: 0 auto 56px;
       box-shadow: var(--shadow);
     }
-    .chat-left-header {
-      background: var(--text);
-      color: #e2e8f0;
-      padding: 14px 20px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .chat-left-header .logo-sm { color: #fff; font-weight: 800; font-size: 0.9rem; }
-    .chat-left-header .logo-sm span { color: var(--accent); }
-    .chat-left-header .live-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: var(--accent); margin-left: auto;
-      box-shadow: 0 0 0 3px rgba(16,185,129,0.25);
-    }
-    .chat-left-header .live-label { font-size: 0.72rem; color: #6ee7b7; }
-    .mini-kpi-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1px;
-      background: var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-    .mini-kpi {
-      background: #fff;
-      padding: 14px 16px;
-    }
-    .mini-kpi-label { font-size: 0.68rem; color: var(--text-muted); font-weight: 500; margin-bottom: 3px; }
-    .mini-kpi-val { font-size: 1.05rem; font-weight: 700; }
-    .mini-kpi-sub { font-size: 0.68rem; color: var(--accent); font-weight: 600; margin-top: 2px; }
-    .mini-chart-area { padding: 16px 18px; }
-    .mini-chart-label { font-size: 0.72rem; color: var(--text-muted); font-weight: 500; margin-bottom: 10px; }
-    .mini-bar-chart { display: flex; align-items: flex-end; gap: 5px; height: 52px; }
-    .mini-bar { flex: 1; border-radius: 3px 3px 0 0; background: var(--primary); opacity: 0.5; }
-    .mini-bar.hl { opacity: 1; }
-    .mini-bar.fc { background: var(--accent); opacity: 0.55; }
-
-    /* Chat panel */
-    .chat-panel {
-      background: #fff;
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      display: flex;
-      flex-direction: column;
-      height: 460px;
-    }
-    .chat-panel-header {
-      background: var(--primary);
-      color: #fff;
-      padding: 14px 18px;
-      border-radius: var(--radius) var(--radius) 0 0;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .chat-avatar {
-      width: 32px; height: 32px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.8rem; font-weight: 700;
-    }
-    .chat-panel-header-text { font-size: 0.88rem; font-weight: 700; }
-    .chat-panel-header-sub  { font-size: 0.72rem; color: #bfdbfe; }
-    .chat-panel-header .online { width: 7px; height: 7px; border-radius: 50%; background: #6ee7b7; margin-left: auto; }
-
-    .chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px 16px 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .msg { display: flex; gap: 8px; align-items: flex-end; }
-    .msg.user { flex-direction: row-reverse; }
-    .msg-bubble {
-      max-width: 76%;
-      padding: 10px 14px;
-      border-radius: 14px;
-      font-size: 0.86rem;
-      line-height: 1.5;
-    }
-    .msg.ai   .msg-bubble { background: var(--bg-soft); color: var(--text); border-bottom-left-radius: 4px; }
-    .msg.user .msg-bubble { background: var(--primary); color: #fff; border-bottom-right-radius: 4px; }
-    .msg-avatar {
-      width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
-      background: var(--primary-light); color: var(--primary);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.68rem; font-weight: 700;
-    }
-    .msg.user .msg-avatar { background: #dbeafe; }
-
-    .chat-suggestions {
-      padding: 8px 14px 4px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-      border-top: 1px solid var(--border);
-    }
-    .suggestion-btn {
-      background: var(--primary-light);
-      color: var(--primary);
-      border: 1px solid #bfdbfe;
-      border-radius: 999px;
-      padding: 6px 13px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-      transition: background 0.15s, transform 0.1s;
-      white-space: nowrap;
-    }
-    .suggestion-btn:hover { background: #dbeafe; transform: translateY(-1px); }
-
-    .chat-input-row {
-      display: flex;
-      gap: 8px;
-      padding: 10px 14px 14px;
-      border-top: 1px solid var(--border);
-    }
-    .chat-input {
-      flex: 1;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      padding: 9px 13px;
-      font-size: 0.88rem;
-      font-family: inherit;
-      color: var(--text);
-      background: var(--bg-soft);
-      outline: none;
-    }
-    .chat-input:focus { border-color: var(--primary); background: #fff; }
-    .chat-send {
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 9px 16px;
-      font-size: 0.88rem;
+    .recap-label {
+      text-align: center;
+      font-size: 0.72rem;
       font-weight: 700;
-      cursor: pointer;
-      font-family: inherit;
-      transition: background 0.15s;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 28px;
     }
-    .chat-send:hover { background: var(--primary-dark); }
-
-    @media (max-width: 860px) {
-      .chat-demo-wrapper { grid-template-columns: 1fr; }
-      .chat-panel { height: 400px; }
+    .recap-steps {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+    }
+    .recap-step {
+      flex: 1;
+      text-align: center;
+      padding: 0 16px;
+    }
+    .recap-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      margin: 0 auto 10px;
+    }
+    .recap-connector {
+      width: 3px; height: 18px;
+      background: var(--primary);
+      margin: 0 auto 10px;
+      border-radius: 2px;
+    }
+    .recap-tag {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+    .recap-step h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+    .recap-step p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+    .recap-arrow {
+      font-size: 1.4rem;
+      color: var(--border);
+      padding-top: 14px;
+      flex-shrink: 0;
+      align-self: flex-start;
+    }
+    .recap-cta-note {
+      text-align: center;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+    @media (max-width: 820px) {
+      .recap-steps { flex-direction: column; align-items: stretch; gap: 0; }
+      .recap-step { padding: 16px 0; border-bottom: 1px solid var(--border); text-align: left; display: flex; gap: 16px; align-items: flex-start; }
+      .recap-step:last-child { border-bottom: none; }
+      .recap-icon { flex-shrink: 0; margin: 0; }
+      .recap-connector { display: none; }
+      .recap-arrow { display: none; }
+      .recap-wrap { padding: 28px 22px 20px; }
     }
 
-    /* ─── RESPONSIVE ─── */
-    @media (max-width: 600px) {
-      .kpi-row  { grid-template-columns: 1fr 1fr; }
-      .chart-row{ grid-template-columns: 1fr; }
-      .form-row { grid-template-columns: 1fr; }
-      .cta-box  { padding: 36px 22px; }
-      section   { padding: 64px 5%; }
+    /* Saved benchmark badge */
+    .saved-badge {
+      display: flex; align-items: flex-start; gap: 12px;
+      background: var(--accent-light); border: 1.5px solid #6ee7b7;
+      border-radius: 12px; padding: 14px 18px; margin-top: 16px;
+    }
+    .saved-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 1px; }
+    .saved-badge div { display: flex; flex-direction: column; gap: 3px; }
+    .saved-badge strong { font-size: 0.88rem; color: #065f46; }
+    .saved-badge span { font-size: 0.8rem; color: #047857; }
+
+    /* Evaluatie section CTA */
+    .eval-cta { text-align: center; margin-top: 44px; }
+    .eval-cta-q { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 22px; }
+    .eval-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn-outline { padding: 13px 26px; border: 2px solid var(--primary); border-radius: 10px; color: var(--primary); font-size: 0.95rem; font-weight: 700; text-decoration: none; transition: background 0.15s, color 0.15s; }
+    .btn-outline:hover { background: var(--primary-light); }
+    .btn-solid { padding: 13px 26px; background: var(--primary); border-radius: 10px; color: #fff; font-size: 0.95rem; font-weight: 700; text-decoration: none; transition: background 0.15s; }
+    .btn-solid:hover { background: var(--primary-dark); }
+
+    /* Pre-qualification steps */
+    .preq-box { background: var(--bg-soft); border: 1px solid var(--border); border-radius: 14px; padding: 28px 32px; margin-bottom: 36px; }
+    .preq-box h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+    .preq-box p { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 20px; }
+    .preq-step { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 16px; }
+    .preq-step:last-child { margin-bottom: 0; }
+    .preq-num { width: 28px; height: 28px; background: var(--primary); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 800; flex-shrink: 0; margin-top: 2px; }
+    .preq-step strong { display: block; font-size: 0.88rem; font-weight: 700; margin-bottom: 2px; }
+    .preq-step p { font-size: 0.82rem; color: var(--text-muted); margin: 0; }
+
+    /* Responsive */
+    @media (max-width: 720px) {
+      .hero-split-body { grid-template-columns: 1fr; }
+      .hero-chat-right { height: 380px; border-top: 1px solid var(--border); }
+      .kpi-row { grid-template-columns: 1fr 1fr; }
+      .chart-row { grid-template-columns: 1fr; }
+      .form-row, .value-row { grid-template-columns: 1fr; }
+      .form-box { padding: 32px 22px; }
+      .cta-box { padding: 36px 22px; }
+      section { padding: 60px 5%; }
     }
   </style>
 </head>
 <body>
 
-<!-- NAVIGATIE -->
+<!-- NAV -->
 <nav>
-  <a href="#" class="logo" style="text-decoration:none;">Begrip<span>.ai</span></a>
+  <a href="#" class="logo">Begrip<span>.ai</span></a>
   <div class="nav-links">
-    <a href="#hoe-het-werkt">Hoe werkt het</a>
-    <a href="#prijzen">Prijzen</a>
-    <a href="#ervaringen">Ervaringen</a>
+    <a href="#demo">Demo</a>
+    <a href="#evaluatie">Evaluatie</a>
+    <a href="#zelfscan">Zelfscan</a>
+    <a href="#workshop">Workshop</a>
   </div>
-  <a href="#gesprek" class="nav-cta">Plan een gesprek</a>
+  <a href="#workshop" class="nav-cta">Plan een gesprek</a>
 </nav>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="eyebrow">Driver-based forecasting — van black box naar vertrouwen</div>
-  <h1>Jij kent de drivers.<br/><em>Begrip.ai rekent ze door.</em></h1>
-  <p>Managers weten wat hun business drijft — headcount, pipeline, prijsstelling. Begrip.ai vertaalt die kennis direct naar scenario's, zodat elke beslissing rust op iets wat jij begrijpt en kunt uitleggen.</p>
-  <div class="hero-btns">
-    <a href="#gesprek" class="btn-primary">Plan een vrijblijvend gesprek</a>
-    <a href="#hoe-het-werkt" class="btn-secondary">Hoe werkt het?</a>
-  </div>
 
-  <div class="hero-visual">
-    <div class="dashboard-mock">
-      <!-- Titelbalk -->
+<!-- ══════════════════════════════════════════
+     STAP 1 — MICRO-DEMONSTRATIE
+═══════════════════════════════════════════ -->
+<section id="demo" class="demo-section">
+  <div class="journey-badge">
+    <span class="journey-badge-num">1</span>
+    Micro-demonstratie — ervaar het zelf
+  </div>
+  <h1>U bent directeur van Fortis Componenten B.V..<br><em>Het ziet er niet goed uit.</em></h1>
+  <p class="demo-intro">Start hieronder en doorloop de situatie. U bouwt stap voor stap scenario's op — met uw eigen drivers als vertrekpunt.</p>
+
+  <div class="demo-wrap">
+    <div class="dashboard-mock" id="demoBrowser">
+
+      <!-- Browser chrome -->
       <div class="mock-header">
         <div class="mock-dot red"></div>
         <div class="mock-dot yellow"></div>
         <div class="mock-dot green"></div>
-        <span class="mock-title">Begrip.ai – Scenarioanalyse FY 2026</span>
-        <div class="mock-live">
-          <div class="mock-live-dot"></div>
-          <span class="mock-live-label">Live</span>
-        </div>
+        <span class="mock-title">Begrip.ai — Fortis Componenten B.V. &middot; Directie Dashboard &middot; FY 2026</span>
+        <div class="mock-live"><div class="mock-live-dot"></div><span class="mock-live-label">Live</span></div>
       </div>
 
-      <!-- Split: dashboard links, chat rechts -->
+      <!-- Progress bar -->
+      <div class="demo-progress-bar"><div class="demo-progress-fill" id="demoProgress"></div></div>
+
+      <!-- Dashboard + Chat -->
       <div class="hero-split-body">
 
-        <!-- LINKS: KPIs + grafiek + inzicht -->
+        <!-- LEFT: Dashboard -->
         <div class="hero-dash-left">
+
+          <!-- KPIs -->
           <div class="kpi-row">
-            <div class="kpi">
-              <div class="kpi-label">Omzet MTD</div>
-              <div class="kpi-value">€ 2,83M</div>
-              <div class="kpi-delta up">+9% t.o.v. vorige maand</div>
+            <div class="kpi" id="kpiA">
+              <div class="kpi-label">Omzet Q1</div>
+              <div class="kpi-value bad" id="kpiAval">€1,18M</div>
+              <div class="kpi-delta bad" id="kpiAdelta">↓ 18% vs vorig jaar</div>
             </div>
-            <div class="kpi">
-              <div class="kpi-label">EBITDA prognose Q3</div>
-              <div class="kpi-value">€ 150K</div>
-              <div class="kpi-delta up">Scenario: Groei</div>
+            <div class="kpi" id="kpiB">
+              <div class="kpi-label">EBITDA-marge</div>
+              <div class="kpi-value bad" id="kpiBval">2,8%</div>
+              <div class="kpi-delta bad" id="kpiBdelta">↓ van 9,2% vorig jaar</div>
             </div>
-            <div class="kpi">
-              <div class="kpi-label">Vrije cashflow dec</div>
-              <div class="kpi-value">€ 207K</div>
-              <div class="kpi-delta up">Driver-based berekend</div>
+            <div class="kpi" id="kpiC">
+              <div class="kpi-label" id="kpiClabel">Cashflow Q3 (prognose)</div>
+              <div class="kpi-value bad" id="kpiCval">−€92K</div>
+              <div class="kpi-delta bad" id="kpiCdelta">Tekort verwacht</div>
             </div>
           </div>
+
+          <!-- Chart row -->
           <div class="chart-row">
             <div class="chart-box">
-              <div class="chart-box-label">Omzet per maand — werkelijk vs. scenario's</div>
-              <div class="bar-chart">
-                <div class="bar" style="height:40%"></div>
-                <div class="bar" style="height:55%"></div>
-                <div class="bar" style="height:47%"></div>
-                <div class="bar" style="height:68%"></div>
-                <div class="bar highlight" style="height:82%"></div>
-                <div class="bar forecast" style="height:88%"></div>
-                <div class="bar forecast" style="height:72%"></div>
-              </div>
-              <div style="display:flex;gap:12px;margin-top:7px;">
-                <span style="font-size:0.64rem;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--primary);opacity:0.6;"></span>Werkelijk</span>
-                <span style="font-size:0.64rem;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--accent);opacity:0.6;"></span>Prognose</span>
-              </div>
+              <div class="chart-box-label" id="chartLabel">Omzet per maand — huidig pad, geen scenario's actief</div>
+              <div class="bar-chart" id="demoChart"></div>
+              <div class="chart-legend" id="chartLegend"></div>
             </div>
             <div class="chart-box">
-              <div class="ai-insight">
-                <strong>Begrip.ai signaleert</strong>
-                Scenario Groei levert €43K meer EBITDA op dan Basis, maar vraagt €180K extra werkkapitaal in Q2. Nu inzichtelijk — voordat de beslissing genomen wordt.
+              <div class="ai-insight" id="demoInsight">
+                <strong>Begrip.ai</strong>
+                Geen scenario's actief. Ik heb de situatie geanalyseerd en kan helpen het pad vooruit te bepalen.
               </div>
             </div>
           </div>
+
+          <!-- Scenario comparison (hidden until stage 3) -->
+          <div class="scenario-table-wrap" id="scenarioTableWrap" style="display:none;">
+            <table class="stbl">
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th>Cashflow Q3</th>
+                  <th>EBITDA eind jaar</th>
+                  <th>Klantconcentratie</th>
+                </tr>
+              </thead>
+              <tbody id="scenarioRows">
+                <tr class="row-current">
+                  <td>Huidig pad</td>
+                  <td class="v-bad">−€92K</td>
+                  <td class="v-bad">2,8%</td>
+                  <td class="v-bad">38%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
         </div>
 
-        <!-- RECHTS: Chat panel -->
+        <!-- RIGHT: Chat -->
         <div class="hero-chat-right">
           <div class="hero-chat-header">
             <div class="hero-chat-avatar">AI</div>
             <div>
               <div class="hero-chat-header-text">Begrip.ai</div>
-              <div class="hero-chat-header-sub">Analyseert jouw bedrijfsdata</div>
+              <div class="hero-chat-header-sub">Analyseert Fortis Componenten B.V.</div>
             </div>
             <div class="h-online"></div>
           </div>
-          <div class="hero-chat-msgs" id="heroChatMsgs">
+
+          <div class="hero-chat-msgs" id="demoChatMsgs">
             <div class="msg ai">
               <div class="msg-avatar">AI</div>
-              <div class="msg-bubble">Goedemiddag. Ik heb toegang tot jullie bedrijfsdata. Welk scenario wil je doorrekenen?</div>
+              <div class="msg-bubble">Goedemiddag, directeur. Ik ben verbonden met de bedrijfsdata van Fortis Componenten B.V. en sta klaar om u te helpen het pad vooruit te bepalen. Waarmee kan ik u vandaag helpen?</div>
             </div>
           </div>
-          <div class="hero-chat-sugg" id="heroChatSugg">
-            <button class="hero-sugg-btn" onclick="heroAsk(this,'Wat als we 5 nieuwe mensen aannemen?')">Wat als we 5 mensen aannemen?</button>
-            <button class="hero-sugg-btn" onclick="heroAsk(this,'Welk scenario geeft de beste cashflow?')">Welk scenario geeft de beste cashflow?</button>
-            <button class="hero-sugg-btn" onclick="heroAsk(this,'Wanneer bereiken we break-even?')">Wanneer bereiken we break-even?</button>
+
+          <div class="hero-chat-sugg" id="demoBtns">
+            <button class="hero-sugg-btn" onclick="demoStep(1)">Hoe staat het bedrijf ervoor?</button>
           </div>
+
           <div class="hero-chat-input-row">
-            <input class="hero-chat-input" id="heroChatInput" type="text" placeholder="Stel uw vraag..." onkeydown="if(event.key==='Enter') heroSend()" />
-            <button class="hero-chat-send" onclick="heroSend()">Verstuur</button>
+            <input class="hero-chat-input" id="demoInput" type="text" placeholder="Of stel hier zelf een vraag..." onkeydown="if(event.key==='Enter')demoFree()" />
+            <button class="hero-chat-send" onclick="demoFree()">↑</button>
           </div>
         </div>
-
       </div><!-- /hero-split-body -->
+
     </div><!-- /dashboard-mock -->
-  </div>
+
+    <!-- Completion overlay -->
+    <div class="demo-complete-overlay" id="demoOverlay">
+      <div class="demo-complete-check">✓</div>
+      <h2>U heeft zojuist gedaan wat managers met Begrip.ai dagelijks doen.</h2>
+      <p>Uw eigen drivers gebruikt om de toekomst door te rekenen — transparant, herleidbaar, in minuten. Klaar voor de volgende stap?</p>
+      <a href="#evaluatie" class="btn-white">Wat betekent dit voor mij? →</a>
+    </div>
+  </div><!-- /demo-wrap -->
+
 </section>
 
-<!-- HERKENBAAR -->
-<section class="problem">
-  <div class="section-label">Herkenbaar?</div>
-  <h2>De spreadsheet zegt het — maar niemand weet waarom.</h2>
-  <p class="section-sub">Finance levert een getal. Managers herkennen het niet, vertrouwen het niet, en nemen de beslissing toch op gevoel. Niet omdat de data ontbreekt, maar omdat de link tussen beslissing en uitkomst onzichtbaar is.</p>
-  <div class="pain-grid">
-    <div class="pain-card">
-      <h3>De prognose is een black box</h3>
-      <p>Niemand buiten Finance weet op welke aannames het model is gebouwd. Als het getal niet klopt met wat een manager in de markt ziet, wint het gevoel het van de spreadsheet.</p>
-    </div>
-    <div class="pain-card">
-      <h3>Managers vertrouwen hun eigen inzicht meer dan het model</h3>
-      <p>En dat is begrijpelijk — ze kennen de pipeline, de klanten, de seizoenspatronen. Maar dat inzicht zit nergens in het model verwerkt. De kans op de juiste beslissing wordt zo kleiner, niet groter.</p>
-    </div>
-    <div class="pain-card">
-      <h3>Eén scenario biedt geen keuze</h3>
-      <p>Een enkele prognose laat niet zien wat er gebeurt als je iets anders doet. Zonder alternatieven is er niets te kiezen — en wordt iedere beslissing een sprong in het duister.</p>
-    </div>
-    <div class="pain-card">
-      <h3>Drivers veranderen, Excel-modellen niet</h3>
-      <p>Zodra de strategie wijzigt, klopt het model niet meer. Formules gebouwd op historische correlaties houden geen rekening met nieuwe beslissingen — en geven managers een vals gevoel van zekerheid.</p>
-    </div>
+
+<!-- Connector 1→2 -->
+<div class="journey-connector">
+  <div class="journey-connector-inner">
+    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+    <span class="journey-connector-label">Stap 2 van 4</span>
   </div>
-</section>
+</div>
 
-<!-- USPS -->
-<section>
-  <div class="section-label">Wat Begrip.ai doet</div>
-  <h2>Prognoses die managers herkennen — en vertrouwen.</h2>
-  <p class="section-sub">Begrip.ai bouwt prognoses op de drivers die managers al kennen. Geen black box, maar een transparante koppeling tussen wat jij besluit en wat dat financieel betekent.</p>
-  <div class="usps-wrapper">
 
-    <div class="usp-card featured">
-      <div class="usp-tag">Driver-based forecasting</div>
-      <h3>Gebouwd op wat jij al weet</h3>
-      <p>Begrip.ai berekent uitkomsten vanuit de drivers die jij als manager kent: headcount, prijsstelling, pipeline, capaciteit. Verander een driver — en elk getal update direct. Zo herken je de prognose, omdat jij hem zelf begrijpt.</p>
-    </div>
-
-    <div class="usp-card featured">
-      <div class="usp-tag">Scenario's op aanvraag</div>
-      <h3>Vergelijk wat er echt toe doet — vóór de beslissing</h3>
-      <p>Wat als we drie sales reps aannemen? Wat als de marge met 5% daalt? Begrip.ai werkt meerdere what-if's gelijktijdig uit op ROI, cashflow en bedrijfsdoelstellingen. Zo kun je met vertrouwen kiezen, niet op gevoel.</p>
-    </div>
-
-    <div class="usp-card">
-      <div class="usp-tag">Koppeling met je systemen</div>
-      <h3>Verbonden met ERP, CRM en boekhouding</h3>
-      <p>Begrip.ai koppelt aan je bestaande systemen — SAP, Salesforce, Exact of iets anders — zonder data te verplaatsen. De prognose is altijd gebaseerd op actuele bedrijfsdata, niet op handmatig ingevoerde aannames.</p>
-    </div>
-
-    <div class="usp-card">
-      <div class="usp-tag">Uitlegbaar voor iedereen</div>
-      <h3>Niet alleen een getal — ook het verhaal erachter</h3>
-      <p>Elke uitkomst is herleidbaar tot de drivers die eraan ten grondslag liggen. Managers kunnen hun keuze uitleggen aan het bestuur, aan hun team, aan zichzelf — omdat de redenering zichtbaar is, niet verborgen in formules.</p>
-    </div>
-
+<!-- ══════════════════════════════════════════
+     STAP 2 — EVALUATIE
+═══════════════════════════════════════════ -->
+<section id="evaluatie" class="section-bg-soft">
+  <div class="journey-badge" style="background:var(--accent);">
+    <span class="journey-badge-num">2</span>
+    Evaluatie
   </div>
-</section>
+  <h2>Wat u zojuist heeft gedaan — en waarom het werkt</h2>
+  <p class="section-sub">Scenarioanalyse geeft managers vertrouwen in beslissingen omdat het redeneren transparant is. Geen black-box spreadsheet, maar uw eigen drivers die direct zichtbaar doorwerken in de uitkomst.</p>
 
-<!-- CHAT DEMO -->
-<section class="chat-demo-section">
-  <div class="section-label">Zo werkt het</div>
-  <h2>Jij bepaalt de driver. Begrip.ai rekent het door.</h2>
-  <p class="section-sub">Stel je vraag zoals je die aan een collega zou stellen. Begrip.ai vertaalt jouw business-kennis direct naar een financiële doorrekening — transparant, herleidbaar, en direct te vergelijken met andere scenario's.</p>
+  <!-- ── Recap van stap 1 ── -->
+  <div class="recap-wrap">
+    <div class="recap-label">Dit heeft u zojuist doorlopen in de demo</div>
+    <div class="recap-steps">
 
-  <div style="display:flex; justify-content:center;">
-    <div class="dashboard-mock" style="max-width:920px;">
-      <!-- Titelbalk -->
-      <div class="mock-header">
-        <div class="mock-dot red"></div>
-        <div class="mock-dot yellow"></div>
-        <div class="mock-dot green"></div>
-        <span class="mock-title">Begrip.ai – Scenarioplanning FY 2026</span>
-        <div class="mock-live">
-          <div class="mock-live-dot"></div>
-          <span class="mock-live-label">Live</span>
-        </div>
+      <div class="recap-step">
+        <div class="recap-icon" style="background:#eff6ff; color:var(--primary);">📈</div>
+        <div class="recap-connector"></div>
+        <div class="recap-tag" style="background:var(--primary-light); color:var(--primary);">1a — Forecast</div>
+        <h4>AI maakte een prognose</h4>
+        <p>Op basis van de bedrijfsdata stelde Begrip.ai automatisch een financiële forecast op — omzet, EBITDA en cashflow voor het komende jaar.</p>
       </div>
 
-      <!-- Split: dashboard links, chat rechts -->
-      <div class="hero-split-body">
+      <div class="recap-arrow">→</div>
 
-        <!-- LINKS: KPIs + grafiek -->
-        <div class="hero-dash-left">
-          <div class="kpi-row">
-            <div class="kpi">
-              <div class="kpi-label">Omzet FY — Basis</div>
-              <div class="kpi-value">€ 9,4M</div>
-              <div class="kpi-delta up">huidig scenario</div>
-            </div>
-            <div class="kpi">
-              <div class="kpi-label">Omzet FY — Groei</div>
-              <div class="kpi-value" style="color:var(--accent)">€ 12,1M</div>
-              <div class="kpi-delta up">+3 sales reps</div>
-            </div>
-            <div class="kpi">
-              <div class="kpi-label">Cashflow verschil</div>
-              <div class="kpi-value">−€ 180K</div>
-              <div class="kpi-delta" style="color:#f59e0b">Extra werkkapitaal Q2</div>
-            </div>
-          </div>
-          <div class="chart-row">
-            <div class="chart-box">
-              <div class="chart-box-label">Omzet per maand — Basis vs. Groei scenario</div>
-              <div class="bar-chart">
-                <div class="bar" style="height:14%"></div>
-                <div class="bar" style="height:24%"></div>
-                <div class="bar" style="height:46%"></div>
-                <div class="bar" style="height:74%"></div>
-                <div class="bar highlight" style="height:100%"></div>
-                <div class="bar" style="height:80%"></div>
-                <div class="bar" style="height:30%"></div>
-                <div class="bar" style="height:22%"></div>
-                <div class="bar forecast" style="height:18%"></div>
-                <div class="bar forecast" style="height:12%"></div>
-                <div class="bar forecast" style="height:10%"></div>
-                <div class="bar forecast" style="height:14%"></div>
-              </div>
-              <div style="display:flex;gap:12px;margin-top:7px;">
-                <span style="font-size:0.64rem;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--primary);opacity:0.6;"></span>Werkelijk</span>
-                <span style="font-size:0.64rem;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--accent);opacity:0.6;"></span>Prognose</span>
-              </div>
-            </div>
-            <div class="chart-box">
-              <div class="ai-insight">
-                <strong>Begrip.ai signaleert</strong>
-                Het Groei-scenario levert €2,7M meer omzet — gedreven door de aanname van 3 reps (jouw driver). De cashflow wordt krap in Q2 door de onboardingkosten. Dat is zichtbaar, herleidbaar, en nu te plannen.
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- RECHTS: Chat panel -->
-        <div class="hero-chat-right">
-          <div class="hero-chat-header">
-            <div class="hero-chat-avatar">AI</div>
-            <div>
-              <div class="hero-chat-header-text">Begrip.ai</div>
-              <div class="hero-chat-header-sub">Analyseert jullie bedrijfsdata</div>
-            </div>
-            <div class="h-online"></div>
-          </div>
-          <div class="hero-chat-msgs" id="chatMessages">
-            <div class="msg ai">
-              <div class="msg-avatar">AI</div>
-              <div class="msg-bubble">Goedemiddag. Ik heb toegang tot jullie bedrijfsdata. Welk scenario wil je vergelijken?</div>
-            </div>
-          </div>
-          <div class="hero-chat-sugg" id="chatSuggestions">
-            <button class="hero-sugg-btn" onclick="askQuestion(this, 'Wat is het effect van 10% prijsverhoging?')">Effect van 10% prijsverhoging?</button>
-            <button class="hero-sugg-btn" onclick="askQuestion(this, 'Hoe ziet mijn cashflow er volgende maand uit?')">Cashflow scenario vergelijken?</button>
-            <button class="hero-sugg-btn" onclick="askQuestion(this, 'Wanneer moet ik opletten dat ik krap kom te zitten?')">Wanneer wordt cashflow kritisch?</button>
-          </div>
-          <div class="hero-chat-input-row">
-            <input class="hero-chat-input" id="chatInput" type="text" placeholder="Stel je vraag..." onkeydown="if(event.key==='Enter') sendChat()" />
-            <button class="hero-chat-send" onclick="sendChat()">Verstuur</button>
-          </div>
-        </div>
-
-      </div><!-- /hero-split-body -->
-    </div><!-- /dashboard-mock -->
-  </div>
-</section>
-
-<!-- HOE HET WERKT -->
-<section class="how" id="hoe-het-werkt">
-  <div class="section-label">Werkwijze</div>
-  <h2>Van eerste gesprek tot eerste scenario — snel</h2>
-  <p class="section-sub">In drie stappen van spreadsheet-frustratie naar proactieve, scenario-gedreven besluitvorming.</p>
-  <div class="steps-grid">
-    <div class="step">
-      <div class="step-number">1</div>
-      <h3>Use case discovery</h3>
-      <p>We houden een workshop om jouw eerste high-impact use case te identificeren — een groeiobstakel, een operationele inefficiëntie of een KPI die achterblijft. Dat wordt ons startpunt.</p>
-    </div>
-    <div class="step">
-      <div class="step-number">2</div>
-      <h3>Systemen koppelen</h3>
-      <p>We verbinden Begrip.ai met jouw ERP, CRM en boekhouding — zonder data te verplaatsen. Jouw cijfers blijven waar ze horen; wij mappen ze naar de drivers achter jouw business.</p>
-    </div>
-    <div class="step">
-      <div class="step-number">3</div>
-      <h3>Scenario's draaien</h3>
-      <p>De AI vertaalt wijzigingen in bedrijfsdrivers direct naar accurate prognoses. Vergelijk what-if's op ROI en cashflow, neem een beslissing en volg de uitkomst terug naar de driver.</p>
-    </div>
-  </div>
-</section>
-
-<!-- PRICING -->
-<section id="prijzen" style="background: var(--bg);">
-  <div class="section-label">Tarieven</div>
-  <h2>Eenvoudige, transparante prijzen</h2>
-  <p class="section-sub">Geen verborgen kosten, geen lange contracten. Kies het pakket dat past bij jouw organisatie.</p>
-
-  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:24px; max-width:740px; margin:0 auto;">
-
-    <!-- Starter -->
-    <div style="border:1px solid var(--border); border-radius:var(--radius); padding:36px 32px; background:var(--bg-soft);">
-      <div style="font-size:0.78rem; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; color:var(--text-muted); margin-bottom:14px;">Starter</div>
-      <div style="display:flex; align-items:flex-end; gap:4px; margin-bottom:6px;">
-        <span style="font-size:2.6rem; font-weight:800; line-height:1; letter-spacing:-1px;">€ 29</span>
-        <span style="font-size:0.9rem; color:var(--text-muted); padding-bottom:5px;">/ maand</span>
+      <div class="recap-step">
+        <div class="recap-icon" style="background:#fff7ed; color:#f59e0b;">🔍</div>
+        <div class="recap-connector" style="background:#f59e0b;"></div>
+        <div class="recap-tag" style="background:#fff7ed; color:#b45309;">1b — Analyse</div>
+        <h4>AI analyseerde en signaleerde</h4>
+        <p>Begrip.ai herkende drie kritieke signalen: dalende marge, klantconcentratie en dreigend cashflow-tekort — en koppelde ze terug aan de onderliggende drivers.</p>
       </div>
-      <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:28px;">Alles wat je nodig hebt om te starten met driver-based forecasting.</p>
-      <ul style="list-style:none; display:flex; flex-direction:column; gap:11px; margin-bottom:32px;">
-        <li style="font-size:0.9rem; display:flex; gap:10px; align-items:flex-start;">
-          <svg style="flex-shrink:0;margin-top:2px;" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Koppeling met jouw boekhoudsoftware
-        </li>
-        <li style="font-size:0.9rem; display:flex; gap:10px; align-items:flex-start;">
-          <svg style="flex-shrink:0;margin-top:2px;" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Realtime financieel dashboard
-        </li>
-        <li style="font-size:0.9rem; display:flex; gap:10px; align-items:flex-start;">
-          <svg style="flex-shrink:0;margin-top:2px;" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Maandprognose en cashflowvoorspelling
-        </li>
-        <li style="font-size:0.9rem; display:flex; gap:10px; align-items:flex-start;">
-          <svg style="flex-shrink:0;margin-top:2px;" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          AI-chat over jouw financiële data
-        </li>
-        <li style="font-size:0.9rem; display:flex; gap:10px; align-items:flex-start; color:var(--text-muted);">
-          <svg style="flex-shrink:0;margin-top:2px;" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#cbd5e1" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          ERP-koppeling
-        </li>
-        <li style="font-size:0.9rem; display:flex; gap:10px; align-items:flex-start; color:var(--text-muted);">
-          <svg style="flex-shrink:0;margin-top:2px;" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#cbd5e1" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          CRM-koppeling
-        </li>
-      </ul>
-      <a href="#gesprek" style="display:block; text-align:center; background:#fff; color:var(--primary); border:2px solid var(--primary); border-radius:9px; padding:12px; font-weight:700; font-size:0.95rem; text-decoration:none; transition:background 0.2s;" onmouseover="this.style.background='var(--primary-light)'" onmouseout="this.style.background='#fff'">Plan een gesprek</a>
-    </div>
 
-    <!-- Pro -->
-    <div style="border:2px solid var(--primary); border-radius:var(--radius); padding:36px 32px; background:#fff; box-shadow:var(--shadow-lg); position:relative;">
-      <div style="position:absolute; top:-13px; left:50%; transform:translateX(-50%); background:var(--primary); color:#fff; font-size:0.72rem; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; padding:4px 14px; border-radius:999px; white-space:nowrap;">Meest gekozen</div>
-      <div style="font-size:0.78rem; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; color:var(--primary); margin-bottom:14px;">Pro</div>
-      <div style="display:flex; align-items:flex-end; gap:4px; margin-bottom:6px;">
-        <span style="font-size:2.6rem; font-weight:800; line-height:1; letter-spacing:-1px;">€ 149</span>
-        <span style="font-size:0.9rem; color:var(--text-muted); padding-bottom:5px;">/ maand</span>
+      <div class="recap-arrow">→</div>
+
+      <div class="recap-step">
+        <div class="recap-icon" style="background:#f5f3ff; color:#7c3aed;">🔀</div>
+        <div class="recap-connector" style="background:#7c3aed;"></div>
+        <div class="recap-tag" style="background:#f5f3ff; color:#7c3aed;">2 — Scenario's</div>
+        <h4>U bedacht de alternatieven</h4>
+        <p>Als directeur stelde u twee what-if vragen — kosten snijden en nieuwe klanten werven. Begrip.ai rekende elk scenario door op cashflow, EBITDA en klantrisico.</p>
       </div>
-      <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:28px;">Volledige scenario-analyse met koppelingen naar boekhouding, ERP én CRM in één dashboard.</p>
-      <ul style="list-style:none; display:flex; flex-direction:column; gap:11px; margin-bottom:32px;">
-        <li style="font-size:0.9rem; display:flex; gap:10px; align-items:flex-start;">
-          <svg style="flex-shrink:0;margin-top:2px;" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Koppeling met jouw boekhoudsoftware
-        </li>
-        <li style="font-size:0.9rem; display:flex; gap:10px; align-items:flex-start;">
-          <svg style="flex-shrink:0;margin-top:2px;" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Realtime financieel dashboard
-        </li>
-        <li style="font-size:0.9rem; display:flex; gap:10px; align-items:flex-start;">
-          <svg style="flex-shrink:0;margin-top:2px;" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Maandprognose en cashflowvoorspelling
-        </li>
-        <li style="font-size:0.9rem; display:flex; gap:10px; align-items:flex-start;">
-          <svg style="flex-shrink:0;margin-top:2px;" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          AI-chat over jouw financiële data
-        </li>
-        <li style="font-size:0.9rem; display:flex; gap:10px; align-items:flex-start;">
-          <svg style="flex-shrink:0;margin-top:2px;" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          ERP-koppeling
-        </li>
-        <li style="font-size:0.9rem; display:flex; gap:10px; align-items:flex-start;">
-          <svg style="flex-shrink:0;margin-top:2px;" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          CRM-koppeling
-        </li>
-      </ul>
-      <a href="#gesprek" style="display:block; text-align:center; background:var(--primary); color:#fff; border:2px solid var(--primary); border-radius:9px; padding:12px; font-weight:700; font-size:0.95rem; text-decoration:none; transition:background 0.2s;" onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary)'">Plan een gesprek</a>
-    </div>
 
+      <div class="recap-arrow">→</div>
+
+      <div class="recap-step">
+        <div class="recap-icon" style="background:var(--accent-light); color:var(--accent);">✓</div>
+        <div class="recap-connector" style="background:var(--accent);"></div>
+        <div class="recap-tag" style="background:var(--accent-light); color:#065f46;">3 — Beslissing</div>
+        <h4>U koos het beste pad</h4>
+        <p>Op basis van uw eigen drivers adviseerde Begrip.ai de combinatie — en u sloeg dat scenario op als benchmark. Voortaan weet u meteen wanneer de werkelijkheid afwijkt.</p>
+      </div>
+
+    </div>
+    <div class="recap-cta-note">Elke stap was herleidbaar tot uw eigen drivers. Geen magie — uw kennis, doorgerekend.</div>
   </div>
-  <p style="text-align:center; font-size:0.82rem; color:var(--text-muted); margin-top:20px;">Prijzen zijn excl. btw. Geen jaarcontract verplicht — opzegbaar per maand.</p>
-</section>
+  <!-- ── /Recap ── -->
 
-<!-- SOCIAL PROOF -->
-<section id="ervaringen" class="social-proof">
-  <div class="section-label" style="color:#93c5fd;">Ervaringen</div>
-  <h2>Wat onze klanten zeggen</h2>
-  <p class="section-sub">Finance-teams en directies die de stap zetten van een black-box spreadsheet naar prognoses die ze zelf vertrouwen.</p>
-  <div class="quotes-grid">
-    <div class="quote-card">
-      <p class="quote-text">"Vroeger vertrouwde ik de prognose van Finance niet — niet omdat ze slecht werk leverde, maar omdat ik niet wist waar het getal op was gebaseerd. Nu zie ik precies welke drivers eronder zitten. Dat verandert alles."</p>
-      <div class="quote-author">Sabine van der Berg</div>
-      <div class="quote-role">CFO, Polar Bear Innovates</div>
-    </div>
-    <div class="quote-card">
-      <p class="quote-text">"We namen beslissingen op gevoel, omdat de spreadsheet een black box was. Nu bouwen we scenario's op drivers die wij zelf kennen. Het vertrouwen in de keuzes is een stuk groter geworden."</p>
-      <div class="quote-author">Tom Hendricks</div>
-      <div class="quote-role">Head of FP&amp;A, Logistics Group NL</div>
-    </div>
-    <div class="quote-card">
-      <p class="quote-text">"De what-if voor onze nieuwe productlijn was vroeger twee weken werk en dan nog twijfelde iedereen aan de aannames. Nu is de doorrekening de volgende ochtend klaar — en begrijpt de directie hem ook."</p>
-      <div class="quote-author">Miriam Oosterbeek</div>
-      <div class="quote-role">Finance Director, ScaleUp B.V.</div>
+  <div class="eval-cta">
+    <p class="eval-cta-q">Wil je de stappen nog een keer doorlopen — of liever zelf aan de slag?</p>
+    <div class="eval-btns">
+      <a href="#demo" class="btn-outline">← Herhaal de demo</a>
+      <a href="#zelfscan" class="btn-solid">Doe de zelfscan met mijn situatie →</a>
     </div>
   </div>
 </section>
 
-<!-- CALENDLY -->
-<section class="cta-section" id="gesprek">
-  <div class="cta-box" style="max-width:720px; padding: 48px 40px 36px;">
-    <h2>Plan een vrijblijvend gesprek</h2>
-    <p>Kies een moment dat jou uitkomt. In 30 minuten bespreken we jouw eerste use case en laten we zien hoe driver-based forecasting eruitziet voor jouw business.</p>
-    <!-- Calendly inline widget begin -->
+
+<!-- Connector 2→3 -->
+<div class="journey-connector">
+  <div class="journey-connector-inner">
+    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+    <span class="journey-connector-label">Stap 3 van 4</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     STAP 3 — ZELFSCAN
+═══════════════════════════════════════════ -->
+<section id="zelfscan">
+  <div class="journey-badge" style="background:#7c3aed;">
+    <span class="journey-badge-num">3</span>
+    Zelfscan
+  </div>
+  <h2>Breng uw eigen situatie in kaart</h2>
+  <p class="section-sub">Werk in 30 minuten uw eigen use case uit. De zelfscan helpt u de drivers te benoemen achter het probleem dat u wilt oplossen — als voorbereiding op het gesprek met uw Begrip consultant.</p>
+
+  <div class="scan-grid">
+    <div class="scan-card">
+      <div class="scan-icon">🎯</div>
+      <div>
+        <h4>Uw drie belangrijkste drivers</h4>
+        <p>Welke bedrijfsbeslissingen hebben de meeste impact op uw resultaat? U kent ze — de scan helpt ze te structureren.</p>
+      </div>
+    </div>
+    <div class="scan-card">
+      <div class="scan-icon">💸</div>
+      <div>
+        <h4>De kosten van de huidige situatie</h4>
+        <p>Wat kost het u — in tijd, gemiste kansen, foute beslissingen — dat u nu zonder goede forecasting werkt?</p>
+      </div>
+    </div>
+    <div class="scan-card">
+      <div class="scan-icon">🔀</div>
+      <div>
+        <h4>Uw eerste what-if vraag</h4>
+        <p>Welke vraag zou u morgen stellen als u elk scenario in minuten kon doorrekenen? Dat wordt uw eerste use case.</p>
+      </div>
+    </div>
+    <div class="scan-card">
+      <div class="scan-icon">🤝</div>
+      <div>
+        <h4>Voorbereiding voor het gesprek</h4>
+        <p>Met de ingevulde scan kan uw Begrip consultant direct inhoudelijk starten — geen generieke demo, maar uw situatie.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-box">
+    <h3>Ontvang de zelfscan</h3>
+    <p>Vul uw gegevens in en ontvang de zelfscan direct in uw inbox. Gratis, geen verplichtingen.</p>
+    <form id="scanForm" onsubmit="handleScanSubmit(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="scanNaam">Naam</label>
+          <input type="text" id="scanNaam" name="naam" required placeholder="Uw naam" />
+        </div>
+        <div class="form-group">
+          <label for="scanBedrijf">Organisatie</label>
+          <input type="text" id="scanBedrijf" name="bedrijf" placeholder="Bedrijfsnaam" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="scanEmail">E-mailadres</label>
+        <input type="email" id="scanEmail" name="email" required placeholder="u@bedrijf.nl" />
+      </div>
+      <div class="form-group">
+        <label for="scanRol">Uw rol</label>
+        <select id="scanRol" name="rol">
+          <option value="">Selecteer uw rol</option>
+          <option>Directeur / CEO</option>
+          <option>CFO / Finance Director</option>
+          <option>Head of FP&amp;A</option>
+          <option>Controller</option>
+          <option>Operationeel directeur</option>
+          <option>Andere</option>
+        </select>
+      </div>
+      <button type="submit" class="submit-btn" id="scanBtn">Stuur mij de zelfscan →</button>
+      <p class="form-note">Uw gegevens worden uitsluitend gebruikt om de zelfscan te sturen. Geen spam.</p>
+    </form>
+    <div class="success-msg" id="scanSuccess">
+      ✓ &nbsp;De zelfscan is onderweg. Controleer uw inbox (en eventueel uw spammap).
+    </div>
+  </div>
+</section>
+
+
+<!-- Connector 3→4 -->
+<div class="journey-connector">
+  <div class="journey-connector-inner">
+    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+    <span class="journey-connector-label">Stap 4 van 4</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     STAP 4 — GRATIS WORKSHOP
+═══════════════════════════════════════════ -->
+<section id="workshop" class="cta-section">
+  <div class="journey-badge" style="background:#0f172a; margin-bottom:32px;">
+    <span class="journey-badge-num" style="background:rgba(255,255,255,0.15);">4</span>
+    Gratis workshop
+  </div>
+  <div class="cta-box">
+    <h2>Plan uw gratis workshop</h2>
+    <p>In een sessie van 45 minuten werken we samen uw eerste use case uit — van driver naar scenario naar beslissing. Het resultaat is een concreet voorstel voor de implementatie van Begrip.ai op uw situatie.</p>
+
+    <!-- Pre-qualification -->
+    <div class="preq-box">
+      <h3>Hoe u in aanmerking komt</h3>
+      <p>Om de workshop zo waardevol mogelijk te maken, beginnen we altijd met een kort intakegesprek van 30 minuten. Zo starten we de workshop met uw specifieke situatie — geen generiek verhaal.</p>
+      <div class="preq-step">
+        <div class="preq-num">1</div>
+        <div>
+          <strong>Plan een intakegesprek van 30 minuten</strong>
+          <p>Kies hieronder een moment. We bespreken uw use case, uw drivers en wat u wilt bereiken. Zo kunnen we de workshop volledig afstemmen op uw situatie.</p>
+        </div>
+      </div>
+      <div class="preq-step">
+        <div class="preq-num">2</div>
+        <div>
+          <strong>U ontvangt een bevestiging + voorbereiding</strong>
+          <p>Na het gesprek sturen we u een korte voorbereiding: wat u meeneemt naar de workshop en wat u kunt verwachten.</p>
+        </div>
+      </div>
+      <div class="preq-step">
+        <div class="preq-num">3</div>
+        <div>
+          <strong>Workshop — uw eerste use case live</strong>
+          <p>In 45 minuten werken we uw situatie volledig uit: van uw drivers naar een werkend scenario en een concreet implementatieplan.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="workshop-steps">
+      <div class="ws-step">
+        <div class="ws-num">A</div>
+        <div>
+          <strong>Use case verdiepen</strong>
+          <p>We nemen uw zelfscan door en identificeren de drivers achter uw probleem.</p>
+        </div>
+      </div>
+      <div class="ws-step">
+        <div class="ws-num">B</div>
+        <div>
+          <strong>Scenario's live doorrekenen</strong>
+          <p>Op basis van uw data draaien we live de eerste what-if — zodat u ziet hoe het werkt voor uw situatie.</p>
+        </div>
+      </div>
+      <div class="ws-step">
+        <div class="ws-num">C</div>
+        <div>
+          <strong>Concreet implementatieplan</strong>
+          <p>U verlaat de workshop met een concreet plan en een voorstel voor de eerste use case op Begrip.ai.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calendly -->
+    <p style="text-align:center;font-size:0.9rem;font-weight:600;color:var(--text-muted);margin-bottom:16px;">Kies hieronder een moment voor het intakegesprek van 30 minuten</p>
     <div class="calendly-inline-widget" data-url="https://calendly.com/wouter-delken/30min" style="min-width:280px;height:660px;margin-top:8px;border-radius:10px;overflow:hidden;"></div>
     <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
-    <!-- Calendly inline widget end -->
   </div>
 </section>
+
 
 <!-- FOOTER -->
 <footer>
   <div class="footer-logo">Begrip<span>.ai</span></div>
   <p style="margin-bottom:10px;">Prognoses die managers begrijpen — en vertrouwen</p>
-    <p style="margin-top:14px;">© 2026 Begrip.ai. Alle rechten voorbehouden.</p>
+  <p style="margin-top:14px;">© 2026 Begrip.ai. Alle rechten voorbehouden.</p>
 </footer>
 
+
 <script>
-  /* ── Formulier: verstuur naar Formspree ── */
-  function handleSubmit(e) {
-    e.preventDefault();
-    var form = document.getElementById('contactForm');
-    var btn  = form.querySelector('.submit-btn');
-    btn.textContent = 'Versturen…';
-    btn.disabled = true;
+/* ════════════════════════════════════════
+   DEMO ENGINE
+════════════════════════════════════════ */
+var demoBusy = false;
+var demoCurrentStage = 0;
 
-    var data = {
-      naam:     document.getElementById('naam').value,
-      bedrijf:  document.getElementById('bedrijf').value,
-      email:    document.getElementById('email').value,
-      software: document.getElementById('software').value
-    };
+/* ── Chart configurations ── */
+var charts = {
+  0: {
+    label: "Omzet per maand — huidig pad, geen scenario's actief",
+    bars: [
+      {h:80,cls:''},{h:72,cls:''},{h:62,cls:''},{h:54,cls:''},
+      {h:46,cls:'hi'},{h:38,cls:'forecast'},{h:30,cls:'forecast'}
+    ],
+    legend: [
+      {color:'var(--primary)',op:0.55,label:'Werkelijk'},
+      {color:'var(--primary)',op:0.35,label:'Prognose huidig pad'}
+    ]
+  },
+  2: {
+    label: "Vrije cashflow per maand — huidig pad",
+    bars: [
+      {h:62,cls:''},{h:56,cls:''},{h:48,cls:''},{h:40,cls:''},
+      {h:30,cls:'hi'},{h:14,cls:'warn-bar'},{h:5,cls:'neg'}
+    ],
+    legend: [
+      {color:'var(--primary)',op:0.55,label:'Gezonde cashflow'},
+      {color:'#f59e0b',op:0.75,label:'Krap'},
+      {color:'#ef4444',op:0.75,label:'Tekort'}
+    ]
+  },
+  3: {
+    label: "Cashflow — Scenario 1: 12% kostenbesparing",
+    bars: [
+      {h:62,cls:'s1'},{h:58,cls:'s1'},{h:55,cls:'s1'},{h:52,cls:'s1'},
+      {h:50,cls:'s1 hi'},{h:46,cls:'s1'},{h:44,cls:'s1'}
+    ],
+    legend: [{color:'#f59e0b',op:0.75,label:'Scenario 1 — kostenbesparing'}]
+  },
+  4: {
+    label: "Cashflow — Scenario 2: 3 nieuwe klanten",
+    bars: [
+      {h:62,cls:'s2'},{h:60,cls:'s2'},{h:56,cls:'s2'},{h:52,cls:'s2'},
+      {h:44,cls:'s2 hi'},{h:40,cls:'s2'},{h:65,cls:'s2'}
+    ],
+    legend: [{color:'var(--accent)',op:0.75,label:'Scenario 2 — nieuwe klanten'}]
+  },
+  5: {
+    label: "Cashflow — Optimaal scenario (combinatie)",
+    bars: [
+      {h:62,cls:'opt'},{h:60,cls:'opt'},{h:58,cls:'opt'},{h:56,cls:'opt'},
+      {h:54,cls:'opt hi'},{h:52,cls:'opt'},{h:64,cls:'opt'}
+    ],
+    legend: [{color:'var(--accent)',op:0.85,label:'✓ Optimaal scenario — cashflow positief heel jaar'}]
+  }
+};
 
-    fetch('https://formspree.io/wouter@day-one.ai', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify(data)
-    })
-    .then(function(r) {
-      form.style.display = 'none';
-      document.getElementById('successMsg').style.display = 'block';
-    })
-    .catch(function() {
-      btn.textContent = 'Gesprek inplannen';
-      btn.disabled = false;
-      alert('Er ging iets mis. Stuur ons gerust een e-mail op info@dayone.nl.');
+function renderChart(n) {
+  var cfg = charts[n];
+  if (!cfg) return;
+  var c = document.getElementById('demoChart');
+  c.innerHTML = '';
+  cfg.bars.forEach(function(b) {
+    var el = document.createElement('div');
+    el.className = 'bar ' + (b.cls || '');
+    el.style.height = b.h + '%';
+    c.appendChild(el);
+  });
+  document.getElementById('chartLabel').textContent = cfg.label;
+  var leg = document.getElementById('chartLegend');
+  leg.innerHTML = '';
+  cfg.legend.forEach(function(item) {
+    var s = document.createElement('span');
+    s.className = 'legend-dot';
+    s.innerHTML = '<span style="background:'+item.color+';opacity:'+item.op+'"></span>' + item.label;
+    leg.appendChild(s);
+  });
+}
+
+function setInsight(html, variant) {
+  var el = document.getElementById('demoInsight');
+  el.className = 'ai-insight' + (variant ? ' '+variant : '');
+  el.innerHTML = '<strong>Begrip.ai signaleert</strong>' + html;
+}
+
+function setKPI(id, val, delta, variant) {
+  var v = document.getElementById('kpi'+id+'val');
+  var d = document.getElementById('kpi'+id+'delta');
+  if (v) { v.textContent = val; v.className = 'kpi-value '+(variant||''); }
+  if (d) { d.textContent = delta; d.className = 'kpi-delta '+(variant||''); }
+}
+
+function setProgress(pct) {
+  document.getElementById('demoProgress').style.width = pct + '%';
+}
+
+function addMsg(html, type) {
+  var box = document.getElementById('demoChatMsgs');
+  var div = document.createElement('div');
+  div.className = 'msg ' + type;
+  var av = document.createElement('div'); av.className = 'msg-avatar';
+  av.textContent = type === 'ai' ? 'AI' : 'U';
+  var bbl = document.createElement('div'); bbl.className = 'msg-bubble';
+  bbl.innerHTML = html;
+  if (type === 'user') { div.appendChild(bbl); div.appendChild(av); }
+  else { div.appendChild(av); div.appendChild(bbl); }
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  return div;
+}
+
+function addTyping() {
+  var box = document.getElementById('demoChatMsgs');
+  var div = document.createElement('div');
+  div.className = 'msg ai'; div.id = 'typingIndicator';
+  var av = document.createElement('div'); av.className = 'msg-avatar'; av.textContent = 'AI';
+  var bbl = document.createElement('div'); bbl.className = 'msg-bubble';
+  bbl.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  div.appendChild(av); div.appendChild(bbl);
+  box.appendChild(div); box.scrollTop = box.scrollHeight;
+}
+
+function removeTyping() {
+  var el = document.getElementById('typingIndicator');
+  if (el) el.remove();
+}
+
+function setBtns(btns) {
+  var c = document.getElementById('demoBtns');
+  c.innerHTML = '';
+  btns.forEach(function(b) {
+    var el = document.createElement('button');
+    el.className = 'hero-sugg-btn' + (b.primary ? ' primary-btn' : '');
+    el.innerHTML = b.label;
+    (function(stage) { el.onclick = function() { if (!demoBusy) demoStep(stage); }; })(b.to);
+    c.appendChild(el);
+  });
+}
+
+function addScenarioRow(name, cf, ebitda, klant, rowCls) {
+  var cfCls = cf.indexOf('−') === 0 ? 'v-bad' : cf.indexOf('+') === 0 ? 'v-good' : 'v-neutral';
+  var eCls  = parseFloat(ebitda) >= 6 ? 'v-good' : parseFloat(ebitda) >= 4 ? 'v-neutral' : 'v-bad';
+  var kCls  = parseInt(klant) <= 25 ? 'v-good' : 'v-bad';
+  var tbody = document.getElementById('scenarioRows');
+  var tr = document.createElement('tr');
+  if (rowCls) tr.className = rowCls;
+  tr.innerHTML = '<td>'+name+'</td><td class="'+cfCls+'">'+cf+'</td><td class="'+eCls+'">'+ebitda+'</td><td class="'+kCls+'">'+klant+'</td>';
+  tbody.appendChild(tr);
+}
+
+/* ── Stage definitions ── */
+var stages = {
+  1: {
+    userMsg: "Hoe staat het bedrijf ervoor?",
+    delay: 950,
+    aiMsg: "Ik heb de data geanalyseerd en stel een forecast op. Er zijn drie signalen die direct aandacht vragen:<br><br>▸ <strong>Inkoopkosten +23%</strong> — EBITDA daalde van 9,2% naar 2,8%.<br>▸ <strong>Twee klanten (38% van omzet)</strong> schroefden hun orders 40% terug.<br>▸ <strong>Cashflow Q3 prognose: −€92K</strong> — op het huidige pad, zonder bijsturing.",
+    dashFn: null,
+    progress: 16,
+    btns: [{ label: "📊 Toon de cashflow-grafiek", to: 2 }]
+  },
+  2: {
+    userMsg: "Toon de cashflow-grafiek",
+    delay: 800,
+    aiMsg: "Dit is de verwachte vrije cashflow per maand — zonder aanpassingen. In <strong>augustus dreigt −€92K</strong>. De oranje en rode staven zijn de kritieke maanden. Een vertraging in betalingen maakt dit acuut.",
+    dashFn: function() {
+      renderChart(2);
+      setInsight("Zonder ingreep: cashflow negatief aug–sep. Geen actieve scenario's om dit te keren.", "warn");
+    },
+    progress: 33,
+    btns: [{ label: "🔧 Scenario 1: stel we besparen 12% op kosten", to: 3 }]
+  },
+  3: {
+    userMsg: "Scenario 1: stel we besparen 12% op kosten — wat verandert er?",
+    delay: 1050,
+    aiMsg: "Scenario 1 — <strong>Kostenbesparing 12%</strong>: cashflow stabiliseert op <strong>+€18K in Q3</strong>. EBITDA herstelt naar <strong>5,4%</strong>. Uitvoerbaar binnen 6 weken.<br><br>Maar: de dalende omzet én de klantconcentratie van 38% blijven onaangepakt. Dit scenario pakt het symptoom aan — niet de oorzaak.",
+    dashFn: function() {
+      renderChart(3);
+      document.getElementById('scenarioTableWrap').style.display = 'block';
+      addScenarioRow("Scenario 1 — Kostenbesparing 12%", "+€18K", "5,4%", "38%", "");
+      setInsight("Scenario 1 stabiliseert de cashflow. Maar klantconcentratie (38%) blijft een structureel risico.", "");
+      setKPI('B', "5,4%", "↑ Scenario 1: hersteld", "neutral");
+      setKPI('C', "+€18K", "Scenario 1: stabiel Q3", "neutral");
+    },
+    progress: 50,
+    btns: [{ label: "🚀 Scenario 2: stel we werven 3 nieuwe klanten", to: 4 }]
+  },
+  4: {
+    userMsg: "Scenario 2: stel we werven 3 nieuwe klanten à €220K — wat levert dat op?",
+    delay: 1100,
+    aiMsg: "Scenario 2 — <strong>3 nieuwe klanten (gem. €220K/jaar)</strong>: cashflow stijgt naar <strong>+€63K in Q4</strong>, EBITDA naar <strong>7,1%</strong>, klantconcentratie daalt van 38% naar 22%.<br><br>Maar: eerste omzet pas over 4–5 maanden. Sales-investering: €42K. In Q3 is de cashflow tijdelijk nog negatief.",
+    dashFn: function() {
+      renderChart(4);
+      addScenarioRow("Scenario 2 — Nieuwe klanten (3×)", "+€63K (Q4)", "7,1%", "22%", "");
+      setInsight("Scenario 2 lost het omzetrisico op — maar vraagt geduld. Q3 cashflow is tijdelijk nog negatief.", "");
+      setKPI('B', "7,1%", "↑ Scenario 2 EOY", "neutral");
+    },
+    progress: 67,
+    btns: [{ label: "⚖️ Welk scenario is het beste pad?", to: 5 }]
+  },
+  5: {
+    userMsg: "Welk scenario is het beste pad?",
+    delay: 1300,
+    aiMsg: "De <strong>combinatie</strong> werkt het best: 8% kostenbesparing (snelle maatregel) + acquisitie van 2 klanten.<br><br>Resultaat: cashflow Q3 <strong>+€28K</strong> &middot; EBITDA eind jaar <strong>6,9%</strong> &middot; klantconcentratie: 38% → 22%.<br><br>Dit zijn <em>uw</em> drivers — u kende ze al. Begrip.ai heeft ze alleen doorgerekend.",
+    dashFn: function() {
+      renderChart(5);
+      addScenarioRow("✓ Optimaal: combinatie", "+€28K", "6,9%", "22%", "row-opt");
+      setInsight("Optimaal scenario bepaald: cashflow gezond, EBITDA op koers, klantrisico verlaagd.", "ok");
+      setKPI('A', "€1,18M", "Basis voor bijsturing", "");
+      setKPI('B', "6,9%", "✓ Optimaal EOY", "good");
+      setKPI('C', "+€28K", "✓ Cashflow gezond Q3", "good");
+      document.getElementById('kpiA').className = 'kpi';
+      document.getElementById('kpiB').className = 'kpi kpi-good';
+      document.getElementById('kpiC').className = 'kpi kpi-good';
+    },
+    progress: 100,
+    btns: [{ label: "💾 Sla dit scenario op als benchmark", to: 6, primary: true }]
+  },
+  6: {
+    userMsg: "Sla het optimale scenario op als benchmark",
+    delay: 1000,
+    aiMsg: "Het combinatiescenario is opgeslagen als benchmark voor <strong>Fortis Componenten B.V.</strong> — gedateerd op vandaag.<br><br>Begrip.ai vergelijkt de actuals maandelijks met deze verwachting en signaleert zodra de werkelijkheid afwijkt van het gekozen pad.",
+    dashFn: function() {
+      /* Mark optimal row as saved */
+      var rows = document.querySelectorAll('#scenarioRows tr.row-opt td:first-child');
+      rows.forEach(function(td) { td.innerHTML = '💾 Opgeslagen: combinatie'; });
+      /* Show saved badge */
+      var wrap = document.getElementById('scenarioTableWrap');
+      var badge = document.createElement('div');
+      badge.className = 'saved-badge';
+      badge.innerHTML = '<span class="saved-icon">💾</span><div><strong>Benchmark opgeslagen — ' + new Date().toLocaleDateString('nl-NL', {day:'numeric',month:'long',year:'numeric'}) + '</strong><span>Begrip.ai monitort de actuals en signaleert afwijkingen van dit scenario.</span></div>';
+      wrap.appendChild(badge);
+    },
+    progress: 100,
+    btns: [{ label: "Klaar — wat is de volgende stap?", to: 7, primary: true }]
+  },
+  7: {
+    userMsg: "Wat is de volgende stap?",
+    delay: 800,
+    aiMsg: "U heeft zojuist uw eerste scenarioanalyse doorlopen met uw eigen drivers. De volgende stap is dit te doen met uw eigen data. Scroll naar beneden om te starten.",
+    dashFn: null,
+    progress: 100,
+    btns: []
+  }
+};
+
+function demoStep(n) {
+  if (demoBusy) return;
+  demoBusy = true;
+  demoCurrentStage = n;
+
+  /* disable current buttons */
+  var btns = document.querySelectorAll('#demoBtns button');
+  btns.forEach(function(b){ b.disabled = true; });
+
+  var s = stages[n];
+  if (!s) { demoBusy = false; return; }
+
+  addMsg(s.userMsg, 'user');
+  addTyping();
+
+  setTimeout(function() {
+    removeTyping();
+    if (s.dashFn) s.dashFn();
+    addMsg(s.aiMsg, 'ai');
+    setProgress(s.progress);
+
+    if (n === 7) {
+      setTimeout(function() {
+        document.getElementById('demoOverlay').classList.add('show');
+        demoBusy = false;
+      }, 1400);
+    } else {
+      setBtns(s.btns);
+      demoBusy = false;
+    }
+  }, s.delay);
+}
+
+function demoFree() {
+  if (demoBusy) return;
+  var inp = document.getElementById('demoInput');
+  var q = inp.value.trim(); if (!q) return;
+  inp.value = '';
+  demoBusy = true;
+  addMsg(q, 'user');
+  addTyping();
+  setTimeout(function() {
+    removeTyping();
+    addMsg("Goede vraag. In uw eigen omgeving beantwoordt Begrip.ai dit direct vanuit uw bedrijfsdata. Gebruik de knoppen hieronder om de demo te doorlopen.", 'ai');
+    demoBusy = false;
+  }, 850);
+}
+
+/* ── Initialize chart ── */
+document.addEventListener('DOMContentLoaded', function() {
+  renderChart(0);
+  setInsight("Geen scenario's actief. Ik heb de situatie geanalyseerd en kan helpen het pad vooruit te bepalen.", "");
+});
+
+/* ── File upload label ── */
+document.addEventListener('DOMContentLoaded', function() {
+  var fu = document.getElementById('scanUpload');
+  if (fu) {
+    fu.addEventListener('change', function() {
+      var label = fu.closest('.upload-area').querySelector('.upload-label');
+      if (fu.files.length > 0) label.textContent = '✓ ' + fu.files[0].name;
     });
   }
+});
 
-  /* ── Gedeelde helper: voeg chatbericht toe ── */
-  function appendMsg(containerId, text, type) {
-    var box = document.getElementById(containerId);
-    var div = document.createElement('div');
-    div.className = 'msg ' + type;
-    var av = document.createElement('div');
-    av.className = 'msg-avatar';
-    av.textContent = type === 'ai' ? 'AI' : 'U';
-    var bbl = document.createElement('div');
-    bbl.className = 'msg-bubble';
-    bbl.innerHTML = text;
-    div.appendChild(av);
-    div.appendChild(bbl);
-    box.appendChild(div);
-    box.scrollTop = box.scrollHeight;
-  }
 
-  /* ── Hero chat ── */
-  var heroAnswers = {
-    'Wat als we 5 nieuwe mensen aannemen?':        'In het Groei-scenario met 5 nieuwe medewerkers verwacht Begrip.ai <strong>+€ 1,4M omzet</strong> tegen eind Q4, maar de cashflow wordt krap in Q2 door onboarding- en salariskosten. Overweeg een overbruggingskrediet van <strong>€ 220K</strong>.',
-    'Welk scenario geeft de beste cashflow?':      'Begrip.ai vergelijkt drie scenario\'s. Het <strong>Basis-scenario</strong> houdt de vrije cashflow het sterkst (€ 207K eind jaar). Het Groei-scenario levert meer omzet maar vereist extra werkkapitaal in Q2–Q3.',
-    'Wanneer bereiken we break-even?':             'Op basis van de huidige drivers bereikt jullie bedrijf break-even in het <strong>Basis-scenario in maand 8</strong>. In het Groei-scenario schuift dat op naar maand 11 door de hogere kosten — maar de lange termijn EBITDA is 34% hoger.'
+/* ════════════════════════════════════════
+   FORM HANDLERS (Formspree)
+════════════════════════════════════════ */
+function handleScanSubmit(e) {
+  e.preventDefault();
+  var btn = document.getElementById('scanBtn');
+  btn.textContent = 'Versturen…'; btn.disabled = true;
+  var data = {
+    naam:   document.getElementById('scanNaam').value,
+    bedrijf:document.getElementById('scanBedrijf').value,
+    email:  document.getElementById('scanEmail').value,
+    rol:    document.getElementById('scanRol').value,
+    form:   'zelfscan'
   };
+  fetch('https://formspree.io/wouter@day-one.ai', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify(data)
+  }).then(function() {
+    document.getElementById('scanForm').style.display = 'none';
+    document.getElementById('scanSuccess').style.display = 'block';
+  }).catch(function() {
+    btn.textContent = 'Stuur mij de zelfscan →'; btn.disabled = false;
+    alert('Er ging iets mis. Stuur een e-mail naar wouter@begrip.ai.');
+  });
+}
 
-  function heroAsk(btn, question) {
-    appendMsg('heroChatMsgs', question, 'user');
-    btn.disabled = true; btn.style.opacity = '0.5';
-    setTimeout(function() {
-      appendMsg('heroChatMsgs', heroAnswers[question] || 'Goed punt. In uw eigen omgeving zoek ik dat direct op.', 'ai');
-    }, 700);
-  }
-
-  function heroSend() {
-    var inp = document.getElementById('heroChatInput');
-    var q = inp.value.trim(); if (!q) return;
-    inp.value = '';
-    appendMsg('heroChatMsgs', q, 'user');
-    setTimeout(function() {
-      appendMsg('heroChatMsgs', 'Dat zoek ik voor je op. Wil je dit live zien voor jouw eigen bedrijf? <a href="#gesprek" style="color:var(--primary);font-weight:600;">Plan een gesprek in.</a>', 'ai');
-    }, 750);
-  }
-
-  /* ── Demo chat (sectie verderop) ── */
-  var chatAnswers = {
-    'Wat is het effect van 10% prijsverhoging?': 'Bij 10% prijsverhoging met gelijkblijvend volume stijgt de brutomarge met <strong>€ 940K</strong> op jaarbasis. Begrip.ai schat het volume-effect op −4% op basis van historische elasticiteit. Per saldo een netto voordeel van <strong>€ 680K</strong>.',
-    'Hoe ziet mijn cashflow er volgende maand uit?': 'In het Basis-scenario verwacht Begrip.ai een netto cashinstroom van <strong>€ 380K</strong> in mei. In het Groei-scenario daalt dit naar <strong>€ 140K</strong> door extra salariskosten. Beide scenario\'s staan naast elkaar in het dashboard.',
-    'Wanneer moet ik opletten dat ik krap kom te zitten?': 'In het Groei-scenario wordt de cashflow krap in <strong>week 3 van juni</strong>. Begrip.ai adviseert een kredietlijn van €200K te activeren voor die datum, of de aanname van twee reps te verschuiven naar Q3.'
+function handleWaardeSubmit(e) {
+  e.preventDefault();
+  var btn = document.getElementById('waardeBtn');
+  btn.textContent = 'Versturen…'; btn.disabled = true;
+  var data = {
+    naam:     document.getElementById('wNaam').value,
+    email:    document.getElementById('wEmail').value,
+    situatie: document.getElementById('wSituatie').value,
+    waarde:   document.getElementById('wWaarde').value,
+    omvang:   document.getElementById('wOmvang').value,
+    form:     'waarde'
   };
-
-  function askQuestion(btn, question) {
-    appendMsg('chatMessages', question, 'user');
-    btn.disabled = true; btn.style.opacity = '0.5';
-    setTimeout(function() {
-      appendMsg('chatMessages', chatAnswers[question] || 'Op basis van uw data kijk ik dat voor u na.', 'ai');
-    }, 750);
-  }
-
-  function sendChat() {
-    var inp = document.getElementById('chatInput');
-    var q = inp.value.trim(); if (!q) return;
-    inp.value = '';
-    appendMsg('chatMessages', q, 'user');
-    setTimeout(function() {
-      appendMsg('chatMessages', 'Dat zoek ik voor je op in jouw administratie. Wil je dit live zien? <a href="#gesprek" style="color:var(--primary);font-weight:600;">Plan een gesprek in.</a>', 'ai');
-    }, 800);
-  }
+  fetch('https://formspree.io/wouter@day-one.ai', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify(data)
+  }).then(function() {
+    document.getElementById('waardeForm').style.display = 'none';
+    document.getElementById('waardeSuccess').style.display = 'block';
+  }).catch(function() {
+    btn.textContent = 'Stuur ter voorbereiding →'; btn.disabled = false;
+    alert('Er ging iets mis. Stuur een e-mail naar wouter@begrip.ai.');
+  });
+}
 </script>
 
 </body>
