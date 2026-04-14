@@ -313,6 +313,8 @@ canvas{max-height:280px}
     <button class="sc-btn" data-scenario="bank-loan">Bank Loan</button>
     <button class="sc-btn" data-scenario="push-receivables">Push Receivables</button>
     <button class="sc-btn" data-scenario="hire-sales">Hire More Sales</button>
+    <div style="flex:1"></div>
+    <button class="sc-btn" id="sc-compare-btn" onclick="mod='compare';renderNav();render();">⇄ Compare Scenarios</button>
   </div>
   <div class="content" id="content"></div>
 </div>
@@ -2255,7 +2257,7 @@ function render(){
   document.getElementById('tb-title').textContent=meta.title;
   document.getElementById('tb-sub').textContent=meta.sub;
   // Hide scenario bar on compare and my-dashboard views
-  document.querySelector('.scenario-bar').style.display=(mod==='compare')?'none':'';
+  document.querySelector('.scenario-bar').style.display=(mod==='compare'||mod==='my-dashboard')?'none':'';
   if(mod==='finance')renderFinance();
   else if(mod==='revenue')renderRevenue();
   else if(mod==='marketing')renderMarketing();
@@ -2271,14 +2273,12 @@ function render(){
 // NAV
 // ═══════════════════════════════════════════════════════
 const MODULES = [
-  {key:'my-dashboard',  label:'My Dashboard',       icon:'dashboard'},
-  {key:'finance',       label:'Finance',           icon:null},
-  {key:'revenue',       label:'Revenue',            icon:null},
-  {key:'marketing',     label:'Marketing',          icon:null},
-  {key:'hr',            label:'HR',                 icon:null},
-  {key:'logistics',     label:'Logistics',          icon:null},
-  {key:'projects',      label:'Projects',           icon:null},
-  {key:'compare',       label:'Compare Scenarios',  icon:'compare'},
+  {key:'finance',    label:'Finance'},
+  {key:'revenue',    label:'Revenue'},
+  {key:'marketing',  label:'Marketing'},
+  {key:'hr',         label:'HR'},
+  {key:'logistics',  label:'Logistics'},
+  {key:'projects',   label:'Projects'},
 ];
 const NAV_ICONS = {
   briefcase:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;opacity:.8;margin-right:8px"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>`,
@@ -2290,57 +2290,28 @@ function renderNav(){
   const nav = document.getElementById('sb-nav');
   let html = '';
 
-  // ── Starred section ──
-  if(starredMods.length > 0){
-    html += '<div class="nav-group-label">Starred</div>';
-    starredMods.forEach(key=>{
-      const m = MODULES.find(x=>x.key===key);
-      if(!m) return;
-      const active = mod===key ? ' active' : '';
-      const primary = key==='finance' ? ' nav-item-primary' : '';
-      const icon = m.icon ? (NAV_ICONS[m.icon]||'') : '';
-      html += `<div class="nav-item${primary}${active}" data-module="${key}">${icon}${m.label}<span class="nav-star starred" data-star="${key}" title="Unstar">★</span></div>`;
-    });
-    html += '<div class="nav-divider"></div>';
-  }
+  // ── My Dashboard (primary) ──
+  const dashActive = mod==='my-dashboard' ? ' active' : '';
+  html += `<div class="nav-item nav-item-primary${dashActive}" data-module="my-dashboard">My Dashboard</div>`;
+  html += '<div class="nav-divider"></div>';
 
-  // ── All (unstarred) section ──
-  const unstarred = MODULES.filter(m=>!starredMods.includes(m.key));
-  if(unstarred.length > 0){
-    html += '<div class="nav-group-label">All</div>';
-    unstarred.forEach(m=>{
-      const active = mod===m.key ? ' active' : '';
-      const icon = m.icon ? (NAV_ICONS[m.icon]||'') : '';
-      html += `<div class="nav-item${active}" data-module="${m.key}">${icon}${m.label}<span class="nav-star" data-star="${m.key}" title="Star">☆</span></div>`;
-    });
-  }
+  // ── Modules section ──
+  html += '<div class="nav-group-label">Modules</div>';
+  MODULES.forEach(m=>{
+    const active = mod===m.key ? ' active' : '';
+    html += `<div class="nav-item${active}" data-module="${m.key}">${m.label}</div>`;
+  });
 
   nav.innerHTML = html;
 
-  // Module click (ignore clicks on the star itself)
   nav.querySelectorAll('.nav-item').forEach(el=>{
-    el.addEventListener('click', e=>{
-      if(e.target.closest('.nav-star')) return;
+    el.addEventListener('click', ()=>{
       mod = el.dataset.module;
       renderNav();
       render();
     });
   });
 
-  // Star toggle
-  nav.querySelectorAll('.nav-star').forEach(el=>{
-    el.addEventListener('click', e=>{
-      e.stopPropagation();
-      const key = el.dataset.star;
-      if(starredMods.includes(key)){
-        starredMods = starredMods.filter(k=>k!==key);
-      } else {
-        starredMods = [...starredMods, key];
-      }
-      localStorage.setItem('oneday_starred', JSON.stringify(starredMods));
-      renderNav();
-    });
-  });
 }
 
 // ═══════════════════════════════════════════════════════
