@@ -396,7 +396,15 @@ Chart.defaults.plugins.legend.labels.font  = { size: 11 };
 Chart.defaults.plugins.tooltip.titleFont   = { size: 11 };
 Chart.defaults.plugins.tooltip.bodyFont    = { size: 11 };
 let claudeApiKey = localStorage.getItem('oneday_api_key') || '';
-let chatHistory = [];  // [{role:'user'|'assistant', content:'...'}]
+let chatHistory = [];  // active conversation [{role:'user'|'assistant', content:'...'}]
+
+// Two persistent histories: 'widget' (My Dashboard) and 'analyst' (all other modules)
+const chatHistories = JSON.parse(localStorage.getItem('oneday_chat_histories') || '{}');
+function chatKey(){ return mod === 'my-dashboard' ? 'widget' : 'analyst'; }
+function saveChatHistory(){
+  chatHistories[chatKey()] = chatHistory.slice(-60);
+  localStorage.setItem('oneday_chat_histories', JSON.stringify(chatHistories));
+}
 
 // ── Widget state ────────────────────────────────────────
 let widgets = JSON.parse(localStorage.getItem('oneday_widgets') || '[]');
@@ -1511,12 +1519,30 @@ function renderChat(){
   document.getElementById('chat-ctx-mod').textContent=MODULE_META[mod]?MODULE_META[mod].title:mod;
   document.getElementById('chat-ctx-scen').textContent=(mod==='my-dashboard') ? 'Widget mode' : (SC[scen]?SC[scen].lbl:scen);
 
-  chatHistory=[];
+  // Load the correct persistent history
+  chatHistory = chatHistories[chatKey()] || [];
 
   const isWidgetMode = (mod === 'my-dashboard');
+  const c = document.getElementById('chat-msgs');
 
-  if(isWidgetMode){
-    document.getElementById('chat-msgs').innerHTML=`
+  if(chatHistory.length > 0){
+    // Restore previous conversation
+    let html = '';
+    chatHistory.forEach(msg => {
+      if(msg.role === 'user'){
+        html += `<div class="cmsg user"><div class="cmsg-av">👤</div><div class="cmsg-text">${msg.content.replace(/</g,'&lt;')}</div></div>`;
+      } else {
+        const fmt = msg.content.replace(/</g,'&lt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+        // Skip raw widget JSON blobs from display
+        if(!msg.content.trim().startsWith('{')){
+          html += `<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text">${fmt}</div></div>`;
+        }
+      }
+    });
+    c.innerHTML = html;
+    setTimeout(()=>{ c.scrollTop = c.scrollHeight; }, 50);
+  } else if(isWidgetMode){
+    c.innerHTML=`
       <div class="chat-welcome">
         <div class="chat-welcome-av">✦</div>
         <div class="chat-welcome-title">Dashboard builder</div>
@@ -1529,7 +1555,7 @@ function renderChat(){
         </div>
       </div>`;
   } else {
-    document.getElementById('chat-msgs').innerHTML=`
+    c.innerHTML=`
       <div class="chat-welcome">
         <div class="chat-welcome-av">✦</div>
         <div class="chat-welcome-title">Hi, I'm One Day AI</div>
@@ -1557,7 +1583,7 @@ function renderChat(){
   // Update placeholder
   const inp = document.getElementById('chat-inp');
   if(inp && !inp.disabled){
-    inp.placeholder = isWidgetMode ? 'Beschrijf een widget of stel een datavraag…' : 'Ask One Day AI…';
+    inp.placeholder = isWidgetMode ? 'Describe a widget or ask a data question…' : 'Ask One Day AI…';
   }
 
   updateChatKeyUI();
