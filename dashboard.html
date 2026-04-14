@@ -455,6 +455,33 @@ function scanCode(code){
   return { safe: violations.length === 0, violations };
 }
 
+// Dry-run the widget code with live data before adding to dashboard.
+// Returns { ok: true } or { ok: false, error: string }
+function testWidgetCode(code){
+  try {
+    const fn = new Function('data', code);
+    const result = fn(buildScenData());
+    if(!result) return { ok: false, error: 'code returned nothing' };
+    if(typeof result === 'string'){
+      // HTML widget — check it's non-empty
+      if(!result.trim()) return { ok: false, error: 'code returned empty HTML' };
+      return { ok: true };
+    }
+    if(typeof result === 'object'){
+      if(!result.type) return { ok: false, error: 'Chart.js config missing "type"' };
+      if(!result.data) return { ok: false, error: 'Chart.js config missing "data"' };
+      if(!Array.isArray(result.data.datasets) || result.data.datasets.length === 0)
+        return { ok: false, error: 'Chart.js config has no datasets' };
+      const hasData = result.data.datasets.some(ds => Array.isArray(ds.data) && ds.data.length > 0);
+      if(!hasData) return { ok: false, error: 'all datasets are empty' };
+      return { ok: true };
+    }
+    return { ok: false, error: 'unexpected return type: ' + typeof result };
+  } catch(err) {
+    return { ok: false, error: err.message };
+  }
+}
+
 function buildIframeHTML(code, scenData){
   // Escape closing script tags to prevent HTML injection
   const safe = code.replace(/<\/script>/gi, '<\\/script>');
@@ -1973,10 +2000,15 @@ async function sendChat(){
             if(!scan.safe){
               badgeHTML = `<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text"><span class="widget-badge err">⚠ Blocked: ${scan.violations.join(', ')}</span></div></div>`;
             } else {
-              applyWidgetAction(w);
-              renderWidgets();
-              const verb = w.action==='update' ? 'updated' : 'added';
-              badgeHTML = `<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text"><span class="widget-badge ok">✓ Widget '${w.title||w.id}' ${verb}</span></div></div>`;
+              const test = testWidgetCode(w.code||'');
+              if(!test.ok){
+                badgeHTML = `<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text"><span class="widget-badge err">⚠ Widget test failed: ${test.error} — try asking again</span></div></div>`;
+              } else {
+                applyWidgetAction(w);
+                renderWidgets();
+                const verb = w.action==='update' ? 'updated' : 'added';
+                badgeHTML = `<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text"><span class="widget-badge ok">✓ Widget '${w.title||w.id}' ${verb}</span></div></div>`;
+              }
             }
           }
         }
