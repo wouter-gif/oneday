@@ -1870,6 +1870,9 @@ WRONG — never do these:
   "answer": "Short text (type answer or both only)"
 }
 
+## Code field formatting
+Write the "code" value as a single line — no literal newlines or indentation. Use semicolons between statements. The examples below show the correct style.
+
 ## Typography rules — ALL charts must follow these exactly
 - Font size: 11 on all axes, legends, titles, tooltips — set font:{size:11} on every ticks/legend/title option
 - Axis tick color: #64748b
@@ -1911,13 +1914,35 @@ Data question:
 Always return valid JSON. This is a hard requirement.`;
 }
 
-// Parse JSON from Claude response (handles wrapped/plain JSON)
+// Sanitise a JSON string: collapse literal newlines/tabs inside string values
+// so the model's multiline code fields don't break JSON.parse.
+function sanitiseJSON(raw){
+  let out = '', inStr = false, esc = false;
+  for(let i = 0; i < raw.length; i++){
+    const c = raw[i];
+    if(esc){ out += c; esc = false; continue; }
+    if(c === '\\' && inStr){ out += c; esc = true; continue; }
+    if(c === '"'){ inStr = !inStr; out += c; continue; }
+    if(inStr && c === '\n'){ out += '\\n'; continue; }
+    if(inStr && c === '\r'){ continue; }
+    if(inStr && c === '\t'){ out += '\\t'; continue; }
+    out += c;
+  }
+  return out;
+}
+
+// Parse JSON from Claude response (handles markdown fences, literal newlines in strings)
 function parseClaudeJSON(text){
-  try{ return JSON.parse(text.trim()); }catch{}
-  const m = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-  if(m){ try{ return JSON.parse(m[1]); }catch{} }
-  const o = text.match(/\{[\s\S]*\}/);
-  if(o){ try{ return JSON.parse(o[0]); }catch{} }
+  const t = text.trim();
+  try{ return JSON.parse(t); }catch{}
+  // Strip markdown code fence
+  const m = t.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+  const candidate = m ? m[1] : t;
+  // Try with literal-newline sanitisation
+  try{ return JSON.parse(sanitiseJSON(candidate)); }catch{}
+  // Last resort: extract outermost {...}
+  const o = candidate.match(/\{[\s\S]*\}/);
+  if(o){ try{ return JSON.parse(sanitiseJSON(o[0])); }catch{} }
   return null;
 }
 
