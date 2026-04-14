@@ -541,27 +541,23 @@ function deleteWidget(id){
   renderWidgets();
 }
 
-// Render a single widget card (returns HTML string)
-function widgetCardHTML(w){
-  const iframeId = 'wif-'+w.id;
+// Data object passed into every widget function
+function buildScenData(){
   const d = getScenData();
-  const scenData = {
+  return {
     scenario: scen,
     scenarioLabel: SC[scen].lbl,
     months: MONTHS,
-    adjusted: { rev: d.rev, cost: d.cost, opRes: d.opRes, rbt: d.rbt, rat: d.rat, lb: d.lb },
-    base: { rev: B.rev, cost: B.cost, liqBal: B.liqBal, ca: B.ca },
-    scenarioConfig: SC[scen],
-    allScenarios: Object.fromEntries(Object.entries(SC).map(([k,s])=>[k,{lbl:s.lbl,rAdj:s.rAdj,cAdj:s.cAdj,lbAdj:s.lbAdj}])),
-    revenue: REV_BASE,
+    adjusted: { rev: d.rev, cost: d.cost, opRes: d.opRes, lb: d.lb },
+    base: { rev: B.rev, cost: B.cost, liqBal: B.liqBal },
     hr: HR_BASE,
     marketing: MKT_BASE,
     logistics: LOG_BASE,
-    projects: PRJ_BASE,
   };
-  const html = buildIframeHTML(w.code || '', scenData);
-  const srcdoc = html.replace(/"/g, '&quot;');
-  const h = w.height || (w.size === 'tall' ? 340 : 220);
+}
+
+// Widget card HTML — canvas-based, no iframes
+function widgetCardHTML(w){
   return `<div class="widget-card" data-size="${w.size||'medium'}" data-id="${w.id}">
   <div class="widget-title-bar">
     <span>${w.title||'Widget'}</span>
@@ -569,9 +565,30 @@ function widgetCardHTML(w){
       <button class="widget-del-btn" onclick="deleteWidget('${w.id}')" title="Remove widget">✕</button>
     </div>
   </div>
-  <iframe id="${iframeId}" srcdoc="${srcdoc}" sandbox="allow-scripts"
-    style="width:100%;height:${h}px;border:none;display:block;transition:height .2s ease"></iframe>
+  <div class="widget-body" id="wb-${w.id}"><canvas id="wc-${w.id}"></canvas></div>
 </div>`;
+}
+
+// Render one widget into its card body using Chart.js
+function renderSingleWidget(w){
+  const bodyEl = document.getElementById('wb-'+w.id);
+  if(!bodyEl) return;
+  if(!w.code || /function\s+Widget\s*\(|window\.SCENARIO_DATA|ReactDOM/.test(w.code)){
+    bodyEl.innerHTML = `<div style="padding:10px;color:#92400e;font-size:11px;background:#fffbeb;border-radius:6px">Old format — delete and ask again.</div>`;
+    return;
+  }
+  try {
+    const result = new Function('data', w.code)(buildScenData());
+    if(typeof result === 'string'){ bodyEl.innerHTML = result; return; }
+    if(result && result.type && result.data){
+      const cid = 'wc-'+w.id;
+      if(chartReg[cid]){ chartReg[cid].destroy(); delete chartReg[cid]; }
+      const canvas = document.getElementById(cid);
+      if(canvas) chartReg[cid] = new Chart(canvas, result);
+    }
+  } catch(err){
+    bodyEl.innerHTML = `<div style="padding:10px;color:#dc2626;font-size:11px;background:#fef2f2;border-radius:6px"><strong>Error:</strong> ${err.message}</div>`;
+  }
 }
 
 function renderWidgets(){
@@ -591,6 +608,7 @@ function renderWidgets(){
     </div>`;
   } else {
     el.innerHTML = `<div class="widget-grid">${widgets.map(widgetCardHTML).join('')}</div>`;
+    widgets.forEach(renderSingleWidget);
   }
 }
 
