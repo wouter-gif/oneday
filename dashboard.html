@@ -1532,9 +1532,22 @@ function renderChat(){
       if(msg.role === 'user'){
         html += `<div class="cmsg user"><div class="cmsg-av">👤</div><div class="cmsg-text">${msg.content.replace(/</g,'&lt;')}</div></div>`;
       } else {
-        const fmt = msg.content.replace(/</g,'&lt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
-        // Skip raw widget JSON blobs from display
-        if(!msg.content.trim().startsWith('{')){
+        const content = msg.content.trim();
+        if(content.startsWith('{')){
+          // Widget mode — parse JSON and show badge
+          try {
+            const j = JSON.parse(content);
+            if(j.answer){
+              const fmt = j.answer.replace(/</g,'&lt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+              html += `<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text">${fmt}</div></div>`;
+            }
+            if(j.widget && j.widget.title){
+              const verb = j.widget.action === 'remove' ? 'removed' : j.widget.action === 'update' ? 'updated' : 'added';
+              html += `<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text"><span class="widget-badge ok">✓ Widget '${j.widget.title}' ${verb}</span></div></div>`;
+            }
+          } catch(e){ /* skip unparseable */ }
+        } else {
+          const fmt = content.replace(/</g,'&lt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
           html += `<div class="cmsg ai"><div class="cmsg-av">✦</div><div class="cmsg-text">${fmt}</div></div>`;
         }
       }
@@ -2283,7 +2296,7 @@ function render(){
   document.getElementById('tb-title').textContent=meta.title;
   document.getElementById('tb-sub').textContent=meta.sub;
   // Hide scenario bar on compare and my-dashboard views
-  document.querySelector('.scenario-bar').style.display=(mod==='compare'||mod==='my-dashboard')?'none':'';
+  document.querySelector('.scenario-bar').style.display=(mod==='compare')?'none':'';
   if(mod==='finance')renderFinance();
   else if(mod==='revenue')renderRevenue();
   else if(mod==='marketing')renderMarketing();
