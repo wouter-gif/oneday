@@ -455,31 +455,47 @@ function scanCode(code){
   return { safe: violations.length === 0, violations };
 }
 
-// Dry-run the widget code with live data before adding to dashboard.
+// Dry-run the widget code against ALL scenarios before adding to dashboard.
 // Returns { ok: true } or { ok: false, error: string }
 function testWidgetCode(code){
+  const ALL_SCENARIOS = ['base','new-product','bank-loan','push-receivables','hire-sales'];
+  let fn;
   try {
-    const fn = new Function('data', code);
-    const result = fn(buildScenData());
-    if(!result) return { ok: false, error: 'code returned nothing' };
-    if(typeof result === 'string'){
-      // HTML widget — check it's non-empty
-      if(!result.trim()) return { ok: false, error: 'code returned empty HTML' };
-      return { ok: true };
-    }
-    if(typeof result === 'object'){
-      if(!result.type) return { ok: false, error: 'Chart.js config missing "type"' };
-      if(!result.data) return { ok: false, error: 'Chart.js config missing "data"' };
-      if(!Array.isArray(result.data.datasets) || result.data.datasets.length === 0)
-        return { ok: false, error: 'Chart.js config has no datasets' };
-      const hasData = result.data.datasets.some(ds => Array.isArray(ds.data) && ds.data.length > 0);
-      if(!hasData) return { ok: false, error: 'all datasets are empty' };
-      return { ok: true };
-    }
-    return { ok: false, error: 'unexpected return type: ' + typeof result };
-  } catch(err) {
-    return { ok: false, error: err.message };
+    fn = new Function('data', code);
+  } catch(err){
+    return { ok: false, error: 'syntax error: ' + err.message };
   }
+
+  function buildScenDataFor(sk){
+    const saved = scen; scen = sk;
+    const d = buildScenData();
+    scen = saved; return d;
+  }
+
+  function validate(result, sk){
+    if(!result) return 'returned nothing for "' + sk + '"';
+    if(typeof result === 'string') return result.trim() ? null : 'empty HTML for "' + sk + '"';
+    if(typeof result === 'object'){
+      if(!result.type) return 'missing type for "' + sk + '"';
+      if(!result.data) return 'missing data for "' + sk + '"';
+      if(!Array.isArray(result.data.datasets) || !result.data.datasets.length)
+        return 'no datasets for "' + sk + '"';
+      if(!result.data.datasets.some(ds => Array.isArray(ds.data) && ds.data.length))
+        return 'empty datasets for "' + sk + '"';
+      return null;
+    }
+    return 'unexpected return type for "' + sk + '"';
+  }
+
+  for(const sk of ALL_SCENARIOS){
+    try {
+      const err = validate(fn(buildScenDataFor(sk)), sk);
+      if(err) return { ok: false, error: err };
+    } catch(err){
+      return { ok: false, error: 'runtime error on "' + sk + '": ' + err.message };
+    }
+  }
+  return { ok: true };
 }
 
 function buildIframeHTML(code, scenData){
