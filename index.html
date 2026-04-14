@@ -708,9 +708,9 @@
 
 <!-- HERO -->
 <section class="hero">
-  <div class="eyebrow">Financieel inzicht — binnen één dag</div>
-  <h1>Rust over je financiën.<br/><em>Grip op wat er komt.</em></h1>
-  <p>Financiën is niet jouw vak — en dat hoeft ook niet. Begrip.ai koppelt AI aan jouw boekhouding, zodat jij en je accountant precies zien hoe het er nu voor staat én wat de komende maanden brengen.</p>
+  <div class="eyebrow">Driver-based forecasting — van spreadsheet naar beslissing</div>
+  <h1>Weet waar je naartoe gaat.<br/><em>Kies het pad dat past.</em></h1>
+  <p>Betere beslissingen beginnen bij het doorrekenen van alternatieven. Begrip.ai koppelt AI aan jouw bedrijfsdata en werkt meerdere scenario's uit — zodat jij en je team met vertrouwen de juiste richting kiest.</p>
   <div class="hero-btns">
     <a href="#gesprek" class="btn-primary">Plan een vrijblijvend gesprek</a>
     <a href="#hoe-het-werkt" class="btn-secondary">Hoe werkt het?</a>
@@ -723,7 +723,7 @@
         <div class="mock-dot red"></div>
         <div class="mock-dot yellow"></div>
         <div class="mock-dot green"></div>
-        <span class="mock-title">Begrip.ai – Jouw financieel overzicht april 2026</span>
+        <span class="mock-title">Begrip.ai – Scenarioanalyse FY 2026</span>
         <div class="mock-live">
           <div class="mock-live-dot"></div>
           <span class="mock-live-label">Live</span>
@@ -737,24 +737,24 @@
         <div class="hero-dash-left">
           <div class="kpi-row">
             <div class="kpi">
-              <div class="kpi-label">Omzet deze maand</div>
-              <div class="kpi-value">€ 38.420</div>
-              <div class="kpi-delta up">12% meer dan vorige maand</div>
+              <div class="kpi-label">Omzet MTD</div>
+              <div class="kpi-value">€ 2,83M</div>
+              <div class="kpi-delta up">+9% t.o.v. vorige maand</div>
             </div>
             <div class="kpi">
-              <div class="kpi-label">Vrije cashflow</div>
-              <div class="kpi-value">€ 11.700</div>
-              <div class="kpi-delta up">Ruim voldoende</div>
+              <div class="kpi-label">EBITDA prognose Q3</div>
+              <div class="kpi-value">€ 150K</div>
+              <div class="kpi-delta up">Scenario: Groei</div>
             </div>
             <div class="kpi">
-              <div class="kpi-label">Verwachte omzet mei</div>
-              <div class="kpi-value">€ 41.000</div>
-              <div class="kpi-delta up">Op basis van jouw opdrachten</div>
+              <div class="kpi-label">Vrije cashflow dec</div>
+              <div class="kpi-value">€ 207K</div>
+              <div class="kpi-delta up">Driver-based berekend</div>
             </div>
           </div>
           <div class="chart-row">
             <div class="chart-box">
-              <div class="chart-box-label">Omzet per maand — werkelijk en prognose</div>
+              <div class="chart-box-label">Omzet per maand — werkelijk vs. scenario's</div>
               <div class="bar-chart">
                 <div class="bar" style="height:40%"></div>
                 <div class="bar" style="height:55%"></div>
@@ -772,7 +772,7 @@
             <div class="chart-box">
               <div class="ai-insight">
                 <strong>Begrip.ai signaleert</strong>
-                Juni wordt naar verwachting rustiger. Op basis van uw seizoenspatroon daalt de omzet met ca. 20%. Nu is een goed moment om dat in te plannen.
+                Scenario Groei levert €43K meer EBITDA op dan Basis, maar vraagt €180K extra werkkapitaal in Q2. Nu inzichtelijk — voordat de beslissing genomen wordt.
               </div>
             </div>
           </div>
@@ -783,21 +783,21 @@
           <div class="hero-chat-header">
             <div class="hero-chat-avatar">AI</div>
             <div>
-              <div class="hero-chat-header-text">Begrip.ai AI</div>
-              <div class="hero-chat-header-sub">Analyseert jouw data</div>
+              <div class="hero-chat-header-text">Begrip.ai</div>
+              <div class="hero-chat-header-sub">Analyseert jouw bedrijfsdata</div>
             </div>
             <div class="h-online"></div>
           </div>
           <div class="hero-chat-msgs" id="heroChatMsgs">
             <div class="msg ai">
               <div class="msg-avatar">AI</div>
-              <div class="msg-bubble">Goedemiddag. Ik heb toegang tot jouw financiën. Wat wil je weten?</div>
+              <div class="msg-bubble">Goedemiddag. Ik heb toegang tot jullie bedrijfsdata. Welk scenario wil je doorrekenen?</div>
             </div>
           </div>
           <div class="hero-chat-sugg" id="heroChatSugg">
-            <button class="hero-sugg-btn" onclick="heroAsk(this,'Wat verwacht ik te verdienen in juni?')">Verwachte omzet juni?</button>
-            <button class="hero-sugg-btn" onclick="heroAsk(this,'Wanneer loopt mijn cashflow krap?')">Wanneer wordt het krap?</button>
-            <button class="hero-sugg-btn" onclick="heroAsk(this,'Wat laat ik mijn accountant zien?')">Wat laat ik mijn accountant zien?</button>
+            <button class="hero-sugg-btn" onclick="heroAsk(this,'Wat als we 5 nieuwe mensen aannemen?')">Wat als we 5 mensen aannemen?</button>
+            <button class="hero-sugg-btn" onclick="heroAsk(this,'Welk scenario geeft de beste cashflow?')">Welk scenario geeft de beste cashflow?</button>
+            <button class="hero-sugg-btn" onclick="heroAsk(this,'Wanneer bereiken we break-even?')">Wanneer bereiken we break-even?</button>
           </div>
           <div class="hero-chat-input-row">
             <input class="hero-chat-input" id="heroChatInput" type="text" placeholder="Stel uw vraag..." onkeydown="if(event.key==='Enter') heroSend()" />
@@ -813,24 +813,24 @@
 <!-- HERKENBAAR -->
 <section class="problem">
   <div class="section-label">Herkenbaar?</div>
-  <h2>Je hebt een vak. Financiën is het niet.</h2>
-  <p class="section-sub">Je bent ondernemer omdat je goed bent in wat je doet — tuinen ontwerpen, fietsen repareren, een keuken bouwen. De financiële kant hoort erbij, maar het is niet waar je voor opstaat. Begrip.ai zorgt dat je die kant rustig kunt overzien, zonder er uren in te steken.</p>
+  <h2>Beslissingen nemen met een spreadsheet is raden.</h2>
+  <p class="section-sub">Finance besteedt dagen aan het bouwen van prognoses — en zodra de aannames veranderen, begint het opnieuw. Ondertussen wachten stakeholders op antwoorden die ze nodig hebben om te handelen.</p>
   <div class="pain-grid">
     <div class="pain-card">
-      <h3>Je bent liever bij je klanten dan in je boekhouding</h3>
-      <p>Elke minuut die je kwijt bent aan rapporten en overzichten, is een minuut die je niet in je bedrijf bezig bent.</p>
+      <h3>Prognoses kosten weken, niet uren</h3>
+      <p>45% van de FP&amp;A-tijd gaat op aan het verzamelen en opschonen van data — niet aan analyseren. Tegen de tijd dat de prognose klaar is, zijn de aannames al achterhaald.</p>
     </div>
     <div class="pain-card">
-      <h3>Cashflow is lastig te voorspellen</h3>
-      <p>Je hebt genoeg werk, maar toch loop je soms krap. Wanneer worden die facturen betaald? Wat staat er nog open?</p>
+      <h3>Eén scenario is geen keuze</h3>
+      <p>Zonder meerdere what-if's kun je alternatieven niet vergelijken. Beslissers nemen dan de beslissing op gevoel — terwijl de data er wel is.</p>
     </div>
     <div class="pain-card">
-      <h3>Drukke en rustige perioden wisselen af</h3>
-      <p>Niet elke maand is hetzelfde. Hoe houd je daar rekening mee, zodat je ook in een rustige periode gewoon kunt doordraaien?</p>
+      <h3>Aannames veranderen, Excel-modellen niet</h3>
+      <p>Zodra de strategie wijzigt, breken de formules. Modellen die zijn gebouwd op historische correlaties houden geen rekening met nieuwe beslissingen.</p>
     </div>
     <div class="pain-card">
-      <h3>Een jaarrekening kijkt achteruit — en is er maar één keer per jaar</h3>
-      <p>Je accountant doet uitstekend werk. Maar een jaarrekening geeft geen inzicht in wat er de komende maanden aankomt. Dat doet Begrip.ai wel — elke dag.</p>
+      <h3>Stakeholders missen context</h3>
+      <p>Cijfers zonder de onderliggende drivers geven geen houvast. Finance levert een getal, maar niet het verhaal — en dat vertraagt elke beslissing.</p>
     </div>
   </div>
 </section>
@@ -838,32 +838,32 @@
 <!-- USPS -->
 <section>
   <div class="section-label">Wat Begrip.ai doet</div>
-  <h2>Twee voordelen die tellen</h2>
-  <p class="section-sub">Geen ingewikkelde software, geen lange implementatie. Begrip.ai werkt al na één dag samen met jouw boekhouding. Alles draait om twee dingen: snelheid en vooruitkijken.</p>
+  <h2>Van data naar beslissing — in minuten</h2>
+  <p class="section-sub">Geen weken wachten op een prognose. Begrip.ai koppelt aan jouw systemen en vertaalt bedrijfsbeslissingen direct naar financiële uitkomsten. Alles draait om één ding: de juiste keuze maken.</p>
   <div class="usps-wrapper">
 
     <div class="usp-card featured">
-      <div class="usp-tag">Vandaag nog aan de slag</div>
-      <h3>Binnen één dag gekoppeld en overzichtelijk</h3>
-      <p>Begrip.ai koppelt direct aan jouw bestaande boekhoudpakket — of dat nu Exact, Snelstart, Moneybird of iets anders is. Geen gedoe, geen weken wachten. Je ziet dezelfde dag je financiële situatie helder op een rij.</p>
+      <div class="usp-tag">Driver-based forecasting</div>
+      <h3>Elke prognose gebouwd op echte bedrijfsbeslissingen</h3>
+      <p>Begrip.ai berekent uitkomsten vanuit de drivers die jij kent: headcount, prijsstelling, pipeline, capaciteit. Verander een driver — en elk getal update direct. Geen black box, maar een transparante koppeling tussen beslissing en gevolg.</p>
     </div>
 
     <div class="usp-card featured">
-      <div class="usp-tag">Vooruitkijken</div>
-      <h3>Weten wat er aankomt, niet wat er was</h3>
-      <p>Op basis van jouw cijfers, lopende opdrachten en seizoenspatronen berekent Begrip.ai wat de komende maanden waarschijnlijk brengen. Zo weet je op tijd of je gas moet geven of juist iets kunt plannen.</p>
+      <div class="usp-tag">Scenario's op aanvraag</div>
+      <h3>Vergelijk alternatieven voordat je beslist</h3>
+      <p>Wat als we drie sales reps aannemen? Wat als de marge met 5% daalt? Begrip.ai werkt meerdere what-if's gelijktijdig uit en vergelijkt ze op ROI, cashflow en andere bedrijfsdoelstellingen — zodat je gefundeerd kiest.</p>
     </div>
 
     <div class="usp-card">
-      <div class="usp-tag">Samen met je accountant</div>
-      <h3>Loop samen de cijfers door — op hetzelfde scherm</h3>
-      <p>Begrip.ai is het dashboard dat je met je accountant opent tijdens een gesprek. Hij legt toe wat er gebeurt, jij ziet het meteen terug in de grafiek. Zo wordt een accountantsgesprek concreet en nuttig — in plaats van een stapel papier.</p>
+      <div class="usp-tag">Koppeling met je systemen</div>
+      <h3>Verbonden met ERP, CRM en boekhouding</h3>
+      <p>Begrip.ai koppelt aan je bestaande systemen — SAP, Salesforce, Exact of iets anders — zonder data te verplaatsen. Jouw cijfers blijven waar ze horen, wij lezen alleen mee.</p>
     </div>
 
     <div class="usp-card">
-      <div class="usp-tag">Gewone taal</div>
-      <h3>Geen jargon, gewoon antwoord</h3>
-      <p>Stel je vraag zoals je die ook aan iemand zou stellen: "Wat verdiende ik vorig kwartaal?" of "Wanneer loopt mijn cashflow krap?" Je krijgt direct een helder antwoord, zonder spreadsheet of boekhoudterm.</p>
+      <div class="usp-tag">AI-native analyse</div>
+      <h3>Stel je vraag, krijg direct een antwoord</h3>
+      <p>Vraag in gewone taal wat je wilt weten: "Wanneer is de investering terugverdiend?" of "Wat is ons break-even bij dit scenario?" De AI haalt het antwoord rechtstreeks uit jouw data — geen dashboards bouwen, geen formules.</p>
     </div>
 
   </div>
@@ -872,8 +872,8 @@
 <!-- CHAT DEMO -->
 <section class="chat-demo-section">
   <div class="section-label">Zo werkt het</div>
-  <h2>Stel gewoon je vraag</h2>
-  <p class="section-sub">Je typt een vraag zoals je die aan een collega zou stellen. Begrip.ai geeft direct een helder antwoord — geen spreadsheets, geen jargon.</p>
+  <h2>Doorreken een scenario — in minuten</h2>
+  <p class="section-sub">Je stelt een vraag zoals je die aan een collega zou stellen. Begrip.ai vertaalt die direct naar een financiële doorrekening op basis van jouw eigen bedrijfsdata.</p>
 
   <div style="display:flex; justify-content:center;">
     <div class="dashboard-mock" style="max-width:920px;">
@@ -882,7 +882,7 @@
         <div class="mock-dot red"></div>
         <div class="mock-dot yellow"></div>
         <div class="mock-dot green"></div>
-        <span class="mock-title">Begrip.ai – Financieel overzicht 2026</span>
+        <span class="mock-title">Begrip.ai – Scenarioplanning FY 2026</span>
         <div class="mock-live">
           <div class="mock-live-dot"></div>
           <span class="mock-live-label">Live</span>
@@ -896,24 +896,24 @@
         <div class="hero-dash-left">
           <div class="kpi-row">
             <div class="kpi">
-              <div class="kpi-label">Omzet dit jaar</div>
-              <div class="kpi-value">€ 284K</div>
-              <div class="kpi-delta up">incl. prognose</div>
+              <div class="kpi-label">Omzet FY — Basis</div>
+              <div class="kpi-value">€ 9,4M</div>
+              <div class="kpi-delta up">huidig scenario</div>
             </div>
             <div class="kpi">
-              <div class="kpi-label">Bedrijfsresultaat</div>
-              <div class="kpi-value" style="color:var(--accent)">€ 38K</div>
-              <div class="kpi-delta up">heel jaar</div>
+              <div class="kpi-label">Omzet FY — Groei</div>
+              <div class="kpi-value" style="color:var(--accent)">€ 12,1M</div>
+              <div class="kpi-delta up">+3 sales reps</div>
             </div>
             <div class="kpi">
-              <div class="kpi-label">Cashpositie dec</div>
-              <div class="kpi-value">€ 22K</div>
-              <div class="kpi-delta up">bankrekening</div>
+              <div class="kpi-label">Cashflow verschil</div>
+              <div class="kpi-value">−€ 180K</div>
+              <div class="kpi-delta" style="color:#f59e0b">Extra werkkapitaal Q2</div>
             </div>
           </div>
           <div class="chart-row">
             <div class="chart-box">
-              <div class="chart-box-label">Omzet per maand — werkelijk en prognose</div>
+              <div class="chart-box-label">Omzet per maand — Basis vs. Groei scenario</div>
               <div class="bar-chart">
                 <div class="bar" style="height:14%"></div>
                 <div class="bar" style="height:24%"></div>
@@ -936,7 +936,7 @@
             <div class="chart-box">
               <div class="ai-insight">
                 <strong>Begrip.ai signaleert</strong>
-                September en oktober zijn historisch jouw rustigste maanden. Op basis van je huidige kosten heb je dan nog ca. €8.200 vrij beschikbaar. Goed om nu rekening mee te houden.
+                Het Groei-scenario levert €2,7M meer omzet op, maar de cashflow wordt in Q2 kritisch. Overweeg een kredietlijn van €200K om de aannamekosten te overbruggen.
               </div>
             </div>
           </div>
@@ -947,21 +947,21 @@
           <div class="hero-chat-header">
             <div class="hero-chat-avatar">AI</div>
             <div>
-              <div class="hero-chat-header-text">Begrip.ai AI</div>
-              <div class="hero-chat-header-sub">Analyseert jouw data</div>
+              <div class="hero-chat-header-text">Begrip.ai</div>
+              <div class="hero-chat-header-sub">Analyseert jullie bedrijfsdata</div>
             </div>
             <div class="h-online"></div>
           </div>
           <div class="hero-chat-msgs" id="chatMessages">
             <div class="msg ai">
               <div class="msg-avatar">AI</div>
-              <div class="msg-bubble">Goedemiddag. Ik heb toegang tot alle financiële data van jouw bedrijf. Wat wil je weten?</div>
+              <div class="msg-bubble">Goedemiddag. Ik heb toegang tot jullie bedrijfsdata. Welk scenario wil je vergelijken?</div>
             </div>
           </div>
           <div class="hero-chat-sugg" id="chatSuggestions">
-            <button class="hero-sugg-btn" onclick="askQuestion(this, 'Wat is mijn beste maand geweest dit jaar?')">Beste maand dit jaar?</button>
-            <button class="hero-sugg-btn" onclick="askQuestion(this, 'Hoe ziet mijn cashflow er volgende maand uit?')">Cashflow volgende maand?</button>
-            <button class="hero-sugg-btn" onclick="askQuestion(this, 'Wanneer moet ik opletten dat ik krap kom te zitten?')">Wanneer wordt het krap?</button>
+            <button class="hero-sugg-btn" onclick="askQuestion(this, 'Wat is het effect van 10% prijsverhoging?')">Effect van 10% prijsverhoging?</button>
+            <button class="hero-sugg-btn" onclick="askQuestion(this, 'Hoe ziet mijn cashflow er volgende maand uit?')">Cashflow scenario vergelijken?</button>
+            <button class="hero-sugg-btn" onclick="askQuestion(this, 'Wanneer moet ik opletten dat ik krap kom te zitten?')">Wanneer wordt cashflow kritisch?</button>
           </div>
           <div class="hero-chat-input-row">
             <input class="hero-chat-input" id="chatInput" type="text" placeholder="Stel je vraag..." onkeydown="if(event.key==='Enter') sendChat()" />
@@ -977,23 +977,23 @@
 <!-- HOE HET WERKT -->
 <section class="how" id="hoe-het-werkt">
   <div class="section-label">Werkwijze</div>
-  <h2>Zo simpel werkt het</h2>
-  <p class="section-sub">Van eerste gesprek tot volledig inzicht in drie korte stappen.</p>
+  <h2>Van eerste gesprek tot eerste scenario — snel</h2>
+  <p class="section-sub">In drie stappen van spreadsheet-frustratie naar proactieve, scenario-gedreven besluitvorming.</p>
   <div class="steps-grid">
     <div class="step">
       <div class="step-number">1</div>
-      <h3>Kort gesprek</h3>
-      <p>We bespreken in 30 minuten wat je wil weten en welk boekhoudpakket je gebruikt. Geen voorbereiding nodig.</p>
+      <h3>Use case discovery</h3>
+      <p>We houden een workshop om jouw eerste high-impact use case te identificeren — een groeiobstakel, een operationele inefficiëntie of een KPI die achterblijft. Dat wordt ons startpunt.</p>
     </div>
     <div class="step">
       <div class="step-number">2</div>
-      <h3>Koppeling — op dezelfde dag</h3>
-      <p>We verbinden Begrip.ai met jouw software. Jouw cijfers blijven veilig op hun plek — we lezen alleen mee.</p>
+      <h3>Systemen koppelen</h3>
+      <p>We verbinden Begrip.ai met jouw ERP, CRM en boekhouding — zonder data te verplaatsen. Jouw cijfers blijven waar ze horen; wij mappen ze naar de drivers achter jouw business.</p>
     </div>
     <div class="step">
       <div class="step-number">3</div>
-      <h3>Inzicht en prognose</h3>
-      <p>Vanaf dat moment heb je dagelijks een actueel overzicht én een verwachting voor de komende maanden — zonder dat je er iets voor hoeft te doen.</p>
+      <h3>Scenario's draaien</h3>
+      <p>De AI vertaalt wijzigingen in bedrijfsdrivers direct naar accurate prognoses. Vergelijk what-if's op ROI en cashflow, neem een beslissing en volg de uitkomst terug naar de driver.</p>
     </div>
   </div>
 </section>
@@ -1002,7 +1002,7 @@
 <section id="prijzen" style="background: var(--bg);">
   <div class="section-label">Tarieven</div>
   <h2>Eenvoudige, transparante prijzen</h2>
-  <p class="section-sub">Geen verborgen kosten, geen lange contracten. Kies het pakket dat past bij jouw bedrijf.</p>
+  <p class="section-sub">Geen verborgen kosten, geen lange contracten. Kies het pakket dat past bij jouw organisatie.</p>
 
   <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:24px; max-width:740px; margin:0 auto;">
 
@@ -1013,7 +1013,7 @@
         <span style="font-size:2.6rem; font-weight:800; line-height:1; letter-spacing:-1px;">€ 29</span>
         <span style="font-size:0.9rem; color:var(--text-muted); padding-bottom:5px;">/ maand</span>
       </div>
-      <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:28px;">Alles wat je nodig hebt om dagelijks inzicht te krijgen in je financiën.</p>
+      <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:28px;">Alles wat je nodig hebt om te starten met driver-based forecasting.</p>
       <ul style="list-style:none; display:flex; flex-direction:column; gap:11px; margin-bottom:32px;">
         <li style="font-size:0.9rem; display:flex; gap:10px; align-items:flex-start;">
           <svg style="flex-shrink:0;margin-top:2px;" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
@@ -1051,7 +1051,7 @@
         <span style="font-size:2.6rem; font-weight:800; line-height:1; letter-spacing:-1px;">€ 149</span>
         <span style="font-size:0.9rem; color:var(--text-muted); padding-bottom:5px;">/ maand</span>
       </div>
-      <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:28px;">Volledig inzicht door koppelingen met boekhouding, ERP én CRM in één dashboard.</p>
+      <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:28px;">Volledige scenario-analyse met koppelingen naar boekhouding, ERP én CRM in één dashboard.</p>
       <ul style="list-style:none; display:flex; flex-direction:column; gap:11px; margin-bottom:32px;">
         <li style="font-size:0.9rem; display:flex; gap:10px; align-items:flex-start;">
           <svg style="flex-shrink:0;margin-top:2px;" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
@@ -1088,23 +1088,23 @@
 <!-- SOCIAL PROOF -->
 <section id="ervaringen" class="social-proof">
   <div class="section-label" style="color:#93c5fd;">Ervaringen</div>
-  <h2>Wat ondernemers zeggen</h2>
-  <p class="section-sub">Praktijkmensen die de stap zetten en er geen seconde spijt van hadden.</p>
+  <h2>Wat onze klanten zeggen</h2>
+  <p class="section-sub">Finance-teams en directies die de stap zetten van reactief rapporteren naar proactief beslissen.</p>
   <div class="quotes-grid">
     <div class="quote-card">
-      <p class="quote-text">"Ik had altijd het gevoel dat ik de cijfers een halve stap achterliep. Nu zie ik gewoon wat er volgende maand binnenkomt en wat er nog uitstaat. Dat is heel fijn."</p>
-      <div class="quote-author">Gerard Bouwman</div>
-      <div class="quote-role">Tuinarchitect, zelfstandig ondernemer</div>
+      <p class="quote-text">"We hadden altijd één prognose — en die was al verouderd voor hij klaar was. Nu draaien we binnen een uur drie scenario's en loopt de boardroom synchroon met Finance."</p>
+      <div class="quote-author">Sabine van der Berg</div>
+      <div class="quote-role">CFO, Polar Bear Innovates</div>
     </div>
     <div class="quote-card">
-      <p class="quote-text">"Mijn accountant doet nog steeds gewoon zijn werk. Maar nu kom ik veel beter voorbereid bij hem — ik weet al wat de vragen zijn voordat we beginnen."</p>
-      <div class="quote-author">Anita Verhoeven</div>
-      <div class="quote-role">Eigenaar, Verhoeven Fietsen</div>
+      <p class="quote-text">"Het verschil is dat we nu beslissingen nemen op basis van drivers die we zelf begrijpen, niet op basis van een spreadsheet die niemand meer durft aan te raken."</p>
+      <div class="quote-author">Tom Hendricks</div>
+      <div class="quote-role">Head of FP&amp;A, Logistics Group NL</div>
     </div>
     <div class="quote-card">
-      <p class="quote-text">"Ik dacht dat zoiets ingewikkeld zou zijn. Maar het was binnen één middag geregeld en ik zag dezelfde dag al mijn omzet per maand netjes in een grafiek. Heel overzichtelijk."</p>
-      <div class="quote-author">Maarten de Graaf</div>
-      <div class="quote-role">Schilder en ondernemer, De Graaf Kleur &amp; Concept</div>
+      <p class="quote-text">"De what-if voor onze nieuwe productlijn was vroeger twee weken werk. Met Begrip.ai hadden we de doorrekening de volgende ochtend klaar — inclusief cashflow-impact."</p>
+      <div class="quote-author">Miriam Oosterbeek</div>
+      <div class="quote-role">Finance Director, ScaleUp B.V.</div>
     </div>
   </div>
 </section>
@@ -1113,7 +1113,7 @@
 <section class="cta-section" id="gesprek">
   <div class="cta-box" style="max-width:720px; padding: 48px 40px 36px;">
     <h2>Plan een vrijblijvend gesprek</h2>
-    <p>Kies direct een moment dat jou uitkomt. Het gesprek duurt 30 minuten en is geheel vrijblijvend.</p>
+    <p>Kies een moment dat jou uitkomt. In 30 minuten bespreken we jouw eerste use case en laten we zien hoe driver-based forecasting eruitziet voor jouw business.</p>
     <!-- Calendly inline widget begin -->
     <div class="calendly-inline-widget" data-url="https://calendly.com/wouter-delken/30min" style="min-width:280px;height:660px;margin-top:8px;border-radius:10px;overflow:hidden;"></div>
     <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
@@ -1124,7 +1124,7 @@
 <!-- FOOTER -->
 <footer>
   <div class="footer-logo">Begrip<span>.ai</span></div>
-  <p style="margin-bottom:10px;">Financieel inzicht voor ondernemers — op de dag zelf</p>
+  <p style="margin-bottom:10px;">Driver-based forecasting voor betere beslissingen</p>
     <p style="margin-top:14px;">© 2026 Begrip.ai. Alle rechten voorbehouden.</p>
 </footer>
 
@@ -1179,9 +1179,9 @@
 
   /* ── Hero chat ── */
   var heroAnswers = {
-    'Wat verwacht ik te verdienen in juni?':      'Op basis van jouw seizoenspatroon en lopende offertes schat Begrip.ai jouw omzet in juni op <strong>ca. € 31.000</strong> — ongeveer 20% lager dan mei. Rekening mee houden loont.',
-    'Wanneer loopt mijn cashflow krap?':           'Begrip.ai signaleert dat jouw cashflow in <strong>september en oktober</strong> historisch het laagst is. Op dit moment heb je dan naar verwachting nog ca. <strong>€ 8.200</strong> vrij beschikbaar.',
-    'Wat laat ik mijn accountant zien?':           'Je opent dit dashboard samen met je accountant. Hij ziet direct de werkelijke cijfers én de verwachting — en kan dan gericht advies geven over belasting, investeringen of het moment om iets uit te stellen.'
+    'Wat als we 5 nieuwe mensen aannemen?':        'In het Groei-scenario met 5 nieuwe medewerkers verwacht Begrip.ai <strong>+€ 1,4M omzet</strong> tegen eind Q4, maar de cashflow wordt krap in Q2 door onboarding- en salariskosten. Overweeg een overbruggingskrediet van <strong>€ 220K</strong>.',
+    'Welk scenario geeft de beste cashflow?':      'Begrip.ai vergelijkt drie scenario\'s. Het <strong>Basis-scenario</strong> houdt de vrije cashflow het sterkst (€ 207K eind jaar). Het Groei-scenario levert meer omzet maar vereist extra werkkapitaal in Q2–Q3.',
+    'Wanneer bereiken we break-even?':             'Op basis van de huidige drivers bereikt jullie bedrijf break-even in het <strong>Basis-scenario in maand 8</strong>. In het Groei-scenario schuift dat op naar maand 11 door de hogere kosten — maar de lange termijn EBITDA is 34% hoger.'
   };
 
   function heroAsk(btn, question) {
@@ -1204,9 +1204,9 @@
 
   /* ── Demo chat (sectie verderop) ── */
   var chatAnswers = {
-    'Wat is mijn beste maand geweest dit jaar?': 'Jouw beste maand was <strong>mei</strong> met een omzet van €38.420 — ruim boven het maandgemiddelde. Drie opdrachten die tegelijk werden afgerond.',
-    'Hoe ziet mijn cashflow er volgende maand uit?': 'Op basis van openstaande facturen en verwachte opdrachten schat Begrip.ai de cashinstroom op <strong>€ 41.000</strong>. Er staan nog drie facturen open die normaal gesproken binnen 14 dagen worden betaald.',
-    'Wanneer moet ik opletten dat ik krap kom te zitten?': 'Begrip.ai signaleert <strong>september en oktober</strong> als historisch rustigste maanden. Jouw vrije cashflow loopt dan terug naar ca. €8.200. Nu plannen geeft rust.'
+    'Wat is het effect van 10% prijsverhoging?': 'Bij 10% prijsverhoging met gelijkblijvend volume stijgt de brutomarge met <strong>€ 940K</strong> op jaarbasis. Begrip.ai schat het volume-effect op −4% op basis van historische elasticiteit. Per saldo een netto voordeel van <strong>€ 680K</strong>.',
+    'Hoe ziet mijn cashflow er volgende maand uit?': 'In het Basis-scenario verwacht Begrip.ai een netto cashinstroom van <strong>€ 380K</strong> in mei. In het Groei-scenario daalt dit naar <strong>€ 140K</strong> door extra salariskosten. Beide scenario\'s staan naast elkaar in het dashboard.',
+    'Wanneer moet ik opletten dat ik krap kom te zitten?': 'In het Groei-scenario wordt de cashflow krap in <strong>week 3 van juni</strong>. Begrip.ai adviseert een kredietlijn van €200K te activeren voor die datum, of de aanname van twee reps te verschuiven naar Q3.'
   };
 
   function askQuestion(btn, question) {
