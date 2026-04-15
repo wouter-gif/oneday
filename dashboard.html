@@ -139,6 +139,8 @@ body.chat-open .main{margin-right:var(--cw)}
 .int-name{font-size:13px;font-weight:600;color:var(--txt);margin-bottom:4px}
 .int-sub{font-size:11px;color:var(--txt2)}
 canvas{max-height:280px}
+/* Resize-managed cards: let canvas fill the available height */
+.widget-body canvas,.pinned-card .cc canvas{max-height:none!important;height:100%}
 
 /* LOADING OVERLAY */
 .loading-overlay{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:14px}
@@ -638,7 +640,12 @@ function renderSingleWidget(w){
       const cid = 'wc-'+w.id;
       if(chartReg[cid]){ chartReg[cid].destroy(); delete chartReg[cid]; }
       const canvas = document.getElementById(cid);
-      if(canvas) chartReg[cid] = new Chart(canvas, result);
+      if(canvas){
+        // Force chart to fill widget-body height instead of using aspect ratio
+        if(!result.options) result.options = {};
+        result.options.maintainAspectRatio = false;
+        chartReg[cid] = new Chart(canvas, result);
+      }
     }
   } catch(err){
     bodyEl.innerHTML = `<div style="padding:10px;color:#dc2626;font-size:11px;background:#fef2f2;border-radius:6px"><strong>Error:</strong> ${err.message}</div>`;
@@ -810,6 +817,11 @@ function mkChart(id,cfg){
   if(chartReg[id])chartReg[id].destroy();
   const el=document.getElementById(id);
   if(!el)return null;
+  // When inside a pinned-card, fill the container height instead of using aspect ratio
+  if(el.closest('.pinned-card')){
+    if(!cfg.options)cfg.options={};
+    cfg.options.maintainAspectRatio=false;
+  }
   chartReg[id]=new Chart(el,cfg);
   return chartReg[id];
 }
