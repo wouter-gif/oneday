@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Begrip.ai – Prognoses die managers vertrouwen</title>
-  <meta name="description" content="Begrip.ai verbindt uw bedrijfsdrivers aan financiële scenario's. Driver-based forecasting dat managers herkennen — en vertrouwen." />
+  <meta name="description" content="Begrip.ai verbindt jouw bedrijfsdrivers aan financiële scenario's. Driver-based forecasting dat managers herkennen — en vertrouwen." />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -142,6 +142,7 @@
     .kpi-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 12px; }
     .kpi { background: var(--bg-soft); border-radius: 10px; padding: 11px 13px; transition: background 0.4s; }
     .kpi.kpi-good { background: #f0fdf4; }
+    .kpi.kpi-bad  { background: #fff1f2; }
     .kpi-label { font-size: 0.67rem; color: var(--text-muted); font-weight: 500; margin-bottom: 3px; }
     .kpi-value { font-size: 1.08rem; font-weight: 700; color: var(--text); transition: color 0.4s; }
     .kpi-value.bad { color: #ef4444; }
@@ -156,7 +157,10 @@
     .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .chart-box { background: var(--bg-soft); border-radius: 10px; padding: 12px 14px; }
     .chart-box-label { font-size: 0.67rem; color: var(--text-muted); font-weight: 500; margin-bottom: 8px; }
+    .bar-chart-wrap { display: flex; flex-direction: column; }
     .bar-chart { display: flex; align-items: flex-end; gap: 3px; height: 52px; }
+    .bar-day-labels { display: flex; gap: 3px; margin-top: 4px; }
+    .bar-day-labels span { flex: 1; text-align: center; font-size: 0.58rem; color: var(--text-muted); font-weight: 600; }
     .bar { flex: 1; border-radius: 3px 3px 0 0; background: var(--primary); opacity: 0.55; transition: height 0.5s ease, background 0.4s; }
     .bar.hi { opacity: 1; }
     .bar.neg { background: #ef4444; opacity: 0.75; }
@@ -358,6 +362,28 @@
       .recap-wrap { padding: 28px 22px 20px; }
     }
 
+    /* Demo try-it callout */
+    .demo-try-callout {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--primary); color: #fff;
+      padding: 12px 24px; border-radius: 12px;
+      font-size: 0.95rem; font-weight: 700;
+      margin-bottom: 32px; box-shadow: 0 4px 18px rgba(37,99,235,0.25);
+      animation: pulse-cta 2.4s ease-in-out infinite;
+    }
+    .demo-try-callout .try-arrow {
+      font-size: 1.2rem; display: inline-block;
+      animation: bounce-right 1.2s ease-in-out infinite;
+    }
+    @keyframes pulse-cta {
+      0%, 100% { box-shadow: 0 4px 18px rgba(37,99,235,0.25); }
+      50%       { box-shadow: 0 6px 28px rgba(37,99,235,0.45); }
+    }
+    @keyframes bounce-right {
+      0%, 100% { transform: translateX(0); }
+      50%       { transform: translateX(4px); }
+    }
+
     /* Saved benchmark badge */
     .saved-badge {
       display: flex; align-items: flex-start; gap: 12px;
@@ -410,9 +436,9 @@
     <a href="#demo">Demo</a>
     <a href="#evaluatie">Evaluatie</a>
     <a href="#zelfscan">Zelfscan</a>
-    <a href="#workshop">Workshop</a>
+    <a href="#intake">Intake</a>
   </div>
-  <a href="#workshop" class="nav-cta">Plan een gesprek</a>
+  <a href="#intake" class="nav-cta">Plan je intake</a>
 </nav>
 
 
@@ -424,8 +450,14 @@
     <span class="journey-badge-num">1</span>
     Micro-demonstratie — ervaar het zelf
   </div>
-  <h1>U bent directeur van Fortis Componenten B.V..<br><em>Het ziet er niet goed uit.</em></h1>
-  <p class="demo-intro">Start hieronder en doorloop de situatie. U bouwt stap voor stap scenario's op — met uw eigen drivers als vertrekpunt.</p>
+  <h1>Jij kent de drivers.<br><em>Begrip.ai rekent ze door.</em></h1>
+  <p class="demo-intro">Managers weten wat hun business drijft — headcount, pipeline, prijsstelling. Begrip.ai vertaalt die kennis direct naar scenario's, zodat elke beslissing rust op iets wat jij begrijpt en kunt uitleggen.</p>
+
+  <div class="demo-try-callout">
+    <span>👇 Probeer het zelf</span>
+    <span class="try-arrow">→</span>
+    <span style="font-weight:500;opacity:0.88;">Je bent de nieuwe directeur van een fietsenwinkel. Gebruik de app hieronder.</span>
+  </div>
 
   <div class="demo-wrap">
     <div class="dashboard-mock" id="demoBrowser">
@@ -435,7 +467,7 @@
         <div class="mock-dot red"></div>
         <div class="mock-dot yellow"></div>
         <div class="mock-dot green"></div>
-        <span class="mock-title">Begrip.ai — Fortis Componenten B.V. &middot; Directie Dashboard &middot; FY 2026</span>
+        <span class="mock-title">Begrip.ai — De Fietsspecialist &middot; Directie Dashboard &middot; FY 2026</span>
         <div class="mock-live"><div class="mock-live-dot"></div><span class="mock-live-label">Live</span></div>
       </div>
 
@@ -451,27 +483,32 @@
           <!-- KPIs -->
           <div class="kpi-row">
             <div class="kpi" id="kpiA">
-              <div class="kpi-label">Omzet Q1</div>
-              <div class="kpi-value bad" id="kpiAval">€1,18M</div>
-              <div class="kpi-delta bad" id="kpiAdelta">↓ 18% vs vorig jaar</div>
+              <div class="kpi-label">Jaaromzet (prognose)</div>
+              <div class="kpi-value bad" id="kpiAval">€1,60M</div>
+              <div class="kpi-delta bad" id="kpiAdelta">↓ 12% vs vorig jaar</div>
             </div>
             <div class="kpi" id="kpiB">
-              <div class="kpi-label">EBITDA-marge</div>
-              <div class="kpi-value bad" id="kpiBval">2,8%</div>
-              <div class="kpi-delta bad" id="kpiBdelta">↓ van 9,2% vorig jaar</div>
+              <div class="kpi-label">Conversieratio totaal</div>
+              <div class="kpi-value bad" id="kpiBval">18%</div>
+              <div class="kpi-delta bad" id="kpiBdelta">↓ van 28% vorig jaar</div>
             </div>
             <div class="kpi" id="kpiC">
-              <div class="kpi-label" id="kpiClabel">Cashflow Q3 (prognose)</div>
-              <div class="kpi-value bad" id="kpiCval">−€92K</div>
-              <div class="kpi-delta bad" id="kpiCdelta">Tekort verwacht</div>
+              <div class="kpi-label" id="kpiClabel">Wekelijkse bezoekers</div>
+              <div class="kpi-value" id="kpiCval">340</div>
+              <div class="kpi-delta bad" id="kpiCdelta">↑ 9% — maar omzet daalt</div>
             </div>
           </div>
 
           <!-- Chart row -->
           <div class="chart-row">
             <div class="chart-box">
-              <div class="chart-box-label" id="chartLabel">Omzet per maand — huidig pad, geen scenario's actief</div>
-              <div class="bar-chart" id="demoChart"></div>
+              <div class="chart-box-label" id="chartLabel">Omzet per weekdag — huidig jaar</div>
+              <div class="bar-chart-wrap">
+                <div class="bar-chart" id="demoChart"></div>
+                <div class="bar-day-labels">
+                  <span>Ma</span><span>Di</span><span>Wo</span><span>Do</span><span>Vr</span><span>Za</span><span>Zo</span>
+                </div>
+              </div>
               <div class="chart-legend" id="chartLegend"></div>
             </div>
             <div class="chart-box">
@@ -488,17 +525,17 @@
               <thead>
                 <tr>
                   <th>Scenario</th>
-                  <th>Cashflow Q3</th>
-                  <th>EBITDA eind jaar</th>
-                  <th>Klantconcentratie</th>
+                  <th>Omzetimpact</th>
+                  <th>Conversie zaterdag</th>
+                  <th>Investering</th>
                 </tr>
               </thead>
               <tbody id="scenarioRows">
                 <tr class="row-current">
                   <td>Huidig pad</td>
-                  <td class="v-bad">−€92K</td>
-                  <td class="v-bad">2,8%</td>
-                  <td class="v-bad">38%</td>
+                  <td class="v-neutral">−</td>
+                  <td class="v-bad">14%</td>
+                  <td class="v-neutral">−</td>
                 </tr>
               </tbody>
             </table>
@@ -512,7 +549,7 @@
             <div class="hero-chat-avatar">AI</div>
             <div>
               <div class="hero-chat-header-text">Begrip.ai</div>
-              <div class="hero-chat-header-sub">Analyseert Fortis Componenten B.V.</div>
+              <div class="hero-chat-header-sub">Analyseert De Fietsspecialist</div>
             </div>
             <div class="h-online"></div>
           </div>
@@ -520,7 +557,7 @@
           <div class="hero-chat-msgs" id="demoChatMsgs">
             <div class="msg ai">
               <div class="msg-avatar">AI</div>
-              <div class="msg-bubble">Goedemiddag, directeur. Ik ben verbonden met de bedrijfsdata van Fortis Componenten B.V. en sta klaar om u te helpen het pad vooruit te bepalen. Waarmee kan ik u vandaag helpen?</div>
+              <div class="msg-bubble">Goedemiddag, directeur. Ik ben verbonden met de bedrijfsdata van De Fietsspecialist en sta klaar om je te helpen het pad vooruit te bepalen. Waarmee kan ik je vandaag helpen?</div>
             </div>
           </div>
 
@@ -540,8 +577,8 @@
     <!-- Completion overlay -->
     <div class="demo-complete-overlay" id="demoOverlay">
       <div class="demo-complete-check">✓</div>
-      <h2>U heeft zojuist gedaan wat managers met Begrip.ai dagelijks doen.</h2>
-      <p>Uw eigen drivers gebruikt om de toekomst door te rekenen — transparant, herleidbaar, in minuten. Klaar voor de volgende stap?</p>
+      <h2>Je hebt zojuist gedaan wat managers met Begrip.ai dagelijks doen.</h2>
+      <p>Jouw eigen drivers gebruikt om de toekomst door te rekenen — transparant, herleidbaar, in minuten. Klaar voor de volgende stap?</p>
       <a href="#evaluatie" class="btn-white">Wat betekent dit voor mij? →</a>
     </div>
   </div><!-- /demo-wrap -->
@@ -566,40 +603,40 @@
     <span class="journey-badge-num">2</span>
     Evaluatie
   </div>
-  <h2>Wat u zojuist heeft gedaan — en waarom het werkt</h2>
-  <p class="section-sub">Scenarioanalyse geeft managers vertrouwen in beslissingen omdat het redeneren transparant is. Geen black-box spreadsheet, maar uw eigen drivers die direct zichtbaar doorwerken in de uitkomst.</p>
+  <h2>De manager beslist. De AI rekent door.</h2>
+  <p class="section-sub">Finance levert een getal. Managers herkennen het niet, vertrouwen het niet, en nemen de beslissing toch op gevoel. Begrip.ai doorbreekt dat patroon: geen black-box spreadsheet, maar een transparante koppeling tussen wat jij besluit en wat dat financieel betekent.</p>
 
-  <!-- ── Recap van stap 1 ── -->
+  <!-- ── Hoe het werkt ── -->
   <div class="recap-wrap">
-    <div class="recap-label">Dit heeft u zojuist doorlopen in de demo</div>
+    <div class="recap-label">Zo werkt scenarioanalyse met Begrip.ai</div>
     <div class="recap-steps">
 
       <div class="recap-step">
-        <div class="recap-icon" style="background:#eff6ff; color:var(--primary);">📈</div>
+        <div class="recap-icon" style="background:#eff6ff; color:var(--primary);">🔍</div>
         <div class="recap-connector"></div>
-        <div class="recap-tag" style="background:var(--primary-light); color:var(--primary);">1a — Forecast</div>
-        <h4>AI maakte een prognose</h4>
-        <p>Op basis van de bedrijfsdata stelde Begrip.ai automatisch een financiële forecast op — omzet, EBITDA en cashflow voor het komende jaar.</p>
+        <div class="recap-tag" style="background:var(--primary-light); color:var(--primary);">1 — Analyse</div>
+        <h4>Wat zijn de belangrijkste blokkades?</h4>
+        <p>Begrip.ai analyseert de bedrijfsdata en graaft door tot de onderliggende drivers. Je ontvangt concrete signalen: wat remt de groei, waar zit het echte probleem, en waarom.</p>
       </div>
 
       <div class="recap-arrow">→</div>
 
       <div class="recap-step">
-        <div class="recap-icon" style="background:#fff7ed; color:#f59e0b;">🔍</div>
+        <div class="recap-icon" style="background:#fff7ed; color:#f59e0b;">💡</div>
         <div class="recap-connector" style="background:#f59e0b;"></div>
-        <div class="recap-tag" style="background:#fff7ed; color:#b45309;">1b — Analyse</div>
-        <h4>AI analyseerde en signaleerde</h4>
-        <p>Begrip.ai herkende drie kritieke signalen: dalende marge, klantconcentratie en dreigend cashflow-tekort — en koppelde ze terug aan de onderliggende drivers.</p>
+        <div class="recap-tag" style="background:#fff7ed; color:#b45309;">2 — Oplossingen bedenken</div>
+        <h4>Jij stelt de what-if vragen</h4>
+        <p>Op basis van de signalen bedenkt de manager samen met zijn team oplossingen. Wat kunnen we aanpakken? Jij en je team formuleren de opties.</p>
       </div>
 
       <div class="recap-arrow">→</div>
 
       <div class="recap-step">
-        <div class="recap-icon" style="background:#f5f3ff; color:#7c3aed;">🔀</div>
+        <div class="recap-icon" style="background:#f5f3ff; color:#7c3aed;">⚙️</div>
         <div class="recap-connector" style="background:#7c3aed;"></div>
-        <div class="recap-tag" style="background:#f5f3ff; color:#7c3aed;">2 — Scenario's</div>
-        <h4>U bedacht de alternatieven</h4>
-        <p>Als directeur stelde u twee what-if vragen — kosten snijden en nieuwe klanten werven. Begrip.ai rekende elk scenario door op cashflow, EBITDA en klantrisico.</p>
+        <div class="recap-tag" style="background:#f5f3ff; color:#7c3aed;">3 — Oplossingen doorrekenen</div>
+        <h4>AI rekent elk scenario door</h4>
+        <p>Begrip.ai werkt jouw alternatieven direct uit op de cijfers die ertoe doen — omzet, marge, cashflow. Elk scenario naast elkaar, transparant en herleidbaar.</p>
       </div>
 
       <div class="recap-arrow">→</div>
@@ -607,21 +644,21 @@
       <div class="recap-step">
         <div class="recap-icon" style="background:var(--accent-light); color:var(--accent);">✓</div>
         <div class="recap-connector" style="background:var(--accent);"></div>
-        <div class="recap-tag" style="background:var(--accent-light); color:#065f46;">3 — Beslissing</div>
-        <h4>U koos het beste pad</h4>
-        <p>Op basis van uw eigen drivers adviseerde Begrip.ai de combinatie — en u sloeg dat scenario op als benchmark. Voortaan weet u meteen wanneer de werkelijkheid afwijkt.</p>
+        <div class="recap-tag" style="background:var(--accent-light); color:#065f46;">4 — Beslissing</div>
+        <h4>Jij neemt de beslissing</h4>
+        <p>Met de doorgerekende scenario's voor je kies jij het beste pad — onderbouwd, uitlegbaar, en vastgelegd als benchmark. De beslissing is en blijft van jou.</p>
       </div>
 
     </div>
-    <div class="recap-cta-note">Elke stap was herleidbaar tot uw eigen drivers. Geen magie — uw kennis, doorgerekend.</div>
+    <div class="recap-cta-note">Vergelijk wat er echt toe doet — vóór de beslissing. Niet op gevoel, maar op jouw eigen drivers.</div>
   </div>
-  <!-- ── /Recap ── -->
+  <!-- ── /Hoe het werkt ── -->
 
   <div class="eval-cta">
-    <p class="eval-cta-q">Wil je de stappen nog een keer doorlopen — of liever zelf aan de slag?</p>
+    <p class="eval-cta-q">Wil je zien hoe dit werkt met een concreet bedrijfsscenario?</p>
     <div class="eval-btns">
-      <a href="#demo" class="btn-outline">← Herhaal de demo</a>
-      <a href="#zelfscan" class="btn-solid">Doe de zelfscan met mijn situatie →</a>
+      <a href="#demo" class="btn-solid">👆 Probeer de interactieve demo</a>
+      <a href="#zelfscan" class="btn-outline">Start met mijn eigen situatie →</a>
     </div>
   </div>
 </section>
@@ -644,76 +681,38 @@
     <span class="journey-badge-num">3</span>
     Zelfscan
   </div>
-  <h2>Breng uw eigen situatie in kaart</h2>
-  <p class="section-sub">Werk in 30 minuten uw eigen use case uit. De zelfscan helpt u de drivers te benoemen achter het probleem dat u wilt oplossen — als voorbereiding op het gesprek met uw Begrip consultant.</p>
+  <h2>Dit doe je op een papiertje — in 5 minuten.</h2>
+  <p class="section-sub">Je hoeft niets te downloaden of in te vullen. Pak een pen en beantwoord drie vragen. Dat is genoeg om een zinvol gesprek te hebben.</p>
 
   <div class="scan-grid">
     <div class="scan-card">
-      <div class="scan-icon">🎯</div>
+      <div class="scan-icon">1️⃣</div>
       <div>
-        <h4>Uw drie belangrijkste drivers</h4>
-        <p>Welke bedrijfsbeslissingen hebben de meeste impact op uw resultaat? U kent ze — de scan helpt ze te structureren.</p>
+        <h4>Wat zijn je twee grootste blokkades?</h4>
+        <p>Welke twee problemen remmen jouw bedrijf nu het meest? Schrijf ze op. Niet perfect — gewoon wat er in je opkomt.</p>
       </div>
     </div>
     <div class="scan-card">
-      <div class="scan-icon">💸</div>
+      <div class="scan-icon">2️⃣</div>
       <div>
-        <h4>De kosten van de huidige situatie</h4>
-        <p>Wat kost het u — in tijd, gemiste kansen, foute beslissingen — dat u nu zonder goede forecasting werkt?</p>
+        <h4>Bedenk per blokkade twee oplossingen</h4>
+        <p>Voor elke blokkade: wat zou je kunnen doen? Schrijf twee opties op. Het hoeven geen definitieve antwoorden te zijn — het gaat om het nadenken.</p>
       </div>
     </div>
     <div class="scan-card">
-      <div class="scan-icon">🔀</div>
+      <div class="scan-icon">3️⃣</div>
       <div>
-        <h4>Uw eerste what-if vraag</h4>
-        <p>Welke vraag zou u morgen stellen als u elk scenario in minuten kon doorrekenen? Dat wordt uw eerste use case.</p>
-      </div>
-    </div>
-    <div class="scan-card">
-      <div class="scan-icon">🤝</div>
-      <div>
-        <h4>Voorbereiding voor het gesprek</h4>
-        <p>Met de ingevulde scan kan uw Begrip consultant direct inhoudelijk starten — geen generieke demo, maar uw situatie.</p>
+        <h4>Wat levert het op als je ze oplost?</h4>
+        <p>Schat in wat het waard is voor je bedrijf als deze blokkades weg zijn. Meer omzet? Minder verlies? Betere beslissingen? Een ruwe schatting is prima.</p>
       </div>
     </div>
   </div>
 
-  <div class="form-box">
-    <h3>Ontvang de zelfscan</h3>
-    <p>Vul uw gegevens in en ontvang de zelfscan direct in uw inbox. Gratis, geen verplichtingen.</p>
-    <form id="scanForm" onsubmit="handleScanSubmit(event)">
-      <div class="form-row">
-        <div class="form-group">
-          <label for="scanNaam">Naam</label>
-          <input type="text" id="scanNaam" name="naam" required placeholder="Uw naam" />
-        </div>
-        <div class="form-group">
-          <label for="scanBedrijf">Organisatie</label>
-          <input type="text" id="scanBedrijf" name="bedrijf" placeholder="Bedrijfsnaam" />
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="scanEmail">E-mailadres</label>
-        <input type="email" id="scanEmail" name="email" required placeholder="u@bedrijf.nl" />
-      </div>
-      <div class="form-group">
-        <label for="scanRol">Uw rol</label>
-        <select id="scanRol" name="rol">
-          <option value="">Selecteer uw rol</option>
-          <option>Directeur / CEO</option>
-          <option>CFO / Finance Director</option>
-          <option>Head of FP&amp;A</option>
-          <option>Controller</option>
-          <option>Operationeel directeur</option>
-          <option>Andere</option>
-        </select>
-      </div>
-      <button type="submit" class="submit-btn" id="scanBtn">Stuur mij de zelfscan →</button>
-      <p class="form-note">Uw gegevens worden uitsluitend gebruikt om de zelfscan te sturen. Geen spam.</p>
-    </form>
-    <div class="success-msg" id="scanSuccess">
-      ✓ &nbsp;De zelfscan is onderweg. Controleer uw inbox (en eventueel uw spammap).
-    </div>
+  <div style="text-align:center; margin-top:40px; background:var(--bg-soft); border-radius:16px; padding:32px 28px; max-width:640px; margin-left:auto; margin-right:auto;">
+    <p style="font-size:1.05rem; font-weight:700; color:var(--text); margin-bottom:10px;">Klaar? Dan kunnen we aan de slag.</p>
+    <p style="font-size:0.93rem; color:var(--text-muted); margin-bottom:6px;">Jij hebt opgeschreven wat je belangrijkste blokkades zijn, wat mogelijke oplossingen zijn, en hoeveel het waard is om ze op te lossen. We kunnen direct inhoudelijk starten.</p>
+    <p style="font-size:0.93rem; color:var(--text-muted); margin-bottom:24px;">Vinden jij én wij het een mooie uitdaging? Dan plannen we een gratis workshop om samen de eerste scenario's door te rekenen.</p>
+    <a href="#intake" class="btn-solid" style="font-size:1rem; padding:15px 32px;">Plan je intake →</a>
   </div>
 </section>
 
@@ -728,70 +727,19 @@
 
 
 <!-- ══════════════════════════════════════════
-     STAP 4 — GRATIS WORKSHOP
+     STAP 4 — INTAKE
 ═══════════════════════════════════════════ -->
-<section id="workshop" class="cta-section">
+<section id="intake" class="cta-section">
   <div class="journey-badge" style="background:#0f172a; margin-bottom:32px;">
     <span class="journey-badge-num" style="background:rgba(255,255,255,0.15);">4</span>
-    Gratis workshop
+    Intake
   </div>
   <div class="cta-box">
-    <h2>Plan uw gratis workshop</h2>
-    <p>In een sessie van 45 minuten werken we samen uw eerste use case uit — van driver naar scenario naar beslissing. Het resultaat is een concreet voorstel voor de implementatie van Begrip.ai op uw situatie.</p>
-
-    <!-- Pre-qualification -->
-    <div class="preq-box">
-      <h3>Hoe u in aanmerking komt</h3>
-      <p>Om de workshop zo waardevol mogelijk te maken, beginnen we altijd met een kort intakegesprek van 30 minuten. Zo starten we de workshop met uw specifieke situatie — geen generiek verhaal.</p>
-      <div class="preq-step">
-        <div class="preq-num">1</div>
-        <div>
-          <strong>Plan een intakegesprek van 30 minuten</strong>
-          <p>Kies hieronder een moment. We bespreken uw use case, uw drivers en wat u wilt bereiken. Zo kunnen we de workshop volledig afstemmen op uw situatie.</p>
-        </div>
-      </div>
-      <div class="preq-step">
-        <div class="preq-num">2</div>
-        <div>
-          <strong>U ontvangt een bevestiging + voorbereiding</strong>
-          <p>Na het gesprek sturen we u een korte voorbereiding: wat u meeneemt naar de workshop en wat u kunt verwachten.</p>
-        </div>
-      </div>
-      <div class="preq-step">
-        <div class="preq-num">3</div>
-        <div>
-          <strong>Workshop — uw eerste use case live</strong>
-          <p>In 45 minuten werken we uw situatie volledig uit: van uw drivers naar een werkend scenario en een concreet implementatieplan.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="workshop-steps">
-      <div class="ws-step">
-        <div class="ws-num">A</div>
-        <div>
-          <strong>Use case verdiepen</strong>
-          <p>We nemen uw zelfscan door en identificeren de drivers achter uw probleem.</p>
-        </div>
-      </div>
-      <div class="ws-step">
-        <div class="ws-num">B</div>
-        <div>
-          <strong>Scenario's live doorrekenen</strong>
-          <p>Op basis van uw data draaien we live de eerste what-if — zodat u ziet hoe het werkt voor uw situatie.</p>
-        </div>
-      </div>
-      <div class="ws-step">
-        <div class="ws-num">C</div>
-        <div>
-          <strong>Concreet implementatieplan</strong>
-          <p>U verlaat de workshop met een concreet plan en een voorstel voor de eerste use case op Begrip.ai.</p>
-        </div>
-      </div>
-    </div>
+    <h2>Plan je intake — 30 minuten, geen verplichtingen.</h2>
+    <p>Jij hebt opgeschreven wat je belangrijkste blokkades zijn, hoeveel het waard is om ze op te lossen, en welke oplossingen je al voor ogen hebt. Wij komen inhoudelijk voorbereid. Vinden jij én wij het een mooie uitdaging? Dan plannen we een gratis workshop om samen de eerste scenario's door te rekenen.</p>
 
     <!-- Calendly -->
-    <p style="text-align:center;font-size:0.9rem;font-weight:600;color:var(--text-muted);margin-bottom:16px;">Kies hieronder een moment voor het intakegesprek van 30 minuten</p>
+    <p style="text-align:center;font-size:0.9rem;font-weight:600;color:var(--text-muted);margin-bottom:16px;">Kies hieronder een moment</p>
     <div class="calendly-inline-widget" data-url="https://calendly.com/wouter-delken/30min" style="min-width:280px;height:660px;margin-top:8px;border-radius:10px;overflow:hidden;"></div>
     <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
   </div>
@@ -814,53 +762,52 @@ var demoBusy = false;
 var demoCurrentStage = 0;
 
 /* ── Chart configurations ── */
+/* Bars represent Mon–Sun (7 days). Saturday = index 5 (hi class = spotlight) */
 var charts = {
   0: {
-    label: "Omzet per maand — huidig pad, geen scenario's actief",
+    label: "Omzet per weekdag — huidig jaar",
     bars: [
-      {h:80,cls:''},{h:72,cls:''},{h:62,cls:''},{h:54,cls:''},
-      {h:46,cls:'hi'},{h:38,cls:'forecast'},{h:30,cls:'forecast'}
+      {h:28,cls:''},{h:22,cls:''},{h:25,cls:''},{h:38,cls:''},
+      {h:58,cls:''},{h:82,cls:''},{h:46,cls:''}
     ],
     legend: [
-      {color:'var(--primary)',op:0.55,label:'Werkelijk'},
-      {color:'var(--primary)',op:0.35,label:'Prognose huidig pad'}
+      {color:'var(--primary)',op:0.55,label:'Omzet per weekdag'}
     ]
   },
   2: {
-    label: "Vrije cashflow per maand — huidig pad",
+    label: "Omzet per weekdag — huidig jaar",
     bars: [
-      {h:62,cls:''},{h:56,cls:''},{h:48,cls:''},{h:40,cls:''},
-      {h:30,cls:'hi'},{h:14,cls:'warn-bar'},{h:5,cls:'neg'}
+      {h:28,cls:''},{h:22,cls:''},{h:25,cls:''},{h:38,cls:''},
+      {h:58,cls:''},{h:82,cls:'warn-bar'},{h:46,cls:''}
     ],
     legend: [
-      {color:'var(--primary)',op:0.55,label:'Gezonde cashflow'},
-      {color:'#f59e0b',op:0.75,label:'Krap'},
-      {color:'#ef4444',op:0.75,label:'Tekort'}
+      {color:'var(--primary)',op:0.55,label:'Omzet per weekdag'},
+      {color:'#f59e0b',op:0.75,label:'Zaterdag — hoge omzet, maar 14% conversie vs 28% normaal'}
     ]
   },
   3: {
-    label: "Cashflow — Scenario 1: 12% kostenbesparing",
+    label: "Scenario 1 — extra bezetting zaterdag",
     bars: [
-      {h:62,cls:'s1'},{h:58,cls:'s1'},{h:55,cls:'s1'},{h:52,cls:'s1'},
-      {h:50,cls:'s1 hi'},{h:46,cls:'s1'},{h:44,cls:'s1'}
+      {h:28,cls:'s1'},{h:22,cls:'s1'},{h:25,cls:'s1'},{h:38,cls:'s1'},
+      {h:58,cls:'s1'},{h:100,cls:'s1 hi'},{h:46,cls:'s1'}
     ],
-    legend: [{color:'#f59e0b',op:0.75,label:'Scenario 1 — kostenbesparing'}]
+    legend: [{color:'#f59e0b',op:0.75,label:'Scenario 1 — zaterdagomzet +22% door betere bezetting'}]
   },
   4: {
-    label: "Cashflow — Scenario 2: 3 nieuwe klanten",
+    label: "Scenario 2 — online proefrit-reserveringen",
     bars: [
-      {h:62,cls:'s2'},{h:60,cls:'s2'},{h:56,cls:'s2'},{h:52,cls:'s2'},
-      {h:44,cls:'s2 hi'},{h:40,cls:'s2'},{h:65,cls:'s2'}
+      {h:32,cls:'s2'},{h:26,cls:'s2'},{h:29,cls:'s2'},{h:44,cls:'s2'},
+      {h:64,cls:'s2'},{h:95,cls:'s2 hi'},{h:54,cls:'s2'}
     ],
-    legend: [{color:'var(--accent)',op:0.75,label:'Scenario 2 — nieuwe klanten'}]
+    legend: [{color:'var(--accent)',op:0.75,label:'Scenario 2 — online reserveringen verhogen conversie naar 26%'}]
   },
   5: {
-    label: "Cashflow — Optimaal scenario (combinatie)",
+    label: "✓ Optimaal scenario — combinatie",
     bars: [
-      {h:62,cls:'opt'},{h:60,cls:'opt'},{h:58,cls:'opt'},{h:56,cls:'opt'},
-      {h:54,cls:'opt hi'},{h:52,cls:'opt'},{h:64,cls:'opt'}
+      {h:34,cls:'opt'},{h:28,cls:'opt'},{h:31,cls:'opt'},{h:46,cls:'opt'},
+      {h:66,cls:'opt'},{h:100,cls:'opt hi'},{h:56,cls:'opt'}
     ],
-    legend: [{color:'var(--accent)',op:0.85,label:'✓ Optimaal scenario — cashflow positief heel jaar'}]
+    legend: [{color:'var(--accent)',op:0.85,label:'✓ Combinatie: zaterdagconversie 28%, omzet +20%'}]
   }
 };
 
@@ -946,14 +893,15 @@ function setBtns(btns) {
   });
 }
 
-function addScenarioRow(name, cf, ebitda, klant, rowCls) {
-  var cfCls = cf.indexOf('−') === 0 ? 'v-bad' : cf.indexOf('+') === 0 ? 'v-good' : 'v-neutral';
-  var eCls  = parseFloat(ebitda) >= 6 ? 'v-good' : parseFloat(ebitda) >= 4 ? 'v-neutral' : 'v-bad';
-  var kCls  = parseInt(klant) <= 25 ? 'v-good' : 'v-bad';
+function addScenarioRow(name, omzet, conversie, invest, rowCls) {
+  var c1 = omzet.indexOf('+') === 0 ? 'v-good' : omzet === '−' ? 'v-neutral' : 'v-bad';
+  var convNum = parseFloat(conversie);
+  var c2 = convNum >= 26 ? 'v-good' : convNum >= 20 ? 'v-neutral' : 'v-bad';
+  var c3 = invest === '€0' ? 'v-good' : invest === '−' ? 'v-neutral' : 'v-neutral';
   var tbody = document.getElementById('scenarioRows');
   var tr = document.createElement('tr');
   if (rowCls) tr.className = rowCls;
-  tr.innerHTML = '<td>'+name+'</td><td class="'+cfCls+'">'+cf+'</td><td class="'+eCls+'">'+ebitda+'</td><td class="'+kCls+'">'+klant+'</td>';
+  tr.innerHTML = '<td>'+name+'</td><td class="'+c1+'">'+omzet+'</td><td class="'+c2+'">'+conversie+'</td><td class="'+c3+'">'+invest+'</td>';
   tbody.appendChild(tr);
 }
 
@@ -962,46 +910,49 @@ var stages = {
   1: {
     userMsg: "Hoe staat het bedrijf ervoor?",
     delay: 950,
-    aiMsg: "Ik heb de data geanalyseerd en stel een forecast op. Er zijn drie signalen die direct aandacht vragen:<br><br>▸ <strong>Inkoopkosten +23%</strong> — EBITDA daalde van 9,2% naar 2,8%.<br>▸ <strong>Twee klanten (38% van omzet)</strong> schroefden hun orders 40% terug.<br>▸ <strong>Cashflow Q3 prognose: −€92K</strong> — op het huidige pad, zonder bijsturing.",
+    aiMsg: "Ik heb de data geanalyseerd. Drie signalen vragen direct aandacht:<br><br>▸ <strong>Bezoekers +9%</strong> maar omzet daalt toch met 12% — meer mensen komen binnen, maar minder kopen.<br>▸ <strong>Conversie gedaald van 28% naar 18%</strong> — en dit speelt vooral op één dag van de week.<br>▸ <strong>Zaterdag levert 43% van de weekomzet</strong> — maar heeft de laagste conversie van alle weekdagen: 14%.",
     dashFn: null,
     progress: 16,
-    btns: [{ label: "📊 Toon de cashflow-grafiek", to: 2 }]
+    btns: [{ label: "📊 Toon de omzet per weekdag", to: 2 }]
   },
   2: {
-    userMsg: "Toon de cashflow-grafiek",
-    delay: 800,
-    aiMsg: "Dit is de verwachte vrije cashflow per maand — zonder aanpassingen. In <strong>augustus dreigt −€92K</strong>. De oranje en rode staven zijn de kritieke maanden. Een vertraging in betalingen maakt dit acuut.",
+    userMsg: "Toon de omzet per weekdag",
+    delay: 900,
+    aiMsg: "Zaterdag is veruit de drukste dag — maar ook de dag met de laagste conversie. De bezettingsdata verklaart waarom: op zaterdag staan er gemiddeld <strong>3 medewerkers</strong> op de vloer, terwijl er op vrijdag 6 lopen. Op zaterdag verlaten wekelijks <strong>60+ klanten de winkel zonder aankoop</strong> na een wachttijd van meer dan 20 minuten.",
     dashFn: function() {
       renderChart(2);
-      setInsight("Zonder ingreep: cashflow negatief aug–sep. Geen actieve scenario's om dit te keren.", "warn");
+      setInsight("Kernprobleem gevonden: zaterdagbezetting is te laag voor de vraag. 60+ klanten verlaten de winkel wekelijks zonder aankoop.", "warn");
+      document.getElementById('kpiClabel').textContent = 'Conversie zaterdag';
+      setKPI('C', "14%", "Benchmark: 28%", "");
+      document.getElementById('kpiC').className = 'kpi kpi-bad';
     },
     progress: 33,
-    btns: [{ label: "🔧 Scenario 1: stel we besparen 12% op kosten", to: 3 }]
+    btns: [{ label: "🔧 Scenario 1: 2 extra medewerkers op zaterdag", to: 3 }]
   },
   3: {
-    userMsg: "Scenario 1: stel we besparen 12% op kosten — wat verandert er?",
+    userMsg: "Scenario 1: stel we plannen 2 extra medewerkers in op zaterdag — wat verandert er?",
     delay: 1050,
-    aiMsg: "Scenario 1 — <strong>Kostenbesparing 12%</strong>: cashflow stabiliseert op <strong>+€18K in Q3</strong>. EBITDA herstelt naar <strong>5,4%</strong>. Uitvoerbaar binnen 6 weken.<br><br>Maar: de dalende omzet én de klantconcentratie van 38% blijven onaangepakt. Dit scenario pakt het symptoom aan — niet de oorzaak.",
+    aiMsg: "Scenario 1 — <strong>2 extra medewerkers op zaterdag</strong> (verschoven van dinsdag en woensdag, geen extra loonkosten): zaterdagconversie stijgt van 14% naar geschatte <strong>24%</strong>. Omzetimpact: <strong>+€180K/jaar</strong>.<br><br>Maar: online oriënterende klanten — zo'n 35% van je bezoekers — reserveren nu bij een concurrent met een online boekingssysteem. Dat lek blijft onaangepakt.",
     dashFn: function() {
       renderChart(3);
       document.getElementById('scenarioTableWrap').style.display = 'block';
-      addScenarioRow("Scenario 1 — Kostenbesparing 12%", "+€18K", "5,4%", "38%", "");
-      setInsight("Scenario 1 stabiliseert de cashflow. Maar klantconcentratie (38%) blijft een structureel risico.", "");
-      setKPI('B', "5,4%", "↑ Scenario 1: hersteld", "neutral");
-      setKPI('C', "+€18K", "Scenario 1: stabiel Q3", "neutral");
+      addScenarioRow("Scenario 1 — Extra bezetting zaterdag", "+€180K", "24%", "€0", "");
+      setInsight("Scenario 1: zaterdagconversie stijgt van 14% naar 24%. Omzetimpact +€180K zonder extra loonkosten.", "");
+      setKPI('B', "24%", "↑ Scenario 1: zaterdag", "neutral");
+      setKPI('C', "+€180K", "Scenario 1 jaarimpact", "neutral");
     },
     progress: 50,
-    btns: [{ label: "🚀 Scenario 2: stel we werven 3 nieuwe klanten", to: 4 }]
+    btns: [{ label: "🚀 Scenario 2: online proefrit-reserveringen toevoegen", to: 4 }]
   },
   4: {
-    userMsg: "Scenario 2: stel we werven 3 nieuwe klanten à €220K — wat levert dat op?",
+    userMsg: "Scenario 2: stel we voegen online proefrit-reserveringen toe — wat levert dat op?",
     delay: 1100,
-    aiMsg: "Scenario 2 — <strong>3 nieuwe klanten (gem. €220K/jaar)</strong>: cashflow stijgt naar <strong>+€63K in Q4</strong>, EBITDA naar <strong>7,1%</strong>, klantconcentratie daalt van 38% naar 22%.<br><br>Maar: eerste omzet pas over 4–5 maanden. Sales-investering: €42K. In Q3 is de cashflow tijdelijk nog negatief.",
+    aiMsg: "Scenario 2 — <strong>Online proefrit-reserveringen</strong> (€12K investering): klanten die online reserveren converteren op <strong>45%</strong> vs 18% voor walk-ins. Geschat effect: <strong>+€140K/jaar</strong>. De wachttijd op zaterdag daalt ook — bezoekers hebben al een tijdslot gekozen.<br><br>Maar: zonder extra bezetting lost dit het personeelstekort op zaterdagochtend niet volledig op.",
     dashFn: function() {
       renderChart(4);
-      addScenarioRow("Scenario 2 — Nieuwe klanten (3×)", "+€63K (Q4)", "7,1%", "22%", "");
-      setInsight("Scenario 2 lost het omzetrisico op — maar vraagt geduld. Q3 cashflow is tijdelijk nog negatief.", "");
-      setKPI('B', "7,1%", "↑ Scenario 2 EOY", "neutral");
+      addScenarioRow("Scenario 2 — Online reserveringen", "+€140K", "26%", "€12K", "");
+      setInsight("Scenario 2: online bezoekers converteren op 45%. +€140K/jaar, maar zaterdagbezetting blijft een bottleneck.", "");
+      setKPI('B', "26%", "↑ Scenario 2 schatting", "neutral");
     },
     progress: 67,
     btns: [{ label: "⚖️ Welk scenario is het beste pad?", to: 5 }]
@@ -1009,15 +960,15 @@ var stages = {
   5: {
     userMsg: "Welk scenario is het beste pad?",
     delay: 1300,
-    aiMsg: "De <strong>combinatie</strong> werkt het best: 8% kostenbesparing (snelle maatregel) + acquisitie van 2 klanten.<br><br>Resultaat: cashflow Q3 <strong>+€28K</strong> &middot; EBITDA eind jaar <strong>6,9%</strong> &middot; klantconcentratie: 38% → 22%.<br><br>Dit zijn <em>uw</em> drivers — u kende ze al. Begrip.ai heeft ze alleen doorgerekend.",
+    aiMsg: "De <strong>combinatie</strong> werkt het best: 2 medewerkers verschuiven naar zaterdag + online reserveringen activeren.<br><br>Resultaat: omzet van €1,60M naar geschat <strong>€1,92M</strong> &middot; zaterdagconversie van 14% naar <strong>28%</strong> &middot; investering slechts €12K.<br><br>Dit zijn <em>jouw</em> drivers — jij kende ze al. Begrip.ai heeft ze alleen doorgerekend.",
     dashFn: function() {
       renderChart(5);
-      addScenarioRow("✓ Optimaal: combinatie", "+€28K", "6,9%", "22%", "row-opt");
-      setInsight("Optimaal scenario bepaald: cashflow gezond, EBITDA op koers, klantrisico verlaagd.", "ok");
-      setKPI('A', "€1,18M", "Basis voor bijsturing", "");
-      setKPI('B', "6,9%", "✓ Optimaal EOY", "good");
-      setKPI('C', "+€28K", "✓ Cashflow gezond Q3", "good");
-      document.getElementById('kpiA').className = 'kpi';
+      addScenarioRow("✓ Optimaal: combinatie", "+€320K", "28%", "€12K", "row-opt");
+      setInsight("Optimaal scenario: +20% omzet, zaterdagconversie verdubbeld. Investering €12K, terugverdientijd < 3 weken.", "ok");
+      setKPI('A', "€1,92M", "↑ +20% bij implementatie", "good");
+      setKPI('B', "28%", "✓ Conversie hersteld", "good");
+      setKPI('C', "+€320K", "✓ Doelstelling bereikt", "good");
+      document.getElementById('kpiA').className = 'kpi kpi-good';
       document.getElementById('kpiB').className = 'kpi kpi-good';
       document.getElementById('kpiC').className = 'kpi kpi-good';
     },
@@ -1027,12 +978,10 @@ var stages = {
   6: {
     userMsg: "Sla het optimale scenario op als benchmark",
     delay: 1000,
-    aiMsg: "Het combinatiescenario is opgeslagen als benchmark voor <strong>Fortis Componenten B.V.</strong> — gedateerd op vandaag.<br><br>Begrip.ai vergelijkt de actuals maandelijks met deze verwachting en signaleert zodra de werkelijkheid afwijkt van het gekozen pad.",
+    aiMsg: "Het combinatiescenario is opgeslagen als benchmark voor <strong>De Fietsspecialist</strong> — gedateerd op vandaag.<br><br>Begrip.ai vergelijkt de actuals maandelijks met deze verwachting en signaleert zodra de werkelijkheid afwijkt van het gekozen pad.",
     dashFn: function() {
-      /* Mark optimal row as saved */
       var rows = document.querySelectorAll('#scenarioRows tr.row-opt td:first-child');
       rows.forEach(function(td) { td.innerHTML = '💾 Opgeslagen: combinatie'; });
-      /* Show saved badge */
       var wrap = document.getElementById('scenarioTableWrap');
       var badge = document.createElement('div');
       badge.className = 'saved-badge';
@@ -1045,7 +994,7 @@ var stages = {
   7: {
     userMsg: "Wat is de volgende stap?",
     delay: 800,
-    aiMsg: "U heeft zojuist uw eerste scenarioanalyse doorlopen met uw eigen drivers. De volgende stap is dit te doen met uw eigen data. Scroll naar beneden om te starten.",
+    aiMsg: "Je hebt zojuist je eerste scenarioanalyse doorlopen met je eigen drivers. De volgende stap is dit te doen met jouw eigen data. Scroll naar beneden om te starten.",
     dashFn: null,
     progress: 100,
     btns: []
@@ -1095,7 +1044,7 @@ function demoFree() {
   addTyping();
   setTimeout(function() {
     removeTyping();
-    addMsg("Goede vraag. In uw eigen omgeving beantwoordt Begrip.ai dit direct vanuit uw bedrijfsdata. Gebruik de knoppen hieronder om de demo te doorlopen.", 'ai');
+    addMsg("Goede vraag. In jouw eigen omgeving beantwoordt Begrip.ai dit direct vanuit jouw bedrijfsdata. Gebruik de knoppen hieronder om de demo te doorlopen.", 'ai');
     demoBusy = false;
   }, 850);
 }
@@ -1103,7 +1052,7 @@ function demoFree() {
 /* ── Initialize chart ── */
 document.addEventListener('DOMContentLoaded', function() {
   renderChart(0);
-  setInsight("Geen scenario's actief. Ik heb de situatie geanalyseerd en kan helpen het pad vooruit te bepalen.", "");
+  setInsight("Geen scenario's actief. Ik heb de data geanalyseerd en kan helpen de juiste verbetering te vinden.", "");
 });
 
 /* ── File upload label ── */
