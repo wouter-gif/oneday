@@ -535,14 +535,11 @@ new ResizeObserver(reportHeight).observe(document.body);
 
 function saveWidgets(){
   localStorage.setItem('oneday_widgets', JSON.stringify(widgets));
-  // Also persist to Supabase via the /api/widgets endpoint
-  if(claudeApiKey){
-    fetch('/api/widgets', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ widgets })
-    }).catch(()=>{/* silent – localStorage is the source of truth */});
-  }
+  fetch('/api/widgets', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ widgets })
+  }).catch(()=>{/* silent – localStorage is the source of truth */});
 }
 
 function applyWidgetAction(def){
