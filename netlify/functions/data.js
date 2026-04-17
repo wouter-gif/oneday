@@ -77,6 +77,7 @@ exports.handler = async function (event) {
         dot:      s.dot,
         desc:     s.description,
         prjNote:  s.prj_note,
+        mktNote:  s.mkt_note,
         rAdj:     adjs.map(a => a.r_adj),
         cAdj:     adjs.map(a => a.c_adj),
         lbAdj:    adjs.map(a => a.lb_adj),
